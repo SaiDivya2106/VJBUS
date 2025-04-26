@@ -1,0 +1,231 @@
+/* FileUpload.css */
+
+/* --- Page Container & Background --- */
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: calc(100vh - 120px); /* Adjust as needed */
+    width: 100%;
+    padding: 50px 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background-color: #EDEBD9; /* Light Beige/Khaki Page Background */
+  }
+  
+  /* --- Upload Card (Overlay) --- */
+  .overlay1 {
+    background-color: #EBECFF; /* Pale Lavender/Blue Card */
+    border-radius: 25px;
+    margin-top: 50px;
+    padding: 45px 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 750px;
+    text-align: center;
+    margin-bottom: 40px;
+    z-index: 1;
+    box-sizing: border-box;
+  }
+  
+  /* --- Card Content --- */
+  .overlay1 h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #0d1b2a;
+    margin: 0 0 35px 0;
+    text-align: center;
+  }
+  
+  /* --- Upload Form --- */
+  .upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    text-align: left;
+  }
+  
+  /* --- Form Group --- */
+  .form-group1 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* --- Form Labels --- */
+  .form-group1 label {
+    font-weight: 600;
+    color: #495057; /* Darker grey label */
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+  
+  /* --- Form Inputs, Textarea, Select --- */
+  .upload-form input[type="text"],
+  .upload-form textarea,
+  .upload-form select {
+    width: 100%;
+    background-color: #ffffff; /* Keep input background white */
+    color: #495057;
+    border: 1px solid #000000; /* UPDATED: Black border */
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .upload-form select {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"%3E%3Cpath fill="%236c757d" d="M2 0l4 4-4 4V0z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 7px 7px;
+    padding-right: 30px;
+    cursor: pointer;
+  }
+  
+  .upload-form textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  /* Focus state for inputs */
+  .upload-form input[type="text"]:focus,
+  .upload-form textarea:focus,
+  .upload-form select:focus {
+    border-color: #86b7fe; /* Keep blue focus border color */
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Keep blue focus shadow */
+  }
+  
+  /* Disabled state */
+  .upload-form input[type="text"]:disabled,
+  .upload-form textarea:disabled,
+  .upload-form select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+    border-color: #555555; /* UPDATED: Dark gray border for disabled */
+  }
+  
+  /* --- React Select Customization --- */
+  .form-group1 > div[class*="-container"] {
+     color: #495057;
+  }
+  /* Style react-select control to match other inputs */
+  .form-group1 .css-control { /* Example selector, adjust if needed */
+    border: 1px solid #000000 !important; /* UPDATED: Black border */
+    border-radius: 8px !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    min-height: calc(1.5em + 0.75rem + 14px); /* Approx. match padding */
+    padding: 1px 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .form-group1 .css-control--is-disabled { /* Target disabled state specifically */
+      background-color: #e9ecef !important;
+      border-color: #555555 !important; /* UPDATED: Dark gray border for disabled */
+  }
+  .form-group1 .css-control--is-focused {
+    border-color: #86b7fe !important; /* Keep blue focus border color */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; /* Keep blue focus shadow */
+  }
+  /* Adjust placeholder color */
+  .form-group1 .css-placeholder {
+    color: #6c757d !important;
+  }
+  
+  /* --- Submit Button --- */
+  .upload-form .btn.btn-primary.nav-link {
+    background-color: #17a2b8; /* Teal button */
+    border: none;
+    color: #ffffff;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    width: auto;
+    margin: 20px auto 0 auto;
+    max-width: 200px;
+  }
+  
+  .upload-form .btn.btn-primary.nav-link:hover:not(:disabled) {
+    background-color: #138496;
+    color: #ffffff;
+  }
+  
+  .upload-form .btn.btn-primary.nav-link:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* --- Responsiveness --- */
+  @media (max-width: 992px) {
+    .overlay1 {
+      max-width: 650px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upload-container {
+      padding: 30px 15px;
+      min-height: calc(100vh - 100px);
+    }
+    .overlay1 {
+      padding: 35px 25px;
+      max-width: 95%;
+    }
+    .overlay1 h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+    .upload-form {
+      gap: 18px;
+    }
+     .upload-form .btn.btn-primary.nav-link {
+        width: 100%;
+        max-width: 300px;
+     }
+  }
+  
+  @media (max-width: 576px) {
+    .upload-container {
+      padding: 20px 10px;
+    }
+    .overlay1 {
+      border-radius: 15px;
+      padding: 25px 15px;
+    }
+    .overlay1 h1 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+    }
+    .upload-form {
+      gap: 15px;
+    }
+    .upload-form input[type="text"],
+    .upload-form textarea,
+    .upload-form select {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+    .upload-form select {
+       padding-right: 30px;
+    }
+    .upload-form .btn.btn-primary.nav-link {
+       font-size: 0.95rem;
+       padding: 10px 20px;
+       max-width: none;
+       width: 100%;
+    }
+  }

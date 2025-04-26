@@ -1,0 +1,107 @@
+/* Container for Navbar */
+.navbar-container {
+    background-color: #1C1F4C; /* Updated color */
+  }
+  
+  /* Navbar Section */
+  .navbar {
+    display: flex;
+    width: 100%;
+    padding: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Logo and Navigation Links in Single Div */
+  .navbar-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Ensure the div occupies the full width */
+  }
+  
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    white-space: nowrap; /* Prevent breaking to the next line */
+  }
+  
+  /* Desktop Navigation */
+  .desktop-nav {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem; /* Space between nav items */
+    width: 100%;
+  }
+  
+  /* Nav Links */
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  /* Navigation Link Hover Effect */
+  .nav-links .group a {
+    position: relative;
+    color: white;
+    padding: 0.5rem;
+  }
+  
+  .nav-links .group a:hover {
+    text-decoration: underline;
+  }
+  
+  .nav-links .group a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s;
+  }
+  
+  .nav-links .group a:hover::after {
+    width: 100%;
+  }
+  
+  /* Mobile Menu */
+  .mobile-nav {
+    position: absolute;
+    top: 12px;
+    right: 0;
+    width: 250px;
+    height: 100vh;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s ease-in-out;
+  }
+  
+  /* Flexbox for Desktop Menu */
+  @media (min-width: 768px) {
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+  
+  /* Mobile Dropdown Animation */
+  @media (max-width: 767px) {
+    .mobile-nav {
+      clip-path: inset(0% 100% 0% 0%);
+      opacity: 0;
+      z-index: -1;
+    }
+  
+    .mobile-nav.active {
+      clip-path: inset(0% 0% 0% 0%);
+      opacity: 1;
+      z-index: 50;
+    }
+  }
+  

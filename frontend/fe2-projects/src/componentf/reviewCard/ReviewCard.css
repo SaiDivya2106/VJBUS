@@ -1,0 +1,35 @@
+/* .project-card {
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    box-shadow: 4px 4px 10px #b0b0b0, -4px -4px 10px #ffffff;
+    border-radius: 15px;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    height: 45vh;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 15px #a0a0a0, -6px -6px 15px #ffffff;
+  }
+  
+  .card-title {
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  .card-subtitle {
+    font-style: italic;
+  }
+  
+  .card-text {
+    color: #555555;
+  }
+  
+  .rating-badge {
+    background-color: #007bff;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: white;
+  } */

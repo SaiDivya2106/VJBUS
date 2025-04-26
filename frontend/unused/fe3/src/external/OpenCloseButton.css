@@ -1,0 +1,107 @@
+  #btn {
+    position: absolute;
+    width: 8vw;
+    height: 50px;
+    top: 50%;
+    left: 6%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    background-color: hsl(0, 0%, 100%);
+    border-radius: 10px;
+    border: none;
+    outline: none;
+  }
+  
+  .line {
+    position: absolute;
+    width: 40px;
+    left: 0.6vw;
+    top: 3.5vh;
+    height: 4px;
+    background: hsl(0, 0%, 15%);
+    border-radius: 2px;
+    transition: all 0.3s linear;
+  }
+  
+  #btn.on:hover .line::before {
+    width: 100%;
+  }
+  
+  .line::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 100%;
+    top: 0;
+    right: 0;
+    background: hsl(0, 0%, 50%);
+    transition: all 0.3s linear;
+  }
+  
+  .line1.on {
+    animation: span-first-on 0.5s ease-in-out forwards;
+    
+  }
+  
+  .line1.off {
+    animation: span-first-off 0.5s ease-in-out forwards;
+  }
+  
+  .line2.on {
+    animation: span-second-on 0.5s ease-in-out forwards;
+  }
+  
+  .line2.off {
+    animation: span-second-off 0.5s ease-in-out forwards;
+  }
+  
+  .line3.on {
+    animation: span-third-on 0.5s ease-in-out forwards;
+  }
+  
+  .line3.off {
+    animation: span-third-off 0.5s ease-in-out forwards;
+  }
+  
+  @keyframes span-first-on {
+    0% { transform: translateY(-300%); }
+    30% { transform: translateY(-50%); }
+    100% { transform: translateY(-50%) rotate(-45deg); }
+  }
+  
+  @keyframes span-first-off {
+    0% { transform: translateY(-50%) rotate(-45deg); }
+    30% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-300%); }
+  }
+  
+  @keyframes span-second-on {
+    0% { transform: translateY(-50%); }
+    25% { background: hsl(0, 0%, 50%); }
+    50% { transform: translateY(-50%) scale(1); }
+    100% { transform: translateX(-100%) scale(0); }
+  }
+  
+  @keyframes span-second-off {
+    0% { transform: translateX(-100%) scale(0); }
+    25% { background: hsl(0, 0%, 50%); }
+    50% { transform: translateY(-50%) scale(1); }
+    100% { transform: translateY(-50%); }
+  }
+  
+  @keyframes span-third-on {
+    0% { transform: translateY(200%); }
+    30% { transform: translateY(-50%); }
+    100% { transform: translateY(-50%) rotate(45deg); }
+  }
+  
+  @keyframes span-third-off {
+    0% { transform: translateY(-50%) rotate(45deg); }
+    30% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(200%); }
+  }
+#men{
+    font-size: 20px;
+    margin-left: 3vw;
+    font-weight: bold;
+}

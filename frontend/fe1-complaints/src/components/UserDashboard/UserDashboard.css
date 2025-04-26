@@ -1,0 +1,338 @@
+/* UserDashboard Specific Styling */
+.user-dashboard-container {
+  padding: 2rem;
+  background-color: #f5f5f5; /* Slightly darker light gray background */
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+}
+
+.no-complaints-message {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #666;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.raise-complaint-btn {
+  background-color: #2336df;
+}
+
+.tdu {
+  margin-left: 13.5rem;
+}
+
+/* Page Heading */
+.user-dashboard-container .page-heading {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.user-dashboard-container .page-heading h1 {
+  font-size: 2.5rem;
+  color: #455a64; /* Darker gray for headings */
+  margin-bottom: 0.5rem;
+}
+
+.user-dashboard-container .page-heading p {
+  font-size: 1.2rem;
+  color: #607d8b; /* Medium gray for subtext */
+}
+
+/* User Info Section */
+.user-dashboard-container .user-info {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #7250ad, #5481ad);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.user-dashboard-container .user-avatar {
+  margin-right: 1rem;
+}
+
+.user-dashboard-container .user-avatar svg {
+  color: white;
+}
+
+.user-dashboard-container .user-details h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-dashboard-container .user-details p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* My Complaints Heading */
+.user-dashboard-container .my-complaints-heading {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.user-dashboard-container .my-complaints-heading h2 {
+  font-size: 2rem;
+  color: #455a64; /* Darker gray for headings */
+  border-bottom: 2px solid #7e57c2; /* Slightly darker purple border */
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+/* Complaints Cards Section */
+.user-dashboard-container .complaints-cards {
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Complaint Card */
+.user-dashboard-container .complaint-card {
+  border: none;
+  border-radius: 15px;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 380px;
+  min-height: 280px;
+}
+
+.user-dashboard-container .complaint-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.user-dashboard-container .card-body {
+  padding: 1.5rem;
+}
+
+.user-dashboard-container .card-title {
+  color: #455a64; /* Darker gray for titles */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  margin-top: 8px;
+}
+
+.user-dashboard-container .card-subtitle {
+  color: #607d8b; /* Medium gray for subtitles */
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.user-dashboard-container .vote-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.user-dashboard-container .vote-section span {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #546e7a; /* Medium gray for vote counts */
+}
+
+.user-dashboard-container .thumbs-icon {
+  margin-right: 0.5rem;
+  color: #42a5f5; /* Slightly darker blue for icons */
+  font-size: 1.2rem;
+}
+
+.user-dashboard-container .thumbs-icon:hover {
+  color: #1e88e5; /* Darker blue on hover */
+}
+
+/* Button Styling */
+.user-dashboard-container .btn-primary {
+  background-color: #8555d8; /* Slightly darker purple */
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.user-dashboard-container .btn-primary:hover {
+  background-color: #673ab7; /* Darker purple on hover */
+}
+
+/* Status Badge Styling */
+.user-dashboard-container .status-badge {
+  float: inline-end;
+}
+
+.user-dashboard-container .status {
+  padding: 0.2rem 0.5rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.cs {
+  margin-bottom: 2px;
+}
+
+.user-dashboard-container .status.ongoing {
+  background-color: #70c4e5;
+  color: #000;
+}
+
+.user-dashboard-container .status.pending {
+  background-color: rgb(94, 174, 240);
+  color: #fff;
+}
+
+.user-dashboard-container .status.resolved {
+  background-color: #28a745;
+  color: #fff;
+}
+
+/* Admin Updates Section */
+.admin-updates {
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.updates-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.updates-container {
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.update-entry {
+  background-color: #f8f9fa;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  border-left: 3px solid #007bff;
+}
+
+.update-text {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.update-time {
+  font-size: 12px;
+  color: #666;
+  display: block;
+  text-align: right;
+}
+
+.no-updates {
+  font-size: 14px;
+  color: #888;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-dashboard-container .page-heading h1 {
+      font-size: 2rem;
+  }
+
+  .user-dashboard-container .page-heading p {
+      font-size: 1rem;
+  }
+
+  .user-dashboard-container .user-details h2 {
+      font-size: 1.5rem;
+  }
+
+  .user-dashboard-container .user-details p {
+      font-size: 0.9rem;
+  }
+
+  .user-dashboard-container .my-complaints-heading h2 {
+      font-size: 1.75rem;
+  }
+
+  .user-dashboard-container .card-title {
+      font-size: 1.25rem;
+  }
+
+  .user-dashboard-container .card-subtitle {
+      font-size: 0.9rem;
+  }
+
+  .user-dashboard-container .vote-section span {
+      font-size: 0.9rem;
+  }
+
+  .user-dashboard-container .btn-primary {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+  }
+
+  /* Complaints Cards Section */
+  .user-dashboard-container .complaints-cards {
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+  }
+
+  .user-dashboard-container .complaint-card {
+      width: 100%; /* Full width for mobile */
+      max-width: 380px; /* Limit the width */
+  }
+
+  .user-dashboard-container .vote-section {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .admin-updates {
+      padding: 8px;
+  }
+
+  .update-entry {
+      padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further adjustments for very small screens */
+  .user-dashboard-container .page-heading h1 {
+      font-size: 1.8rem;
+  }
+
+  .user-dashboard-container .user-info {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .user-dashboard-container .user-avatar {
+      margin-bottom: 1rem;
+  }
+
+  .user-dashboard-container .complaints-cards {
+      padding: 0;
+  }
+}
+
+
+.td{
+  margin-left: 65%;
+}

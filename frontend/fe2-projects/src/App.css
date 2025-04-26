@@ -1,0 +1,49 @@
+/* .App {
+  text-align: center;
+}
+
+.head1{
+  background-color: rgb(62, 7, 7);
+  color: white;
+}
+
+.head1 ul{
+  list-style-type:none;
+  display: flex;
+  gap: 8px;
+  padding-right: 5px;
+}
+
+.img1{
+  width: 30px;
+  height: 30px;
+} */
+
+/* index.css or styles.css */
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Posts</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+<body>
+    <h1>VNR WALL</h1>
+    <h2>Reported Job/Internship Messages</h2>
+
+    <!-- "Submit for Review" Button -->
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfKSfY19CpacWTETh1Nn3A6jpByFuwsbZkF2IIWzbqIltwf5w/viewform" target="_blank" class="submit-button">
+        Submit a new Message for Review
+    </a>
+
+    <!-- Filter by Category -->
+    <select id="filterCategory">
+        <option value="">All Categories</option>
+        {% for category in df["Message Category"].unique() %}
+            <option value="{{ category }}">{{ category }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Filter by Verification Status -->
+    <select id="filterStatus">
+        <option value="">All Statuses</option>
+        <option value="Under Review">🚀 Under Review</option>
+        <option value="Genuine">✅ Genuine</option>
+        <option value="Fake">❌ Fake</option>
+    </select>
+
+    <!-- Search Box -->
+    <input type="text" id="searchInput" placeholder="Search by Name, Source, or Keywords...">
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Source</th>
+                <th>Scam Indicators</th>
+                <th>Additional Information</th>
+                <th>Verification Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in df.iterrows() %}
+            <tr data-category="{{ row['Message Category'] }}" data-status="{{ row['Verification Status'] }}">
+                <td>{{ row["Name"] }}</td>
+                <td>{{ row["Message Category"] }}</td>
+                <td>{{ row["Message Source"] }}</td>
+                <td>
+                    <ul>
+                        {% for indicator in row["Scam Indicators"].split(",") %}
+                            <li>{{ indicator.strip() }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="multi-line">{{ row["Additional Info"] }}</td>
+                <td>
+                    {% if row["Verification Status"] == "Under Review" %}
+                        🚀 Under Review
+                    {% elif row["Verification Status"] == "Genuine" %}
+                        ✅ Genuine
+                    {% elif row["Verification Status"] == "Fake" %}
+                        ❌ Fake
+                    {% else %}
+                        🚀 Under Review
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            // Filter by Category
+            $("#filterCategory").on("change", function() {
+                var category = $(this).val().toLowerCase();
+                $("tbody tr").each(function() {
+                    var rowCategory = $(this).data("category").toLowerCase();
+                    if (category === "" || rowCategory === category) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Filter by Verification Status
+            $("#filterStatus").on("change", function() {
+                var status = $(this).val().toLowerCase();
+                $("tbody tr").each(function() {
+                    var rowStatus = $(this).data("status").toLowerCase();
+                    if (status === "" || rowStatus === status) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Search by Text
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("tbody tr").each(function() {
+                    var text = $(this).text().toLowerCase();
+                    if (text.indexOf(value) > -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

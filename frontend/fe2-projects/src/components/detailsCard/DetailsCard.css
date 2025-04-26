@@ -1,0 +1,77 @@
+.project-box {
+  border: 1px solid #ccc;
+  padding: 15px;  /* Reduced padding for smaller cards */
+  background-color: #f4f6f9;  /* Light background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Soft shadow */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 300px;  /* Reduced minimum height */
+  margin-bottom: 15px;  /* Reduced space between cards */
+}
+
+.project-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;  /* Allow project details section to take up remaining space */
+}
+
+.project-details h5 {
+  font-size: 0.9rem;  /* Reduced font size */
+  margin: 5px 0;  /* Adjusted margin for smaller spacing */
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;  /* Align the chart container at the bottom */
+}
+
+.percentage-chart {
+  margin: auto;
+}
+
+.text-start {
+  text-align: left;
+}
+
+.m-1 {
+  margin: 4px;  /* Reduced margin between elements */
+}
+
+.p-2 {
+  padding: 8px;  /* Reduced padding */
+}
+
+.shadow-lg {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  /* Reduced shadow size */
+}
+
+.project-list {
+  display: flex;
+  flex-wrap: wrap;  /* Allow cards to wrap to the next line */
+  gap: 15px;  /* Reduced gap between cards */
+}
+
+.col-md-4 {
+  flex: 1 1 25%;  /* Each card now takes up 25% width for 4 cards per row */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px;
+}
+
+@media (max-width: 1024px) {
+  .col-md-4 {
+    flex: 1 1 40%;  /* Adjust card width for medium screens (2-3 cards per row) */
+  }
+}
+
+@media (max-width: 768px) {
+  .col-md-4 {
+    flex: 1 1 100%;  /* 1 card per row on smaller screens */
+  }
+}

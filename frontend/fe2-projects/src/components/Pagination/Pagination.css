@@ -1,0 +1,25 @@
+/* src/components/Pagination/Pagination.css */
+
+/* Add custom styling if Bootstrap's default isn't sufficient */
+/* Example: */
+.pagination {
+    /* margin-top: 30px !important; */
+    /* margin-bottom: 30px !important; */
+}
+
+.pagination .page-link {
+    cursor: pointer; /* Indicate clickable */
+    /* Customize colors/fonts */
+}
+
+.pagination .page-item.disabled .page-link {
+    cursor: not-allowed; /* Indicate not clickable */
+}
+
+/* Style for the disabled page number span */
+.pagination .page-item.disabled .page-link.text-dark {
+    /* Override text-dark if needed */
+    /* color: #6c757d !important; */
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}

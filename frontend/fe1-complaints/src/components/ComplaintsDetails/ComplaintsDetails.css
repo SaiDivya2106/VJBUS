@@ -1,0 +1,194 @@
+/* Restrict styles to .complaint-page only */
+.complaint-page {
+    font-family: "Inter", sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Container */
+  .complaint-page .container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  .categoryb{
+    color: white;
+    border-radius:11px;
+    padding: 3.3px;
+    background-color: rgb(97, 181, 220);
+  }
+  
+  /* Page Title */
+  .complaint-page .page-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #1e40af;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Card Styles */
+  .complaint-page .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    transition: transform 0.2s ease-in-out;
+    margin-bottom: 1.5rem;
+  }
+  
+  .complaint-page .card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .complaint-page .card-header {
+    background-color: #1e40af;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 1rem;
+  }
+  
+  .complaint-page .card-body {
+    padding: 1.5rem;
+  }
+  
+  /* Complaint Meta */
+  .complaint-page .complaint-meta {
+    font-size: 0.875rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .complaint-page .complaint-meta .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    background-color: #1e40af;
+    color: #fff;
+  }
+  
+  /* Buttons */
+  .complaint-page .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+  
+  .complaint-page .btn-outline-secondary,
+  .complaint-page .btn-danger {
+    font-size: 0.875rem;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .complaint-page .btn-outline-secondary {
+    border: 1px solid #1e40af;
+    color: #1e40af;
+  }
+  
+  .complaint-page .btn-outline-secondary:hover {
+    background-color: #1e40af;
+    color: #fff;
+  }
+  
+  .complaint-page .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .complaint-page .btn-danger:hover {
+    background-color: #c82333;
+  }
+  
+  /* Status Dropdown */
+  .complaint-page .form-select {
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #cbd5e1;
+    padding: 0.5rem;
+    width: 200px;
+  }
+  
+  /* Comments Section */
+  .complaint-page .comment {
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #1e40af;
+  }
+  
+  .complaint-page .comment p {
+    margin-top: 0.5rem;
+    color: #475569;
+  }
+  
+  .complaint-page .comment small {
+    color: #64748b;
+    font-size: 0.75rem;
+  }
+  
+  /* Add Comment Box */
+  .complaint-page textarea {
+    border-radius: 8px;
+    resize: none;
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+  
+  .complaint-page .btn-primary {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #1e40af;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .complaint-page .btn-primary:hover {
+    background-color: #1e3a8a;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .complaint-page .container {
+      padding: 1rem;
+    }
+  
+    .complaint-page .page-title {
+      font-size: 1.75rem;
+    }
+  
+    .complaint-page .btn {
+      font-size: 0.8rem;
+    }
+  
+    .complaint-page .form-select {
+      width: 100%;
+    }
+  }
+  

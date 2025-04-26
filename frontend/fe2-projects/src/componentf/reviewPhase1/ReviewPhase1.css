@@ -1,0 +1,112 @@
+/* General styles */
+.phase1-details {
+    width: 90%;
+    margin: 0 auto; 
+    text-align: left; 
+}
+
+/* Welcome Banner */
+.welcome-container {
+    position: relative;
+    background-image: url('../../AllCorrectPages/images/review3.png');
+    background-size: cover;
+    background-position: center;
+    height: 35vh; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.topp{
+    margin-top: 0;
+}
+
+.btn-review:hover {
+    transform: scale(0.9);
+    color: rgb(15, 87, 15);
+    font-weight: 400;
+}
+
+.table-row:hover {
+    background-color: rgba(200, 200, 200, 0.3);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.phase1-overlay1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(27, 28, 31, 0.507);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.phase1-card-title {
+    color: white;
+    font-size: 2.5rem; 
+    text-align: center;
+}
+
+/* Table Styles */
+.project-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+}
+
+.project-table thead {
+    background: #272425;
+    color: white;
+}
+
+.project-table th, .project-table td {
+    padding: 12px 15px;
+    border: 1px solid #dbdbdb;
+    text-align: left;
+    font-size: 1rem;
+}
+
+.project-table tbody tr:nth-child(even) {
+    background: #efecec;
+}
+
+/* Buttons */
+.review-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.reviewed-btn {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: not-allowed;
+    border-radius: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .phase1-details {
+        width: 100%;
+    }
+
+    .phase1-card-title {
+        font-size: 1.5rem;
+    }
+
+    .welcome-container {
+        height: 25vh;
+    }
+}

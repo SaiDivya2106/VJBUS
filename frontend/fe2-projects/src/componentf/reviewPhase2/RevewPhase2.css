@@ -1,0 +1,116 @@
+/* General Styles */
+.alt-container {
+    width: 100%;
+    height: 100%;
+}
+
+.alt-welcome-container {
+    position: relative;
+    background-image: url('../../AllCorrectPages/images/review3.png'); /* Ensure the correct path */
+    background-size: cover;
+    background-position: center;
+    height: 37vh; /* Adjust the height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-title  h4{
+    color:black !important;
+    background-color: blue;
+}
+
+.alt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(14, 18, 44, 0.507); /* Dark transparent overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alt-line {
+    text-align: center;
+}
+
+.alt-title-text {
+    color: black;
+    font-size: 2.5rem; /* Adjust the size as needed */
+}
+
+.alt-title-branch {
+    color: white;
+    font-size: 10vh;
+}
+.modal-header {
+    background-color: rgba(0, 81, 255, 0.795) !important;
+    border-bottom: none !important; /* Optional: Remove border if needed */
+  }
+  
+.alt-project-details {
+    width: 80%;
+    margin: 0 auto; /* This will center the container */
+    text-align: left; /* Ensure the text inside is left-aligned */
+}
+
+.alt-project-title,
+.alt-project-author {
+    text-align: left; /* Reinforcing left alignment for text */
+}
+
+.alt-description-container {
+    border-top: 1px solid #e0e0e0;
+}
+
+.alt-description-text {
+    text-align: left;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .alt-welcome-container {
+        height: 20vh; /* Adjust the height for smaller screens */
+    }
+
+    .alt-title-text {
+        font-size: 2rem; /* Adjust font size for smaller screens */
+    }
+
+    .alt-title-branch {
+        font-size: 6vh; /* Adjust font size for smaller screens */
+    }
+
+    .alt-project-details {
+        width: 90%; /* Increase width for smaller screens */
+    }
+
+    .alt-description-text {
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .alt-title-text {
+        font-size: 1.5rem; /* Further adjust font size for very small screens */
+    }
+
+    .alt-title-branch {
+        font-size: 5vh; /* Further adjust font size for very small screens */
+    }
+
+    .alt-project-details {
+        width: 100%; /* Full width for very small screens */
+        padding: 0 10px; /* Add some padding for better spacing */
+    }
+
+    .alt-description-text {
+        font-size: 0.8rem; /* Further adjust font size for very small screens */
+    }
+    .alt-line{
+        padding-top: 20px;
+    }
+}

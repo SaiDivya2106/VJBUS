@@ -1,0 +1,151 @@
+
+  
+ 
+  
+  hr {
+    height: 2px; /* Adjust thickness */
+    background-color: #000; /* Change color if needed */
+    border: none; /* Remove default border */
+  }
+  
+  
+  
+
+  
+  .para {
+    font-size: 4vh;
+  }
+  
+  .branch {
+    font-size: 10vh;
+  }
+  
+  .review {
+    
+    color: white;
+    text-align: center;
+  }
+  
+  
+  .reviewer-details img {
+    object-fit: cover;
+  }
+  
+  .review-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: left;
+  }
+  
+  .rating span {
+    font-size: 1.25rem;
+  }
+  
+  .txt {
+    text-align: left;
+  }
+  
+  .name1 {
+    font-size: small;
+  }
+  
+  @media (max-width: 768px) {
+    .welcome1-container {
+      height: 25vh; /* Adjust height for smaller screens */
+    }
+  
+    .rpage-card-title {
+      font-size: 2rem; /* Adjust font size for smaller screens */
+    }
+  
+    .para {
+      font-size: 3vh; /* Adjust font size for smaller screens */
+    }
+  
+    .branch {
+      font-size: 8vh; /* Adjust font size for smaller screens */
+    }
+  
+    .rpage-details {
+      width: 90%; /* Increase width for better spacing */
+    }
+  
+    .review-card {
+      padding: 2rem; /* Adjust padding */
+    }
+  
+    .review-content {
+      font-size: 0.9rem; /* Adjust font size */
+    }
+  
+    .rating span {
+      font-size: 1rem; /* Adjust font size */
+    }
+  
+    .name1 {
+      font-size: x-small; /* Adjust font size */
+    }
+  
+    .line p {
+      font-size: 2rem; /* Adjust font size for smaller screens */
+    }
+  
+    .line h1 {
+      font-size: 4rem; /* Adjust font size for smaller screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .welcome1-container {
+      height: 20vh; /* Further adjust height for very small screens */
+    }
+  
+    .rpage-card-title {
+      font-size: 1.5rem; /* Further adjust font size */
+    }
+  
+    .para {
+      font-size: 2vh; /* Further adjust font size */
+    }
+  
+    .branch {
+      font-size: 6vh; /* Further adjust font size */
+    }
+  
+    .rpage-details {
+      width: 95%; /* Increase width for better spacing */
+    }
+  
+    .review-card {
+      padding: 1.5rem; /* Adjust padding */
+    }
+  
+    .review-content {
+      font-size: 0.8rem; /* Adjust font size */
+    }
+  
+    .rating span {
+      font-size: 0.9rem; /* Adjust font size */
+    }
+  
+    .name1 {
+      font-size: xx-small; /* Adjust font size */
+    }
+  
+    .line p {
+        padding: 2px;
+      font-size: 1.5rem; /* Adjust font size for very small screens */
+    }
+  
+    .line h1 {
+      font-size: 1.5rem; /* Adjust font size for very small screens */
+    }
+  
+    .bbr {
+      display: none; /* Hide breaks on smaller screens */
+    }
+    .line{
+        padding-top: 10px;
+    }
+  }
+  

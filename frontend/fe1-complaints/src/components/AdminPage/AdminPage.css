@@ -1,0 +1,28 @@
+.container {
+  max-width: 1200px;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  height: 100%; /* Ensure cards have the same height */
+}
+
+.glass-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.status-pending {
+  color: #ff9800;
+}
+
+.status-ongoing {
+  color: #2196f3;
+}
+
+.status-resolved {
+  color: #4caf50;
+}

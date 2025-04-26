@@ -1,0 +1,113 @@
+.Credits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+    width: 100%; /* Full width */
+  }
+  
+  .person-container {
+    display: flex;
+    width: 60%; /* Full width */
+    max-width: 100%; /* Ensure it doesn't exceed screen width */
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease; /* Smooth resizing for responsiveness */
+  }
+  
+  /* Add hover effect */
+  .person-container:hover {
+    transform: scale(1.05); /* Slightly increase the size */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhance shadow */
+  }
+  
+  /* Text styles */
+  .credits-text {
+    color: darkslategray;
+  }
+  
+  .person-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    padding-left: 15px;
+  }
+  
+  .person-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Space between role, name, and branch */
+  }
+  
+  .person-details h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+  }
+  
+  .person-details h3 {
+    margin: 5px 0 0;
+    font-size: 1.2em;
+    color: #666;
+  }
+  
+  .image-left {
+    flex-direction: row;
+  }
+  
+  .image-right {
+    flex-direction: row-reverse;
+  }
+  
+  /* For tablets and smaller screens */
+  @media (max-width: 768px) {
+    .person-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .image-left, .image-right {
+      flex-direction: column;
+    }
+  
+    .person-image {
+      margin: 0 0 10px 0;
+      width: 120px;
+      height: 120px; /* Adjust image size for smaller screens */
+    }
+  }
+  
+  /* For mobile phones */
+  @media (max-width: 600px) {
+    .Credits {
+      padding: 10px; /* Reduce overall padding for smaller screens */
+      gap: 10px; /* Adjust gap between containers */
+    }
+  
+    .person-container {
+      padding: 15px; /* Reduced padding for small screens */
+      width: 80%;
+    }
+  
+    .person-image {
+      width: 100px;
+      height: 100px; /* Smaller image size on phones */
+      margin-right: 0;
+      margin-bottom: 10px; /* Ensure proper spacing when stacked vertically */
+    }
+  
+    .person-details h2 {
+      font-size: 1.2em;
+    }
+  
+    .person-details h3 {
+      font-size: 0.9em;
+    }
+  }
+  

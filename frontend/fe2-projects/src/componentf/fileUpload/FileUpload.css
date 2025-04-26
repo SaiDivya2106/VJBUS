@@ -1,0 +1,73 @@
+.upload-container {
+    background-size: cover;
+    background-position: center;
+    height: 120vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../../AllCorrectPages/images/img12.jpeg'); 
+    animation: slideInFromRight 0.5 ease-out;
+  }
+  @keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  .overlay1 {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 10px;
+    color: white;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .upload-form {
+    display: flex;
+    flex-direction: column;
+  }
+ #abstract {
+      /* Control the width */
+    height: 100px; /* Control the height */
+    padding: 10px;
+    font-size: 16px;
+    resize: vertical; /* Optional: Allows users to resize the textarea vertically */
+    overflow-y: scroll; /* Force a scrollbar for the vertical axis */
+    /* overflow-x: scroll; if you want horizontal scrollbar as well */
+}
+  
+  .form-group1 {
+    margin-bottom: 15px;
+  }
+  
+  .form-group1 label {
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .form-group1 input,
+  .form-group1 textarea,
+  .form-group1 select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  .btn {
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background-color: #0056b3;
+  }

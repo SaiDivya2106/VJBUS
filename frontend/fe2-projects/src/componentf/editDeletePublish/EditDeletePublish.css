@@ -1,0 +1,461 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Dashboard Container */
+.edit-delete-publish-dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Section */
+.p3 {
+  text-align: center;
+  font-size: 24px;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Button Group */
+.buttonns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.add,
+.research {
+  padding: 10px 20px;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add {
+  background-color: #007bff;
+}
+
+.research {
+  background-color: #28a745;
+}
+
+.add:hover,
+.research:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Project List */
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Project Card */
+.project-card1 {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card1:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-info {
+  width: 100%;
+}
+
+.project-info h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.project-info p,
+.project-info ul {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+  text-align: left;
+}
+
+.project-info ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.project-info li {
+  font-size: 14px;
+  color: #666;
+  margin: 4px 0;
+}
+
+/* Action Buttons */
+.project-actions1 {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: space-between;
+}
+
+.project-actions1 button {
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.project-actions1 button:hover {
+  opacity: 0.8;
+}
+
+.edit-btn {
+  background-color: #ff8f06; /* Yellow for Edit */
+}
+
+.delete-btn {
+  background-color: #b40808; /* Red for Delete */
+}
+
+.publish-btn {
+  background-color: #28a745; /* Green for Publish */
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-radius: 4px;
+  padding: 8px;
+  color: white;
+}
+
+/* Under Review Animation */
+.under-review {
+  font-size: 1.2rem;
+  color: #007bff;
+  font-weight: bold;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .buttonns {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .project-actions1 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .project-actions1 button {
+    width: 100%;
+  }
+}
+
+/* Modal Styling */
+.modal-content {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background: #007bff;
+  color: white;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.modal-footer button:hover {
+  opacity: 0.8;
+}
+
+.modal-footer .btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+/* Input Fields in Modal */
+.modal-body input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.modal-body input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+/* General styles for the dashboard */
+.edit-delete-publish-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Container for the project cards */
+.project-card1, .project-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Hover effect for project cards */
+.project-card1:hover, .project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles for the project title */
+.project-card1 h2, .project-card h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333333;
+}
+
+/* Styles for the project details */
+.project-card1 p, .project-card p {
+  font-size: 1rem;
+  color: #555555;
+  margin-bottom: 10px;
+}
+
+/* Styles for the student list */
+.project-card1 ul, .project-card ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.project-card1 ul li, .project-card ul li {
+  font-size: 0.9rem;
+  color: #666666;
+  margin-bottom: 5px;
+}
+
+/* Styles for the buttons container */
+.buttonns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Styles for the action buttons */
+.project-actions1 {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn, .delete-btn, .publish-btn, .view-reviews {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.edit-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #e53935;
+}
+
+.publish-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.publish-btn:hover {
+  background-color: #1e88e5;
+}
+
+.view-reviews {
+  background-color: #ff9800;
+  color: white;
+}
+
+.view-reviews:hover {
+  background-color: #fb8c00;
+}
+
+/* Styles for the grid layout */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Styles for the slide-in animation */
+.slide-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Styles for the modal */
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Styles for the form inputs */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: #333333;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Styles for the buttons in the modal */
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

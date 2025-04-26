@@ -1,0 +1,80 @@
+/* General Styles */
+.statistics-page {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  /* Chart Card Styles */
+  .chart-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .chart-container {
+    height: 300px;
+    width: 100%;
+    position: relative; /* Ensure the chart container is positioned correctly */
+  }
+  
+  /* Summary Section Styles */
+  .summary-section {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  
+  .summary-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+  }
+  
+  .summary-item {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0.5rem 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .statistics-page {
+      padding: 1rem;
+    }
+  
+    .chart-card {
+      padding: 1rem;
+    }
+  
+    .summary-section {
+      padding: 1rem;
+    }
+  
+    .summary-title {
+      font-size: 1.25rem;
+    }
+  
+    .summary-item {
+      font-size: 1rem;
+    }
+  }

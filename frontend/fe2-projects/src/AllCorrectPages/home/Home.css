@@ -1,0 +1,310 @@
+/* Universal button styling */
+.btn-outline-success {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem; /* Increased padding */
+  border-radius: 0.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1.1rem; /* Increased font size */
+  text-transform: uppercase; /* Ensures the text is uppercase on all devices */
+  width: 100%; /* Makes the button responsive */
+  max-width: 280px; /* Slightly larger maximum width */
+  box-sizing: border-box; /* Ensures padding doesn't increase the width */
+  margin: 0 auto; /* Centers the button horizontally */
+}
+
+/* Adjust button hover effect */
+.btn-outline-success:hover {
+  background-color: #218838;
+  color: #fff;
+}
+
+/* Home container */
+.home-container {
+  position: relative;
+  height: calc(100vh - 80px); /* Adjust height to avoid overlap with header/footer */
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  top: 50%;
+  left: 30px; /* Adjust as needed */
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #1C1F4C;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap; /* Prevents text from wrapping */
+  transition: transform 1s ease, opacity 1s ease;
+  opacity: 0; /* Start as invisible */
+  transform: translateX(-100px); /* Start slightly off-screen */
+  pointer-events: none; /* Prevent mouse events when hidden */
+}
+
+/* Card styling */
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+}
+
+/* Background image */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(155deg, #ffffff 50%, #ebecff 50%); /* Updated gradient */
+  z-index: 0;
+  background-attachment: fixed;
+}
+
+/* Hand icon animation */
+.hand-icon {
+  font-size: 30px; /* Increased size */
+  animation: rot 1.5s ease-in infinite forwards;
+  transform-origin: bottom;
+}
+
+@keyframes rot {
+  0% {
+    transform: rotateZ(20deg) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateZ(-20deg) translateX(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateZ(20deg) translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mov {
+  0% {
+    transform: translateX(140px);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(140px);
+    opacity: 1;
+  }
+}
+
+/* Username animation */
+.username-animate {
+  background-color: #a54e1c;
+  width: 100px;
+  animation: mov 5s ease-in-out 2 forwards;
+}
+
+/* Search page styling */
+.search-page {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0;
+}
+
+/* Card image overlay */
+.card-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  color: #1C1F4C;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Letter rotator */
+.letter-rotator {
+  font-size: 14vh; /* Adjust the size as needed */
+  text-align: center;
+  display: inline-flex; /* Use inline-flex to keep letters in a single line */
+  justify-content: center;
+  white-space: nowrap; /* Prevents wrapping of the letters */
+}
+
+.letter {
+  display: inline-block;
+  font-weight: bold; /* Make the letter bold */
+  animation: wave 1s ease-in-out forwards; /* Added wave animation */
+  margin: 0 2px;
+  opacity: 1; /* Ensure letters are visible */
+  transform: translateY(0);
+}
+
+@keyframes wave {
+  0% {
+    transform: translateY(20px); /* Start from below */
+    opacity: 0; /* Fade in from invisible */
+  }
+  50% {
+    transform: translateY(0); /* Move to original position */
+    opacity: 1; /* Full opacity */
+  }
+  100% {
+    transform: translateY(0); /* Keep in place */
+    opacity: 1; /* Full opacity */
+  }
+}
+
+
+.letter:nth-child(1) { animation-delay: 0.1s; }
+.letter:nth-child(2) { animation-delay: 0.2s; }
+.letter:nth-child(3) { animation-delay: 0.3s; }
+.letter:nth-child(4) { animation-delay: 0.4s; }
+.letter:nth-child(5) { animation-delay: 0.5s; }
+.letter:nth-child(6) { animation-delay: 0.6s; }
+.letter:nth-child(7) { animation-delay: 0.7s; }
+.letter:nth-child(8) { animation-delay: 0.8s; }
+.letter:nth-child(9) { animation-delay: 0.9s; }
+.letter:nth-child(10) { animation-delay: 1s; }
+.letter:nth-child(11) { animation-delay: 1.1s; }
+.letter:nth-child(12) { animation-delay: 1.2s; }
+.letter:nth-child(13) { animation-delay: 1.3s; }
+.letter:nth-child(14) { animation-delay: 1.4s; }
+.letter:nth-child(15) { animation-delay: 1.5s; }
+
+/* Quote styling */
+.quote {
+  font-size: 1.4rem; /* Increased font size */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Search form styling */
+.search-form {
+  width: 70%;
+}
+
+.form-control {
+  width: 100%;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (min-width: 1200px) {
+  .search-form {
+    width: 80%;
+  }
+
+  .btn-outline-success {
+    font-size: 1.4rem; /* Larger font size for larger screens */
+    padding: 0.9rem 1.8rem; /* Larger padding on bigger screens */
+    max-width: 350px; /* Set maximum width to avoid stretching */
+  }
+
+  .letter-rotator {
+    font-size: 12vh; /* Adjust letter size */
+  }
+}
+
+@media (max-width: 1200px) {
+  .search-form {
+    width: 80%;
+  }
+
+  .btn-outline-success {
+    font-size: 1.2rem; /* Adjust font size for medium screens */
+    padding: 0.7rem 1.4rem; /* Adjust padding for better fit */
+    max-width: 300px; /* Adjust maximum width for medium screens */
+  }
+
+  .letter-rotator {
+    font-size: 10vh; /* Adjust letter size for tablets */
+  }
+
+  .quote {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-img-overlay {
+    padding: 10px;
+  }
+
+  .btn-outline-success {
+    font-size: 1.1rem; /* Default button font size for smaller screens */
+    padding: 0.6rem 1.2rem; /* Adjust padding for small devices */
+    width: 90%; /* Ensure button takes up most of the screen width */
+    max-width: none; /* Remove max-width for smaller screens */
+  }
+
+  .letter-rotator {
+    font-size: 8vh; /* Adjust letter size for smaller screens */
+  }
+
+  .quote {
+    font-size: 1.1rem;
+  }
+
+  .search-form {
+    width: 80%;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn-outline-success {
+    font-size: 1rem; /* Smaller font size for very small devices */
+    padding: 0.5rem 1rem; /* Reduce padding on small phones */
+    width: 90%; /* Ensure button takes up most of the screen width */
+  }
+
+  .letter-rotator {
+    font-size: 6vh; /* Further reduce size for tiny screens */
+  }
+
+  .quote {
+    font-size: 1rem;
+  }
+
+  .search-form {
+    width: 90%;
+  }
+}
+
+@media (max-width: 400px) {
+  .btn-outline-success {
+    font-size: 0.9rem; /* Even smaller button size */
+    padding: 0.4rem 0.8rem; /* Adjust padding for tiny screens */
+    width: 90%; /* Ensure button takes up most of the screen width */
+  }
+
+  .letter-rotator {
+    font-size: 5vh; /* Further reduce size for very small screens */
+  }
+
+  .quote {
+    font-size: 0.9rem;
+  }
+
+  .search-form {
+    width: 90%;
+  }
+}

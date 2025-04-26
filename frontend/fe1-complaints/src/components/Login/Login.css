@@ -1,0 +1,77 @@
+/* Login.css */
+.login-container {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  /* Role Selector - Merged Buttons */
+  .role-selector {
+    display: flex;
+    justify-content: center;
+    background-color: #f8f9fa; /* Light background for the container */
+    border-radius: 25px; /* Rounded corners for the container */
+    padding: 5px; /* Padding inside the container */
+    border: 1px solid #dee2e6; /* Border for the container */
+  }
+  
+  .role-option {
+    flex: 1; /* Equal width for both options */
+    padding: 10px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #007bff; /* Default text color */
+    border-radius: 20px; /* Rounded corners for the options */
+  }
+  
+  .role-option.active {
+    background-color: #007bff; /* Active background color */
+    color: white; /* Active text color */
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3); /* Shadow for active state */
+  }
+  
+  .role-option:hover {
+    background-color: #e9ecef; /* Hover background color */
+    color: #007bff; /* Hover text color */
+  }
+  
+  /* User Login */
+  .user-login .btn-dark {
+    background-color: #24292e;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .user-login .btn-dark:hover {
+    background-color: #1c1f23;
+  }
+  
+  /* Admin Login */
+  .admin-login .form-control {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .admin-login .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(128, 189, 255, 0.5);
+  }
+  
+  .admin-login .btn-primary {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+  
+  /* Misc */
+  .text-muted a {
+    color: #0366d6;
+  }
+  
+  .text-muted a:hover {
+    text-decoration: underline;
+  }

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>VNR WALL</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* General Page Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #d4d4e4;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+            margin: 10px 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* Report Button */
+        .submit-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        /* Filters */
+        .filters {
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        select, input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 90%;
+            max-width: 250px;
+        }
+
+        /* Responsive Card Grid */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        /* Card Design */
+        .card {
+            background: white;
+            width: 90%;
+            max-width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: left;
+            position: relative; /* For status positioning */
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* Message Status (Top Right) */
+        .status {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .status-review { color: #e67e22; }  /* Orange */
+        .status-genuine { color: #28a745; }  /* Green */
+        .status-fake { color: #dc3545; }  /* Red */
+
+        /* Scam Indicators */
+        .scam-list {
+            margin: 5px 0;
+            padding-left: 15px;
+            font-size: 13px;
+        }
+
+        /* Name at Bottom Right */
+        .posted-by {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .card {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <h1>VNR WALL</h1>
+    <h2>Reported Job/Internship Messages</h2>
+
+    <!-- "Report a Suspicious Message" Button -->
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfKSfY19CpacWTETh1Nn3A6jpByFuwsbZkF2IIWzbqIltwf5w/viewform" target="_blank" class="submit-button">
+        Report a Suspicious Message
+    </a>
+
+    <!-- Filters -->
+    <div class="filters">
+        <select id="filterCategory">
+            <option value="">All Categories</option>
+            {% for category in df["Message Category"].unique() %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="filterStatus">
+            <option value="">All Statuses</option>
+            <option value="Under Review">🔍 In Review</option>
+            <option value="Genuine">✅ Genuine</option>
+            <option value="Fake">❌ Fake</option>
+        </select>
+
+        <input type="text" id="searchInput" placeholder="Search by Name, Source, or Keywords...">
+    </div>
+
+    <!-- Posts as Cards -->
+    <div class="card-container">
+        {% for index, row in df.iterrows() %}
+        <div class="card" data-category="{{ row['Message Category'] }}" data-status="{{ row['Verification Status'] }}">
+            <!-- Message Status at Top Right -->
+            <span class="status 
+                {% if row['Verification Status'] == 'Under Review' %}status-review{% endif %}
+                {% if row['Verification Status'] == 'Genuine' %}status-genuine{% endif %}
+                {% if row['Verification Status'] == 'Fake' %}status-fake{% endif %}
+            ">
+                {% if row["Verification Status"] == "Under Review" %}
+                    🔍 In Review
+                {% elif row["Verification Status"] == "Genuine" %}
+                    ✅ Genuine
+                {% elif row["Verification Status"] == "Fake" %}
+                    ❌ Fake
+                {% else %}
+                    🔍 In Review
+                {% endif %}
+            </span>
+
+            <p><strong>Category:</strong> {{ row["Message Category"] }}</p>
+            <p><strong>Source:</strong> {{ row["Message Source"] }}</p>
+            <p><strong>Scam Indicators:</strong></p>
+            <ul class="scam-list">
+                {% for indicator in row["Scam Indicators"].split(",") %}
+                    <li>{{ indicator.strip() }}</li>
+                {% endfor %}
+            </ul>
+            <p><strong>Message in Circulation:</strong></p>
+            <p style="white-space: pre-line;">{{ row["Additional Info"].replace('\n', '<br>') | safe }}</p>
+
+            <!-- Posted By Name at Bottom Right -->
+            <p class="posted-by">Posted by: {{ row["Name"] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- JavaScript for Filtering and Searching -->
+    <script>
+        $(document).ready(function() {
+            // Filter by Category
+            $("#filterCategory").on("change", function() {
+                var category = $(this).val().toLowerCase();
+                $(".card").each(function() {
+                    var cardCategory = $(this).data("category").toLowerCase();
+                    if (category === "" || cardCategory === category) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Filter by Verification Status
+            $("#filterStatus").on("change", function() {
+                var status = $(this).val().toLowerCase();
+                $(".card").each(function() {
+                    var cardStatus = $(this).data("status").toLowerCase();
+                    if (status === "" || cardStatus === status) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Search Functionality
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $(".card").each(function() {
+                    var text = $(this).text().toLowerCase();
+                    if (text.indexOf(value) > -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

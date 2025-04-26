@@ -1,0 +1,201 @@
+/* src/pages/Projects/Project.css */
+
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --accent-color: #4895ef;
+  --success-color: #28a745;
+  --light-bg: #f8f9fa;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+.projects-page {
+  background: linear-gradient(135deg, #fce5dcb5 0%, #e2e3ff 100%);
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Enhanced Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.page-header h1 {
+  font-size: 4.5rem; /* Even larger title */
+  font-weight: 900; /* Extra bold */
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  letter-spacing: -2px;
+  line-height: 1;
+  text-transform: uppercase; /* Uppercase like reference */
+  padding: 0 1rem;
+}
+
+.page-header .lead {
+  font-size: 1.8rem; /* Larger subtitle */
+  color: var(--muted-text);
+  max-width: 800px;
+  margin: 1.5rem auto 0;
+  font-weight: 300;
+}
+
+/* Search Form with Smaller Image Button */
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 3rem 0;
+  gap: 0.5rem; /* Consistent gap between elements */
+}
+
+.search-form .form-control {
+  border-radius: var(--border-radius);
+  border: 2px solid #e9ecef;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  width: 100%;
+  max-width: 600px;
+  transition: var(--transition);
+  box-shadow: var(--box-shadow);
+}
+
+/* Primary Search Button */
+.search-form .btn-primary {
+  border-radius: var(--border-radius);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  transition: var(--transition);
+  box-shadow: var(--box-shadow);
+}
+
+/* Image Search Button - Made Smaller */
+.btn-image-search {
+  padding: 0.6rem 1rem !important;
+  font-size: 0.9rem !important;
+  background-color: var(--success-color) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase; /* Match reference style */
+  letter-spacing: 0.5px;
+}
+
+.btn-image-search svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Button Hover Effects */
+.search-form .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.search-form .btn:active {
+  transform: translateY(0);
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.spinner {
+  width: 4rem;
+  height: 4rem;
+  border: 5px solid rgba(72, 149, 239, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .page-header h1 {
+    font-size: 3.5rem;
+  }
+  
+  .page-header .lead {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2.8rem;
+    letter-spacing: -1px;
+  }
+  
+  .page-header .lead {
+    font-size: 1.3rem;
+  }
+  
+  .search-form {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .search-form .btn,
+  .btn-image-search {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-header h1 {
+    font-size: 2.2rem;
+    letter-spacing: normal;
+  }
+  
+  .page-header .lead {
+    font-size: 1.1rem;
+  }
+  
+  .btn-image-search {
+    padding: 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Accessibility */
+*:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
