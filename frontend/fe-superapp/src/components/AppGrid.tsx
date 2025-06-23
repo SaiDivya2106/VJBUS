@@ -58,7 +58,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Projects App",
       description: "Manage Projects life cycle",
       icon: <MessageCircleQuestion  size={40} />,
-      url: "https://projects.vnrzone.site/",
+      url: "https://projecthub.vnrzone.site/",
       color: "bg-green-500"
     },
     {

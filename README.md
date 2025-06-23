@@ -138,6 +138,7 @@ Server2 : 10.45.8.187
 | Navi            | 3107  ✅          |  N/A           | N/A            |       navi        |
 | Activity        | 3106              |  6106          | MongoDB(local) |       activity    |
 | EasyFind        | 3109 <br> 3110    |  6109          | MongoDB(local) |       easyfind   |
+| Bandiwala       | 3111              | 6111           | MongoDB (ext)  |     bandiwala  |
 
 
 ## Github user management 

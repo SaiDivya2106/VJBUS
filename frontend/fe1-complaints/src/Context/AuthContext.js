@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("https://auth.vnrzone.site/check-auth", {
+        const res = await fetch("https://auth.vjstartup.com/check-auth", {
           credentials: "include",
         });
         const data = await res.json();
@@ -56,11 +56,11 @@ export const AuthProvider = ({ children }) => {
     window.google.accounts.id.initialize({
       client_id: "522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com",
       callback: async (response) => {
-        console.log("User Token:", response.credential);
+      
 
 
         const authenticateUser = async () => {
-          const res = await fetch("https://auth.vnrzone.site/auth/google", {
+          const res = await fetch("https://auth.vjstartup.com/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch("https://auth.vnrzone.site/logout", {
+    await fetch("https://auth.vjstartup.com/logout", {
       method: "POST",
       credentials: "include",
     });

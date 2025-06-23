@@ -3,7 +3,7 @@
 let map;
 let markers = {};
 // Match the WebSocket URL with your simulator and server
-const socket = io("wss://bus.vnrzone.site", {
+const socket = io("wss://dev-bus.vjstartup.com", {
     transports: ["websocket"],
     reconnection: true,
     reconnectionAttempts: 5,
@@ -83,7 +83,7 @@ function addFixedMarker() {
  * Subscribe to all available routes
  */
 function subscribeToAllRoutes() {
-    fetch("https://bus.vnrzone.site/bus-be/get_all_routes")
+    fetch("https://dev-bus.vjstartup.com/bus-be/get_all_routes")
         .then(response => response.json())
         .then(routes => {
             console.log("Available routes:", routes);
@@ -129,7 +129,7 @@ function initializeSocketListeners() {
  * Fetch current active connections
  */
 function fetchActiveConnections() {
-    fetch("https://bus.vnrzone.site/bus-be/get_all_locations")
+    fetch("https://dev-bus.vjstartup.com/bus-be/get_all_locations")
         .then(response => response.json())
         .then(activeRoutes => {
             console.log("Active routes:", activeRoutes);

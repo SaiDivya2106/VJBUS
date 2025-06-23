@@ -61,4 +61,4 @@ def home():
 
 if __name__ == "__main__":
     cache.init_app(app)  # Initialize caching
-    app.run(host="0.0.0.0", port=3105, debug=True)
+    app.run(host="0.0.0.0", port=4105, debug=True)

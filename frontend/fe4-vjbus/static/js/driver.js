@@ -1,5 +1,5 @@
 // ===== CONFIGURATION CONSTANTS =====
-const SOCKET_URL = "wss://bus.vnrzone.site";
+const SOCKET_URL = "wss://dev-bus.vjstartup.com";
 const TRACKING_INTERVAL = 5000; // 5 seconds
 
 // ===== GLOBAL VARIABLES =====

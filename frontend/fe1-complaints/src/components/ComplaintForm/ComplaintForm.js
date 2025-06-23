@@ -85,7 +85,7 @@ const ComplaintForm = () => {
       if (error.response && error.response.status === 400) {
         setWarning(error.response.data.message);
       } else {
-        setMessage(error.response?.data?.message || "An error occurred while submitting your complaint.");
+        setMessage(error.response?.data?.message || error.message);
       }
     }
 

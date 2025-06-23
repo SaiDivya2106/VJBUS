@@ -179,7 +179,7 @@
         const MAX_INACTIVITY_MS = 60000; // Consider a bus inactive after 1 minute without updates
         
         // Initialize socket connection
-        const websocketUrl = "wss://bus.vnrzone.site";
+        const websocketUrl = "wss://dev-bus.vjstartup.com";
         const socket = io(websocketUrl, { transports: ['websocket'] });
         
         // Initialize map
@@ -462,7 +462,7 @@
         
         // Function to fetch all locations
         function fetchLocations() {
-            fetch('https://bus.vnrzone.site/bus-be/get_all_locations')
+            fetch('https://dev-bus.vjstartup.com/bus-be/get_all_locations')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -511,7 +511,7 @@
 
         // Function to fetch all connections
         function fetchConnections() {
-            fetch('https://bus.vnrzone.site/bus-be/get_all_connections')
+            fetch('https://dev-bus.vjstartup.com/bus-be/get_all_connections')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);

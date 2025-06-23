@@ -1,6 +1,6 @@
 // ===== CONFIGURATION CONSTANTS =====
-const API_URL = "https://auth.vnrzone.site";
-const socket = io("wss://bus.vnrzone.site", { transports: ["websocket"] });
+const API_URL = "https://auth.vjstartup.com";
+const socket = io("wss://dev-bus.vjstartup.com", { transports: ["websocket"] });
 
 // ===== GLOBAL VARIABLES =====
 let GOOGLE_CLIENT_ID=null;
@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     chatBtn.addEventListener("click", function () {
         setActive(this);
-        window.location.href = "https://bus.vnrzone.site/chat";
+        window.location.href = "https://dev-bus.vjstartup.com/chat";
     });
     
     // Find distance button click

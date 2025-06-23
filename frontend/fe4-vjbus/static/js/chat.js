@@ -3,7 +3,7 @@ let state = {
     room: "",
     username: ""
 };
-const socket = io("https://bus.vnrzone.site");
+const socket = io("https://dev-bus.vjstartup.com");
 
 // Wait for DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function() {
@@ -56,14 +56,14 @@ function initializeEventListeners() {
     const homeBtn = document.getElementById("homeBtn");
     if (homeBtn) {
         homeBtn.addEventListener("click", function() {
-            window.location.href = "https://bus.vnrzone.site";
+            window.location.href = "https://dev-bus.vjstartup.com";
         });
     }
     
     const chatBtn = document.getElementById("chatBtn");
     if (chatBtn) {
         chatBtn.addEventListener("click", function() {
-            window.location.href = "https://bus.vnrzone.site/chat";
+            window.location.href = "https://dev-bus.vjstartup.com/chat";
         });
     }
     

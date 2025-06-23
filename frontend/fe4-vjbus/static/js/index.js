@@ -1,10 +1,10 @@
 // ===== CONFIGURATION CONSTANTS =====
-const API_URL = "https://auth.vnrzone.site";
+const API_URL = "https://auth.vjstartup.com";
 let socket; // Will be initialized after scripts are loaded
 
 // ===== GLOBAL VARIABLES =====
 let GOOGLE_CLIENT_ID = null;
-let selectedRoute = "";
+let selectedRoute = localStorage.getItem("busApplicationSelectedRouteByStudent");
 let latestBusLocation = null;
 let markers = {};
 let firstRecenter = {};
@@ -30,13 +30,17 @@ document.addEventListener("DOMContentLoaded", async function() {
         await loadAllScripts();
         
         // Initialize socket after script is loaded
-        socket = io("wss://bus.vnrzone.site", {
+        socket = io("wss://dev-bus.vjstartup.com", {
             transports: ["websocket"],
             reconnection: true,
             reconnectionAttempts: 5,
-            reconnectionDelay: 1000
+            reconnectionDelay: 1000,
+            query: {
+                route_id: selectedRoute, // replace with dynamic route ID if needed
+                role: "Student"     // or "Student", etc.
+            }
         });
-        
+
         // Initialize map
         initializeMap();
         addFixedMarker();
@@ -69,6 +73,13 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (GOOGLE_CLIENT_ID) {
             initializeGoogleSignIn();
         }
+        document.getElementById('floating-recenter-btn').onclick = function() {
+            if (selectedRoute && markers[selectedRoute]) {
+                let markerPosition = markers[selectedRoute].getLatLng();
+                map.setView([markerPosition.lat - 0.008, markerPosition.lng], 13);
+            }
+        };
+
     } catch (error) {
         console.error("Error during initialization:", error);
     }
@@ -130,7 +141,7 @@ async function getRoutes() {
 async function fetchActiveRoutes() {
     console.log("Fetching active routes...");
     try {
-        const response = await fetch("https://bus.vnrzone.site/bus-be/get_all_connections");
+        const response = await fetch("https://dev-bus.vjstartup.com/bus-be/get_all_connections");
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -344,7 +355,7 @@ function setupEventListeners() {
     if (chatBtn) {
         chatBtn.addEventListener("click", function() {
             setActive(this);
-            window.location.href = "https://bus.vnrzone.site/chat";
+            window.location.href = "https://dev-bus.vjstartup.com/chat";
         });
     }
     

@@ -39,7 +39,7 @@
 
 
         var markers = {};
-        const socket = io("wss://bus.vnrzone.site", { transports: ["websocket"] });
+        const socket = io("wss://dev-bus.vjstartup.com", { transports: ["websocket"] });
 
         // Handle live location updates
         socket.on("location_update", function (data) {
