@@ -10,10 +10,6 @@ import { Clock, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 
-
-
-
-
 const UserDashboard = () => {
   // Get user details from AuthContext
   const { user } = useAuth();
@@ -75,7 +71,7 @@ const UserDashboard = () => {
 
         {/* My Complaints Heading */}
         <div className="my-complaints-heading">
-          <h2>My Complaints</h2>
+          <h3>My Complaints</h3>
         </div>
 
         {/* Complaints Section */}
@@ -90,7 +86,7 @@ const UserDashboard = () => {
     </Button>
           </div>
         ) : (
-        <Row className="complaints-cards mx-1">
+        <Row className="complaints-cards mx-1 ">
           {complaints.map((complaint) => (
             <Col key={complaint._id} className="mb-4">
 
@@ -155,9 +151,15 @@ const UserDashboard = () => {
                     </>
                   )}
 
-                  <Button variant="primary" onClick={() => handleExpand(complaint.complaint_id)}>
-                    {expandedComplaint === complaint.complaint_id ? "Hide Details" : "View Details"}
-                  </Button>
+<Button
+  className="view-details-btn mt-3"
+  
+  onClick={() => handleExpand(complaint.complaint_id)}
+>
+  {expandedComplaint === complaint.complaint_id ? "Hide Details" : "View Details"}
+</Button>
+
+
                 </Card.Body>
               </Card>
             </Col>

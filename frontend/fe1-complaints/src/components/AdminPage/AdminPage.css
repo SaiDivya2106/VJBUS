@@ -2,18 +2,24 @@
   max-width: 1200px;
 }
 
-.glass-effect {
+/* .glass-effect {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  height: 100%; /* Ensure cards have the same height */
-}
+  height: 100%; 
+} */
+/* 
+.glass-effect {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e0e0e0;
+} */
 
-.glass-effect:hover {
+/* .glass-effect:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
+} */
 
 .status-pending {
   color: #ff9800;
@@ -26,3 +32,164 @@
 .status-resolved {
   color: #4caf50;
 }
+
+
+
+/* .status-pill {
+  display: inline-block;
+  padding: 6px 12px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid transparent;
+} */
+
+.status-pill {
+  display: inline-block;
+  padding: 5px 10px;          /* Reduced padding */
+  font-weight: 700;
+  font-size: 0.78rem;         /* Smaller font */
+  border-radius: 999px;       /* Fully rounded pill */
+  /* text-transform: uppercase; */
+  letter-spacing: 0.4px;
+  border: 1.5px solid transparent; /* Thinner border */
+  line-height: 1.2;
+}
+
+/* Specific Status Colors */
+.status-pending {
+  background-color: #fff;
+  color: #f08c00;
+  border-color: #facc15;
+}
+
+.status-ongoing {
+  background-color: #fff;
+  color: #2b8a3e;
+  border-color:#5d8d63;
+}
+
+.status-resolved {
+  background-color: #fff;
+  color: #0c8599;
+  /* border-color:#7adee9; */
+  border-color: #47b2c5;
+}
+ .category-tag1 {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Add this if not present already */
+/* Default state */
+/* AdminPage.css */
+.card-hover-effect {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb; /* light gray */
+  border-radius: 12px;
+}
+
+.card-hover-effect:hover {
+ /* box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px; */
+   box-shadow: 
+    rgba(17, 17, 26, 0.08) 0px 6px 18px, 
+    rgba(17, 17, 26, 0.06) 0px 12px 36px, 
+    rgba(17, 17, 26, 0.04) 0px 18px 50px;
+  border-color: #d1d5db; /* slightly darker */
+}
+
+
+.custom-card-container {
+  position: relative;
+}
+
+.custom-pencil-button {
+  background-color: white !important;
+  border: none !important;
+  border-radius: 48% !important;
+  width: 33px;
+  height: 33px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9b9b9b;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Added transform */
+}
+
+.custom-pencil-button:active {
+  background-color: #e0e0e0 !important;
+  transform: scale(1.25); /* Scale up the circle */
+}
+
+
+.custom-card-container:hover .custom-pencil-button {
+  visibility: visible; /* visible on card hover */
+}
+
+
+.pencil-icon {
+  color: #a5a1a1;
+  color: rgb(155, 108, 237);
+  
+  transform: translate(-7px, -4px);
+}
+
+.adminheading {
+  color: #455a64;
+  margin: 30px;
+  font-family: serif;
+  font-size: 2.5rem;
+  text-align: center; /* Helps alignment on small screens */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+  .adminheading {
+    font-size: 1.8rem;
+    margin: 20px 10px;
+    text-align: center;
+  }
+}
+
+/* Optional: Slightly bigger phones */
+@media (max-width: 768px) {
+  .adminheading {
+    font-size: 2rem;
+    margin: 25px 15px;
+    text-align: center;
+  }
+}
+
+
+/* Removes the blue outline and border on click */
+.form-select:focus {
+  box-shadow: none !important;
+  border-color: #999da0 !important; /* Optional: keep consistent neutral border */
+  outline: none !important;
+}
+.no-hover-bg:hover {
+  background-color: transparent !important;
+  color: #1e90ff !important;
+  border-color: #1e90ff !important;
+}
+
+
+
+
+
+
+
+
+
+
+

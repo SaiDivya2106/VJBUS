@@ -1,194 +1,362 @@
-/* Restrict styles to .complaint-page only */
-.complaint-page {
-    font-family: "Inter", sans-serif;
-    background-color: #f8fafc;
-    color: #1e293b;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+/* === Main Card === */
+.content-section {
+  background: white;
+  border-radius: 24px;
+  padding: 1.2rem 1.4rem;      /* Decreased padding */
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  margin: 2rem auto 1rem auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  max-width: 60rem;            /* Reduced from 80rem to 60rem */
+  font-size: 0.95rem;
+}
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* === Category Badge === */
+.categoryb {
+  background-color: #6A1B9A;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 999px;
+  padding: 8px 20px;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+
+/* === Title === */
+.content-section h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 1.5rem 0 1rem;
+  line-height: 1.4;
+  color: black;
+}
+
+/* === Meta Section === */
+.complaint-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
   
-  /* Container */
-  .complaint-page .container {
-    width: 100%;
-    max-width: 1200px;
-    height: 90vh;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    overflow-y: auto;
-  }
-  .categoryb{
-    color: white;
-    border-radius:11px;
-    padding: 3.3px;
-    background-color: rgb(97, 181, 220);
-  }
-  
-  /* Page Title */
-  .complaint-page .page-title {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #1e40af;
-    padding-bottom: 0.5rem;
-  }
-  
-  /* Card Styles */
-  .complaint-page .card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    transition: transform 0.2s ease-in-out;
-    margin-bottom: 1.5rem;
-  }
-  
-  .complaint-page .card:hover {
-    transform: translateY(-2px);
-  }
-  
-  .complaint-page .card-header {
-    background-color: #1e40af;
-    color: #fff;
-    font-size: 1.25rem;
-    font-weight: 600;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    padding: 1rem;
-  }
-  
-  .complaint-page .card-body {
+}
+
+.complaint-meta span {
+  font-size: 1rem;
+  color: rgb(11, 11, 11);
+  display: flex;
+  align-items: center;
+}
+
+.complaint-meta i {
+  margin-right: 6px;
+  color: #90caf9;
+}
+
+/* === Description Text === */
+.description-text {
+  font-weight: 500;       
+  font-size: 1rem;      /* Optional: Increase size */
+  line-height: 1.6;   
+  color: #222;   
+  margin-bottom: 0.1rem;         /* Optional: Darker shade for visibility */
+}
+
+/* === Status Dropdown === */
+select.form-select {
+  max-width: 180px;
+  font-weight: 600;
+}
+
+/* Status Colors */
+.pending-status {
+  border: 2px solid #ff9800;
+}
+.ongoing-status {
+  border: 2px solid #03a9f4;
+}
+.resolved-status {
+  border: 2px solid #4caf50;
+}
+
+/* === Status Indicator Box === */
+/* === Update Status Box === */
+.update-status-box {
+   background-color: #f8f5ff;
+  color: #000;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width:360px;
+}
+
+/* Tweak select for alignment */
+.update-status-box select.form-select {
+  font-weight: 500;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #fff;
+}
+
+/* === Likes & Dislikes Box Side-by-Side === */
+.engagement-box {
+  display: flex;
+  gap: 1.5rem;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  min-width: 50px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.engagement-box .likes,
+.engagement-box .dislikes {
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.engagement-box .likes {
+  color: #76ff03;
+  font-size: 25px;
+}
+
+.engagement-box .dislikes {
+  color: #ff8a80;
+   font-size: 25px;
+}
+
+.engagement-box .label {
+  font-size: 0.85rem;
+  color: #f0f0f0;
+  opacity: 0.85;
+}
+
+/* === Comments Section Header === */
+.comment-heading {
+   margin-top: 1.5rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.comment-heading i {
+  font-size: 1.4rem;
+  background-color: #e0d9ff;
+  padding: 8px;
+  border-radius: 12px;
+  color: #6a1b9a;
+}
+/* === Comments Container === */
+.comments-container {
+  margin-top: 0.5rem;
+}
+
+/* === Comment Card (Matches Screenshot) === */
+.comment-card {
+  background-color: #f9f9f9;
+  border-left: 4px solid #6a1b9a; /* soft blue border */
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* === Comment Header (Name & Date Row) === */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.author-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Avatar icon (simple circle emoji for now) */
+.comment-avatar {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+/* Author label */
+.comment-author {
+  font-weight: 600;
+  margin-right: auto;
+  color: #37474f;
+}
+
+/* Date */
+.comment-date {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #78909c;
+}
+
+/* === Comment Body === */
+.comment-body {
+  font-size: 1rem;
+  color: #263238;
+  line-height: 1.5;
+}
+
+/* === Textarea === */
+textarea.form-control {
+  background-color: #f5f5fa;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  resize: none;
+  color: #333;
+  width: 100%;
+}
+
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #90caf9;
+}
+
+/* === Send Button === */
+.btn-primary {
+  background-color: #1976d2;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}
+
+/* === Delete Button Section === */
+button.btn-danger {
+ background-color: #ef5350;
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  border-radius: 999px;
+  padding: 8px 20px;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.delete-button-wrapper {
+  display: flex;
+  justify-content: flex-end; /* Default for desktop */
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .content-section {
     padding: 1.5rem;
   }
-  
-  /* Complaint Meta */
-  .complaint-page .complaint-meta {
-    font-size: 0.875rem;
-    color: #64748b;
+
+  .engagement-box {
+    position: static;
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .comments-container {
+    padding: 1.2rem;
+  }
+}
+/* === Like/Dislike beside Back button === */
+.top-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .engagement-box {
+    position: static;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    backdrop-filter: none;
+    box-shadow: none;
+    border-radius: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .delete-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+}
+@media (max-width: 768px) {
+  .comment-card {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 20px;
+  }
+  .comment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .comment-date {
+    order: -1;
+    font-weight: 500;
+    color: #444;
+  }
+
+  .comment-author {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 6px;
+    order: 0;
+    font-weight: 600;
+    color: #37474f;
   }
-  
-  .complaint-page .complaint-meta .badge {
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    background-color: #1e40af;
-    color: #fff;
-  }
-  
-  /* Buttons */
-  .complaint-page .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-  }
-  
-  .complaint-page .btn-outline-secondary,
-  .complaint-page .btn-danger {
-    font-size: 0.875rem;
-    border-radius: 8px;
-    padding: 8px 16px;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .complaint-page .btn-outline-secondary {
-    border: 1px solid #1e40af;
-    color: #1e40af;
-  }
-  
-  .complaint-page .btn-outline-secondary:hover {
-    background-color: #1e40af;
-    color: #fff;
-  }
-  
-  .complaint-page .btn-danger {
-    background-color: #dc3545;
-    color: #fff;
-  }
-  
-  .complaint-page .btn-danger:hover {
-    background-color: #c82333;
-  }
-  
-  /* Status Dropdown */
-  .complaint-page .form-select {
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border: 1px solid #cbd5e1;
-    padding: 0.5rem;
-    width: 200px;
-  }
-  
-  /* Comments Section */
-  .complaint-page .comment {
-    background-color: #f1f5f9;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-left: 4px solid #1e40af;
-  }
-  
-  .complaint-page .comment p {
-    margin-top: 0.5rem;
-    color: #475569;
-  }
-  
-  .complaint-page .comment small {
-    color: #64748b;
-    font-size: 0.75rem;
-  }
-  
-  /* Add Comment Box */
-  .complaint-page textarea {
-    border-radius: 8px;
-    resize: none;
-    border: 1px solid #cbd5e1;
-    padding: 0.75rem;
-    width: 100%;
-    font-size: 0.875rem;
-  }
-  
-  .complaint-page .btn-primary {
-    border-radius: 8px;
-    padding: 10px 20px;
+
+  .comment-avatar {
+    margin: 0;
     font-size: 1rem;
-    background-color: #1e40af;
-    border: none;
-    transition: background-color 0.2s ease-in-out;
-    margin-top: 1rem;
-    width: 100%;
   }
-  
-  .complaint-page .btn-primary:hover {
-    background-color: #1e3a8a;
+}
+@media (max-width: 768px) {
+  .delete-button-wrapper {
+    justify-content: center;
   }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .complaint-page .container {
-      padding: 1rem;
-    }
-  
-    .complaint-page .page-title {
-      font-size: 1.75rem;
-    }
-  
-    .complaint-page .btn {
-      font-size: 0.8rem;
-    }
-  
-    .complaint-page .form-select {
-      width: 100%;
-    }
-  }
-  
+}

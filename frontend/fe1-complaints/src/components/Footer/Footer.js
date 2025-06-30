@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"; // For internal navigation
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-white py-4 pt-5">
+    <footer className="bg-dark text-white py-4 pt-4">
       <div className="container mx-auto">
         <div className="row ">
           {/* Column 1: Website Title */}

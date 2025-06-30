@@ -47,6 +47,9 @@ const Home = () => {
   const [complaints, setComplaints] = useState([]);
   const [expanded, setExpanded] = useState({});
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
   useEffect(() => {
@@ -54,25 +57,32 @@ const Home = () => {
   }, [categoryFilter, statusFilter]);
 
   const fetchComplaints = async () => {
-    try {
-      const url = `${baseUrl}/user-api/filter-complaints?category=${categoryFilter}&status=${statusFilter}`;
-      const response = await axios.get(url);
-      const data = response.data?.complaints || [];
-      setComplaints(data);
+  setLoading(true);
+  setError(false);
 
-      const votes = {};
-      data.forEach((complaint) => {
-        if (Array.isArray(complaint.votedUsers)) {
-          const userVote = complaint.votedUsers.find((v) => v.email === user?.email);
-          if (userVote) votes[complaint.complaint_id] = userVote.type;
-        }
-      });
-      setUserVotes(votes);
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      setComplaints([]);
-    }
-  };
+  try {
+    const url = `${baseUrl}/user-api/filter-complaints?category=${categoryFilter}&status=${statusFilter}`;
+    const response = await axios.get(url);
+    const data = response.data?.complaints || [];
+    setComplaints(data);
+
+    const votes = {};
+    data.forEach((complaint) => {
+      if (Array.isArray(complaint.votedUsers)) {
+        const userVote = complaint.votedUsers.find((v) => v.email === user?.email);
+        if (userVote) votes[complaint.complaint_id] = userVote.type;
+      }
+    });
+    setUserVotes(votes);
+  } catch (err) {
+    console.error("Error fetching complaints:", err);
+    setError(true);
+    setComplaints([]); // Optional: clear data on error
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const filteredComplaints = complaints.filter((complaint) =>
     complaint.title.toLowerCase().includes(search.toLowerCase()) ||

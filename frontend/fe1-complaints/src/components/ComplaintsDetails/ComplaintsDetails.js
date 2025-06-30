@@ -4,13 +4,11 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ComplaintsDetails.css";
-import { HiOutlineThumbUp } from "react-icons/hi";
-import { HiOutlineThumbDown } from "react-icons/hi";
-import { IoMdSend} from "react-icons/io"
+import { HiOutlineThumbUp, HiOutlineThumbDown } from "react-icons/hi";
+import { IoMdSend } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-
+import { BiCategoryAlt } from "react-icons/bi";
 
 const ComplaintsDetails = () => {
   const { complaint_id } = useParams();
@@ -29,11 +27,10 @@ const ComplaintsDetails = () => {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-     
       hour12: true,
     });
   };
-
+  
   useEffect(() => {
     const fetchComplaint = async () => {
       try {
@@ -52,7 +49,6 @@ const ComplaintsDetails = () => {
     };
     fetchComplaint();
   }, [complaint_id]);
-
 
   const handleStatusChange = async (e) => {
     const updatedStatus = e.target.value;
@@ -76,7 +72,6 @@ const ComplaintsDetails = () => {
       });
     }
   };
-
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) return;
@@ -106,9 +101,7 @@ const ComplaintsDetails = () => {
     if (!window.confirm("Are you sure you want to delete this complaint?")) return;
 
     try {
-      await axios.delete(
-        `${baseUrl}/admin-api/delete-complaint/${complaint_id}`
-      );
+      await axios.delete(`${baseUrl}/admin-api/delete-complaint/${complaint_id}`);
       alert("Complaint has been deleted successfully.");
       navigate("/adminpage");
     } catch (error) {
@@ -124,84 +117,108 @@ const ComplaintsDetails = () => {
     return <div className="container">Loading complaint details...</div>;
   }
 
-  
-
   return (
-    
     <div className="complaint-page">
-      <ToastContainer /> 
+      <ToastContainer />
       <div className="container">
-      <button className="btn btn-outline-secondary mb-3" onClick={handleBackClick}>
+        <button className="btn btn-outline-secondary mb-3 mt-3" onClick={handleBackClick}>
           <i className="bi bi-arrow-left"></i> Back
         </button>
-        <h1 className="page-title fs-1 fw-bold">Complaint Details</h1>
-        <div className="d-flex justify-content-end align-items-center mb-4">
+
+        {/* DELETE BUTTON MOVED TO TOP */}
+        <div className="delete-button-wrapper mb-3">
           <button className="btn btn-danger btn-sm" onClick={handleDeleteComplaint}>
-            <i className="bi bi-trash3-fill me-1"></i> Delete Complaint
+            <i className="bi bi-trash3-fill me-1"></i> Delete 
           </button>
         </div>
-        <div className="card mb-4">
-          <div className="card-body">
-            <h1 className="h4 fw-bold">{complaint.title}</h1>
-            <div className="complaint-meta mt-2">
-              <span className="me-3">
-                <i className="bi bi-calendar3 me-1"></i> {formatDate(complaint.timestamp)}
-              </span>
-              <span className="categoryb ">{complaint.category}</span>
-              <div className="mb-1 ms-2 p-2 d-flex align-items-center">
-          <HiOutlineThumbUp className="text-success fs-4 me-1" /> {complaint.likes}
-          <span className="mx-1"></span>
-          <HiOutlineThumbDown className="text-danger fs-4 ms-2 me-1" /> {complaint.dislikes}
-        </div>
+           <h1 className="page-title fs-2 fw-bold text-center my-4">Complaint Details</h1>
+        {/* MAIN SECTION (No Card) */}
+        <div className="content-section">
+          <div className="top-row">
+  <span className="categoryb">
+    <BiCategoryAlt size={18} /> {complaint.category}
+  </span>
+  <div className="engagement-box">
+    <div className="likes">
+      <HiOutlineThumbUp size={24} /> {complaint.likes}
+    </div>
+    <div className="dislikes">
+      <HiOutlineThumbDown size={24} /> {complaint.dislikes}
+    </div>
+  </div>
+</div>
 
-        
 
-            </div>
-            <p className="lead mt-3">{complaint.description}</p>
-            <div className="mt-4 d-flex">
-             
-              <h6 className="mt-2 fw-2">Update Status:</h6>
-              <span className="mx-2 "></span>
-              <select className="form-select mb-3" value={status}  onChange={handleStatusChange}>
-                <option value="Pending">🟡 Pending</option>
-                <option value="Ongoing">🔵 Ongoing</option>
-                <option value="Resolved">🟢 Resolved</option>
-              </select>
-            </div>
+          <h1 className="h4 fw-bold">{complaint.title}</h1>
+
+          <div className="complaint-meta mt-2">
+            <span className="me-3">
+              <i className="bi bi-calendar3 me-1"></i> {formatDate(complaint.timestamp)}
+            </span>
+           
           </div>
-        </div>
-        <div className="card mb-4">
-          <div className="card-body">
-            <h3 className="h5 mb-3">Your Comments</h3>
+
+          <p className="mt-2 description-text">{complaint.description}</p>
+
+          {/* STATUS */}
+          <div className="update-status-box mt-3">
+            <span>Update Status:</span>
+            <select
+              className={`form-select ${status.toLowerCase()}-status`}
+              value={status}
+              onChange={handleStatusChange}
+            >
+              <option value="Pending">⏳ Pending</option>
+              <option value="Ongoing">🔄 Ongoing</option>
+              <option value="Resolved">✅ Resolved</option>
+            </select>
+          </div>
+
+          <hr style={{ borderTop: "2px solid #666", marginTop: "1rem", marginBottom: "2rem" }} />
+
+          {/* COMMENTS */}
+          <div className="section-header">
+            <h3 className="comment-heading">
+              <i className="bi bi-chat-left-dots-fill"></i>Comments ({complaint.comments.length})
+            </h3>
+          </div>
+
+          <div className="comments-container">
             {complaint.comments.length > 0 ? (
               complaint.comments.map((comment) => (
-                <div key={comment.id} className="comment">
-                  <small className="text-muted">{formatDate(comment.date)}</small>
-                  <p className="mb-0">{comment.text}</p>
+                <div key={comment.id} className="comment-card">
+                  <div className="comment-header">
+  <div className="author-wrapper">
+    <span className="comment-avatar">👤</span>
+    <span className="comment-author">{comment.author || "Admin Team"}</span>
+  </div>
+  <div className="comment-date">{formatDate(comment.date)}</div>
+</div>
+                  <div className="comment-body">{comment.text}</div>
                 </div>
               ))
             ) : (
               <p className="text-muted">No comments yet.</p>
             )}
-            <div className="d-flex align-items-center">
-  <textarea
-    className="form-control flex-grow-1"
-    placeholder="Add your comment here..."
-    rows="2"
-    style={{ height: "60px" }}  // Ensures same height as the button
-    value={newComment}
-    onChange={(e) => setNewComment(e.target.value)}
-  ></textarea>
-  
-  <button 
-    className="btn btn-primary btn-sm ms-2 mb-2 d-flex align-items-center justify-content-center"
-    onClick={handleCommentSubmit}
-    disabled={!newComment.trim()} 
-    style={{ width: "60px", height: "60px" }}  
-  >
-    <IoMdSend className="text-white" size={30} />
-  </button>
-</div>
+
+            <div className="d-flex align-items-center mt-3">
+              <textarea
+                className="form-control flex-grow-1"
+                placeholder="Add your comment here..."
+                rows="2"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              ></textarea>
+
+              <button
+                className="btn btn-primary btn-sm ms-2 d-flex align-items-center justify-content-center"
+                onClick={handleCommentSubmit}
+                disabled={!newComment.trim()}
+                style={{ width: "60px", height: "60px" }}
+              >
+                <IoMdSend className="text-white" size={30} />
+              </button>
+            </div>
           </div>
         </div>
       </div>

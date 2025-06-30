@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
 
 
   const checkAdminStatus = async (email) => {
+
     try {
       const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
         method: "POST",
@@ -48,26 +49,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithSSO = () => {
+   
     if (!window.google || !window.google.accounts || !window.google.accounts.id) {
       console.error("Google Identity Services not loaded");
       return;
     }
 
+
     window.google.accounts.id.initialize({
       client_id: "522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com",
       callback: async (response) => {
+    
+
       
-
-
         const authenticateUser = async () => {
+	 
           const res = await fetch("https://auth.vjstartup.com/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({ token: response.credential }),
           });
-
+		
           const data = await res.json();
+	
           if (data.user) {
             setUser(data.user);
             checkAdminStatus(data.user.email);
@@ -77,10 +82,15 @@ export const AuthProvider = ({ children }) => {
 
         authenticateUser();
       },
+      // ux_mode: "redirect"
       ux_mode: "popup",
     });
+  
 
-    window.google.accounts.id.prompt();
+     window.google.accounts.id.prompt();
+
+    
+
   };
 
   const logout = async () => {

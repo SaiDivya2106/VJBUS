@@ -4,7 +4,16 @@
   display: flex;
   justify-content: space-between;
   padding: 10px 20px;
+  position: fixed;              /* ✅ fix to top */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;                /* ✅ ensure it's above all content */
+  background-color: #212529;    /* ✅ retain bg even when fixed */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* ✅ subtle shadow */
 }
+
+
 
 .navbar-nav .nav-item {
   margin-right: 15px;

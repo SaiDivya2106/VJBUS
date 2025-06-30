@@ -65,17 +65,20 @@
 .user-dashboard-container .user-details h2 {
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
+ 
 }
 
 .user-dashboard-container .user-details p {
   font-size: 1rem;
   margin: 0;
+
 }
 
 /* My Complaints Heading */
 .user-dashboard-container .my-complaints-heading {
   margin-top: 2rem;
   margin-bottom: 1.5rem;
+
 }
 
 .user-dashboard-container .my-complaints-heading h2 {
@@ -83,7 +86,7 @@
   color: #455a64; /* Darker gray for headings */
   border-bottom: 2px solid #7e57c2; /* Slightly darker purple border */
   display: inline-block;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 /* Complaints Cards Section */
@@ -183,20 +186,58 @@
   margin-bottom: 2px;
 }
 
-.user-dashboard-container .status.ongoing {
-  background-color: #70c4e5;
-  color: #000;
+/* --- Status Badge Styles --- */
+.status {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
 }
 
-.user-dashboard-container .status.pending {
-  background-color: rgb(94, 174, 240);
-  color: #fff;
+/* Specific status colors */
+.status.pending {
+  color: #ff9800;
+  border: 1px solid #ffcc80;
 }
 
-.user-dashboard-container .status.resolved {
-  background-color: #28a745;
-  color: #fff;
+.status.ongoing {
+  color: #2b8a3e;
+  border: 1px solid #5d9e66;
 }
+
+
+.status.resolved {
+ 
+  color: #0c8599;
+  border: 1px solid #a5c2d6;
+}
+
+
+.view-details-btn {
+  border: 1px solid #8a2be2;     /* Violet border */
+  /* color: #8a2be2;                */
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  background-color: transparent; /* No background */
+  transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background-color: transparent;  /* Keep background transparent */
+  color: #7a1fd0;                 /* Slightly darker text on hover */
+  border-color: #7a1fd0;          /* Slightly darker border */
+  text-decoration: none;
+}
+
+
+
+
+
 
 /* Admin Updates Section */
 .admin-updates {
