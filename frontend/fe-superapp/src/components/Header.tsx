@@ -14,7 +14,7 @@ const Header = () => {
   useEffect(() => {
     async function checkUserDetails() {
       try {
-        const response = await fetch('https://auth.vnrzone.site/check-auth', {
+        const response = await fetch('https://auth.vjstartup.com/check-auth', {
           method: 'GET',
           credentials: 'include',
         });
@@ -44,7 +44,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch('https://auth.vnrzone.site/logout', {
+      await fetch('https://auth.vjstartup.com/logout', {
         method: 'POST',
         credentials: 'include'
       });

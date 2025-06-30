@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     async function checkAuthStatus() {
       try {
-        const response = await fetch('https://auth.vnrzone.site/check-auth', {
+        const response = await fetch('https://auth.vjstartup.com/check-auth', {
           method: 'GET',
           credentials: 'include',
         });

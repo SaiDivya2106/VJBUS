@@ -25,7 +25,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
     setIsLoading(true);
     try {
-      const backendResponse = await fetch('https://auth.vnrzone.site/auth/google', {
+      const backendResponse = await fetch('https://auth.vjstartup.com/auth/google', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
         secure: isSecure && !isLocalhost,
         sameSite: 'lax' as const,
         expires: 1,
-        ...(isLocalhost ? {} : { domain: '.vnrzone.site' }),
+        ...(isLocalhost ? {} : { domain: '.vjstartup.com' }),                   
       };
 
       Cookies.set('userToken', token, cookieOptions);

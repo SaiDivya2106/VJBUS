@@ -55,7 +55,7 @@ const WebView: React.FC<WebViewProps> = ({ url, onBack }) => {
   };
 
   const handleLoginRedirect = () => {
-    window.location.href = 'https://auth.vnrzone.site/login';  // Redirect to SSO login page
+    window.location.href = 'https://auth.vjstartup.com/login';  // Redirect to SSO login page
 };
 
 

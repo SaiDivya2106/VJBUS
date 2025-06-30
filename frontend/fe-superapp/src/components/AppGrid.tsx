@@ -33,7 +33,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Bus Tracking",
       description: "Track college buses in real-time",
       icon: <Bus size={40} />,
-      url: "https://bus.vnrzone.site/",
+      url: "https://bus.vjstartup.com/",
       color: "bg-red-500"
     },
     {
@@ -41,7 +41,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Complaints",
       description: "Register complaints and grievances",
       icon: <FileWarning size={40} />,
-      url: "https://complaints.vnrzone.site/",
+      url: "https://complaints.vjstartup.com/",
       color: "bg-orange-500",
       requiresOwnAuth: true
     },
@@ -50,7 +50,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Fake News Check",
       description: "Fake message verification",
       icon: <Skull size={40} />,
-      url: "https://wall.vnrzone.site/",
+      url: "https://wall.vjstartup.com/",
       color: "bg-blue-500"
     },
     {
@@ -58,7 +58,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Projects App",
       description: "Manage Projects life cycle",
       icon: <MessageCircleQuestion  size={40} />,
-      url: "https://projecthub.vnrzone.site/",
+      url: "https://projecthub.vjstartup.com/",
       color: "bg-green-500"
     },
     {
@@ -66,7 +66,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Open House",
       description: "Explore working projects through demos",
       icon: <Award size={40} />,
-      url: "https://openhouse.vnrzone.site/",
+      url: "https://openhouse.vjstartup.com/",
       color: "bg-purple-500"
     },
     {
@@ -74,7 +74,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "EasyFind",
       description: "Find your lost items here.",
       icon: <Library size={40} />,
-      url: "https://easyfind.vnrzone.site/",
+      url: "https://easyfind.vjstartup.com/",
       color: "bg-yellow-500"
     },
     {
@@ -82,7 +82,7 @@ const AppGrid: React.FC<AppGridProps> = ({ onAppClick }) => {
       name: "Student Activity",
       description: "Generate Resume based on activity",
       icon: <Newspaper size={40} />,
-      url: "https://activity.vnrzone.site/",
+      url: "https://activity.vjstartup.com/",
       color: "bg-indigo-500"
     // },
     // {
