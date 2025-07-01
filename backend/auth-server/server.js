@@ -11,10 +11,14 @@ app.use(express.json());
 app.use(cors({
     origin: function (origin, callback) {
         const allowedOrigins = [
-            "http://localhost:3116", 
+            "http://localhost:3000", 
+            "http://localhost:4000", 
+            "http://localhost:6000", 
             "http://localhost:3117",
-            "http://localhost:3119", 
-            /https?:\/\/([a-zA-Z0-9-]+\.)?vjstartup\.com/ // ✅ Regex for any subdomain of .vjstartup.com
+            "http://localhost:3119",
+            "https://dev-auth.vjstartup.com",
+            "https://auth.vjstartup.com",
+            /^https?:\/\/([a-zA-Z0-9-]+\.)?vjstartup\.com/
         ];
 
         // Check if the origin matches any of the allowed origins
@@ -25,6 +29,8 @@ app.use(cors({
             return origin === allowedOrigin;
         });
 
+        
+
         if (isAllowed || !origin) {
             callback(null, true); // ✅ Allow the request
         } else {
@@ -33,8 +39,7 @@ app.use(cors({
     },
     credentials: true   // ✅ Allow cross-origin cookies
 }));
-
-
+app.options("*", cors());
 app.use(cookieParser());
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -159,3 +164,4 @@ app.post("/logout", (req, res) => {
 
 
 app.listen(3115, () => console.log("Auth Server running on port 3115"));
+

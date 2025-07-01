@@ -10,14 +10,7 @@ export default defineConfig({
 	    '103.248.208.119',
 	    'superapp.vjstartup.com',
 	    'dev-superapp.vjstartup.com'
-    ],
-    hmr: {
-      protocol: 'wss',
-      host: 'dev-superapp.vjstartup.com',
-      port: 3103,
-    },
-  },
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
-});
+    ]
+  }
+  });
+
