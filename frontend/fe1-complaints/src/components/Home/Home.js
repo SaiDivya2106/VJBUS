@@ -165,10 +165,17 @@ const Home = () => {
         </div>
 
         <div className="complaints-list container">
-          {filteredComplaints.length === 0 ? (
-            <p>No complaints found.</p>
-          ) : (
-            filteredComplaints.map((complaint) => (
+          {loading ? (
+  <div className="loading-container">
+    <div className="spinner" />
+    <p>Loading complaints...</p>
+  </div>
+) : error ? (
+  <div className="error-message">Failed to load complaints. Please check your connection.</div>
+) : filteredComplaints.length === 0 ? (
+  <p>No complaints found.</p>
+) : (
+  filteredComplaints.map((complaint) => (
               <div key={complaint.complaint_id} className="complaint-card">
                 <div className="card-header">
                   <div className="date-info">

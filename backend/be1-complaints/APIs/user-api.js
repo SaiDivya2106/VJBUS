@@ -11,6 +11,7 @@ const nodemailer=require("nodemailer");
 const authMiddleware = require("../Middleware/authMiddleware");
 
 
+
 dotenv.config(); // Load environment variables
 
 const userApp = exp.Router();
@@ -26,40 +27,23 @@ userApp.use((req, res, next) => {
     next();
 });
 
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+// Function to check for offensive language
+function containsOffensiveLanguage(text) {
+  const offensiveWords = ["offensive", "abusive", "hate", "stupid"];
+  return offensiveWords.some((word) => text.toLowerCase().includes(word));
+}
 
-// Step 1: Redirect to GitHub OAuth
-userApp.get("/auth/github", (req, res) => {
-  const redirectUri = "http://localhost:5000/auth/github/callback";
-  res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&scope=user`
+// Function to check for meaningless complaints
+function isMeaninglessComplaint(text) {
+  const tokenizer = new natural.WordTokenizer();
+  const words = tokenizer.tokenize(text.toLowerCase());
+
+  const meaningfulWords = words.filter(
+    (word) => validWords.has(word) && !natural.stopwords.includes(word)
   );
-});
 
-// Step 2: GitHub Callback and Token Exchange
-userApp.get("/auth/github/callback", async (req, res) => {
-  const { code } = req.query;
-  try {
-    const response = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code,
-      },
-      { headers: { Accept: "application/json" } }
-    );
-
-    const accessToken = response.data.access_token;
-    res.json({ token: accessToken });
-  } catch (error) {
-    res.status(500).json({ error: "GitHub Authentication Failed" });
-  }
-});
-
-
-
+  return meaningfulWords.length < 2;
+}
 
 userApp.post(
   "/add-complaint",
@@ -175,23 +159,7 @@ userApp.post(
   })
 );
 
-// Function to check for offensive language
-function containsOffensiveLanguage(text) {
-  const offensiveWords = ["offensive", "abusive", "hate", "stupid"];
-  return offensiveWords.some((word) => text.toLowerCase().includes(word));
-}
 
-// Function to check for meaningless complaints
-function isMeaninglessComplaint(text) {
-  const tokenizer = new natural.WordTokenizer();
-  const words = tokenizer.tokenize(text.toLowerCase());
-
-  const meaningfulWords = words.filter(
-    (word) => validWords.has(word) && !natural.stopwords.includes(word)
-  );
-
-  return meaningfulWords.length < 2;
-}
 
   
 
