@@ -57,7 +57,7 @@ const apps: App[] = [
     id: "complaints",
     name: "Complaints",
     description: "Register complaints and grievances",
-    url: "https://complaints.vjstartup.com/",
+    url: "https://dev-complaints.vjstartup.com/",
     icon: FileWarning,
     category: "Student Services",
     color: "bg-orange-500",
@@ -77,7 +77,7 @@ const apps: App[] = [
     id: "projects",
     name: "Projects App",
     description: "Manage Projects life cycle",
-    url: "https://projecthub.vjstartup.com/",
+    url: "https://dev-projecthub.vjstartup.com/",
     icon: MessageCircleQuestion,
     category: "Academic",
     color: "bg-green-500",
@@ -104,15 +104,25 @@ const apps: App[] = [
     gradient: "from-yellow-500 to-yellow-600"
   },
   {
-    id: "student-activity",
-    name: "Student Activity",
-    description: "Generate Resume based on activity",
-    url: "https://activity.vjstartup.com/",
+    id: "student-placements",
+    name: "Placements",
+    description: "Help students get placements",
+    url: "https://placements.vjstartup.com/",
     icon: Newspaper,
     category: "Career",
     color: "bg-indigo-500",
     gradient: "from-indigo-500 to-indigo-600"
   }
+  //   {
+  //   id: "student-activity",
+  //   name: "Student Activity",
+  //   description: "Generate Resume based on activity",
+  //   url: "https://activity.vjstartup.com/",
+  //   icon: Newspaper,
+  //   category: "Career",
+  //   color: "bg-indigo-500",
+  //   gradient: "from-indigo-500 to-indigo-600"
+  // }
 ];
 
 

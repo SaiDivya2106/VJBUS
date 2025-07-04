@@ -27,7 +27,7 @@ const apps = [
     id: "projects",
     name: "Projects App",
     description: "Manage Projects life cycle",
-    url: "https://projecthub.vjstartup.com/"
+    url: "https://dev-projecthub.vjstartup.com/"
   },
   {
     id: "open-house",
@@ -38,14 +38,14 @@ const apps = [
   {
     id: "easyfind",
     name: "EasyFind",
-    description: "Find your lost items here.",
+    description: "Find your lost items here",
     url: "https://easyfind.vjstartup.com/"
   },
   {
-    id: "student-activity",
-    name: "Student Activity",
-    description: "Generate Resume based on activity",
-    url: "https://activity.vjstartup.com/"
+    id: "student-placements",
+    name: "Placements",
+    description: "Help students get placements",
+    url: "https://placements.vjstartup.com/"
   }
 ];
 
