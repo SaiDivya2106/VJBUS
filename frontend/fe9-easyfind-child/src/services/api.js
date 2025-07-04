@@ -2,8 +2,7 @@ import axios from 'axios';
 import Cookies from "js-cookie";
 
 const api = axios.create({
-  // baseURL: import.meta.env.VITE_EASYFIND_BACKEND_URL || 'https://easyfind.vnrzone.site/ef-be/',
-  baseURL:'https://easyfind.vnrzone.site/ef-be/'
+  baseURL: import.meta.env.VITE_EASYFIND_BACKEND_URL || 'https://easyfind.vjstartup.com/ef-be/'
 });
 
 // ✅ Use token from cookies instead of localStorage
