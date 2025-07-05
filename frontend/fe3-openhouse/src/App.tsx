@@ -159,7 +159,9 @@ function App() {
     const matchesDepartment = selectedDepartments.size === 0 || selectedDepartments.has(project.department);
     return matchesTags && matchesDepartment;
   });
-  const shuffledProjects = shuffleArray(filteredProjects);
+  // const shuffledProjects = shuffleArray(filteredProjects);
+  // Use filteredProjects directly to disable shuffling
+  const shuffledProjects = filteredProjects;
 
   if (!user) {
     return (
