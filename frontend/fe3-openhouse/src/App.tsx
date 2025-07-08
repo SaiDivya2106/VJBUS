@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-const API_URL = 'https://openhouse.vnrzone.site/api';
+const API_URL = `${import.meta.env.VITE_API_URL || ''}`;
 // Shuffle function
 const shuffleArray = (array: Project[]): Project[] => {
   return [...array].sort(() => Math.random() - 0.5);
@@ -159,7 +159,9 @@ function App() {
     const matchesDepartment = selectedDepartments.size === 0 || selectedDepartments.has(project.department);
     return matchesTags && matchesDepartment;
   });
-  const shuffledProjects = shuffleArray(filteredProjects);
+  // const shuffledProjects = shuffleArray(filteredProjects);
+  // Use filteredProjects directly to disable shuffling
+  const shuffledProjects = filteredProjects;
 
   if (!user) {
     return (
