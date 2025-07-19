@@ -29,6 +29,8 @@ import GiveToStudent from "./components/GiveToStudent";
 import UploadItem from "./components/UploadItem";
 import ChangePassword from "./components/ChangePassword";
 import EditItem from "./components/EditItem"
+import GoogleLoginButton from './components/GoogleLoginButton';
+import ProtectedRoute from './contexts/ProtectedRoute'
 
 const drawerWidth = 240;
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
@@ -41,41 +43,10 @@ const menuItems = [
   { text: 'Give to Student', path: '/admin/give', icon: <PeopleIcon /> },
   { text: 'Upload Item', path: '/admin/upload', icon: <UploadIcon /> },
   { text: 'Edit Items', path: '/admin/edit', icon: <CheckIcon /> },
-  { text: 'Change Password', path: '/admin/change-password', icon: <LockIcon /> }
+  // { text: 'Change Password', path: '/admin/change-password', icon: <LockIcon /> }
 ];
 
-const ProtectedRoute = ({ children }) => {
-  const [isValid, setIsValid] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem('adminToken');
 
-  useEffect(() => {
-      const verifyToken = async () => {
-          if (!token) {
-              setLoading(false);
-              return;
-          }
-
-          try {
-              await axios.get(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/verify`, {
-                  headers: { Authorization: `Bearer ${token}` }
-              });
-              setIsValid(true);
-          } catch (error) {
-              localStorage.removeItem('adminToken');
-              setIsValid(false);
-          } finally {
-              setLoading(false);
-          }
-      };
-
-      verifyToken();
-  }, [token]);
-
-  if (loading) return null; // Or a loading spinner
-
-  return isValid ? children : <Navigate to="/login" replace />;
-};
 
 
 function AppContent() {
@@ -84,6 +55,9 @@ function AppContent() {
 
   const handleDrawerToggle = () => setOpen(!open);
   const handleLogout = () => {
+    axios.post("https://auth.vjstartup.com/logout",{},{
+      withCredentials: true
+    })
     localStorage.removeItem('adminToken');
     window.location.href = '/login';
   };
@@ -118,14 +92,14 @@ function AppContent() {
         <Toolbar />
         <Container maxWidth="lg">
           <Routes>
-            <Route path="/login" element={<Admin />} />
+            <Route path="/login" element={<GoogleLoginButton />} />
             <Route path="/" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/approve" element={<ProtectedRoute><ApproveItems /></ProtectedRoute>} />
             <Route path="/admin/give" element={<ProtectedRoute><GiveToStudent /></ProtectedRoute>} />
             <Route path="/admin/upload" element={<ProtectedRoute><UploadItem /></ProtectedRoute>} />
             <Route path="/admin/edit" element={<ProtectedRoute><EditItem/></ProtectedRoute>} />
-            <Route path="/admin/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+            {/* <Route path="/admin/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} /> */}
           </Routes>
         </Container>
       </Box>

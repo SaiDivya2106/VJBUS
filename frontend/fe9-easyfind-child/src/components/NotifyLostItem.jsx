@@ -26,7 +26,7 @@ function NotifyLostItems() {
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState({ type: '', content: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
+  const { user,token } = useAuth();
   const email = user?.email;
 
   const handleSubmit = async (e) => {
@@ -53,7 +53,7 @@ function NotifyLostItems() {
           dateLost,
           description 
         },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setMessage({

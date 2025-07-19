@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 
 function LostItems() {
-  const { user } = useAuth();
+  const { user,token } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,12 +19,13 @@ function LostItems() {
           `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/lost-items/${user.email}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
         setItems(res.data);
       } catch (err) {
+        console.log(err)
         setError("Failed to fetch lost items.");
       } finally {
         setLoading(false);
@@ -44,7 +45,7 @@ function LostItems() {
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/lost/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

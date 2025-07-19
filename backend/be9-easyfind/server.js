@@ -2,20 +2,45 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
-const authRoutes = require("./apis/auth/auth.route");
-const itemsRoutes = require("./apis/items/items.route");    
-const userDetails = require("./apis/users/userDetails");
+const authRoutes = require("./routes/auth.route");
+const adminRoutes = require("./routes/admin.route");
+const userRoutes = require("./routes/user.route")  
+const cookieParser = require("cookie-parser");
+
+// const userDetails = require("./apis/users/userDetails");
 const connectDB=require('./config/db')
 // const securityRoutes = require("./apis/security/security.route");
 
+
 const app = express();
+
 
 // Database connection
 connectDB()
-    
+
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3116",
+  "http://localhost:3110",
+  "http://localhost:3000",
+  "http://localhost:4000",
+  "http://localhost:3117",
+  "https://easyfind.vjstartup.com", // add as needed
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // ✅ allow request
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // ✅ required for cookies
+}));
+
 app.use(express.json());
+app.use(cookieParser());
 // app.use(passport.initialize());
 
 // // DB Connect
@@ -27,8 +52,9 @@ app.get("/" ,(req,res)=>{
     res.send("Hello world")
 })
 app.use("/auth", authRoutes);
-app.use("/api/items", itemsRoutes);
-app.use("/api", userDetails);
+app.use("/api/items/admin", adminRoutes);
+app.use("/api/items", userRoutes);
+// app.use("/api", userDetails);
 
 // app.use("/api/security", securityRoutes);
 

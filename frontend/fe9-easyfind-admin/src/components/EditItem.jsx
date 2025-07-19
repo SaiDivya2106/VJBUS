@@ -24,7 +24,8 @@ const EditItemPage = () => {
             try {
                 const token = localStorage.getItem("adminToken");
                 const res = await axios.get(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
+                    withCredentials:true,
                 });
                 setItems(res.data);
             } catch (err) {
@@ -67,7 +68,9 @@ const EditItemPage = () => {
                 
                 `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/edit-item/${editItem._id}`,
                 editItem,
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${token}` },
+                 withCredentials:true, },
+                
             );
             setItems(items.map(item => item._id === editItem._id ? editItem : item));
             setEditItem(null);
@@ -82,7 +85,8 @@ const EditItemPage = () => {
             const token = localStorage.getItem("adminToken");
             await axios.delete(
                 `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/edit-item/${deleteId}`,
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${token}` },
+                withCredentials:true }
             );
             setItems(items.filter((i) => i._id !== deleteId));
             setShowDeleteModal(false);

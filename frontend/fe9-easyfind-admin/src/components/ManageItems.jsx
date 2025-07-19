@@ -22,7 +22,8 @@ function ManageItems() {
         const response = await axios.get(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-          }
+          },
+          withCredentials:true,
         });
         // Sort items by reportedDate in descending order
         const sortedItems = response.data.sort((a, b) => 
@@ -52,7 +53,8 @@ function ManageItems() {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-          }
+          },
+          withCredentials:true,
         }
       );
       

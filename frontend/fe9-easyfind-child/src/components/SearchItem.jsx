@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchFoundItems } from "../services/api";
 import stringSimilarity from "string-similarity"; 
+import { useAuth } from "../contexts/AuthContext";
 
 const categories = [
   "ID Card/Student Card",
@@ -23,12 +23,28 @@ const SearchItem = () => {
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeTab, setActiveTab] = useState("verified");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const {token} = useAuth();
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetchFoundItems();
-      setItems(response || []);
+      console.log("at the searchItem token from auth context",token)
+      const response = await fetch(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch");
+      }
+
+      const data = await response.json();
+      setItems(data || []);
       setError("");
     } catch (error) {
       setError("Error fetching items. Please try again.");
@@ -36,7 +52,7 @@ const SearchItem = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchItems();
@@ -54,9 +70,7 @@ const SearchItem = () => {
   const filteredItems = items
     .filter((item) => {
       const matchesCategory = activeCategory === "All" || item.category === activeCategory;
-      
       const matchesStatus = item.status === activeTab;
-      // console.log(item.itemName,item.description);
       return matchesCategory && matchesStatus;
     })
     .map((item) => ({
@@ -80,6 +94,28 @@ const SearchItem = () => {
         <p className="text-gray-600 text-sm sm:text-base">
           Browse through items found on campus
         </p>
+        
+        {/* Notice Message */}
+        <div className="mt-4 bg-orange-100 border-l-4 border-orange-400 p-4 rounded-r-lg">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-orange-700">
+                <strong>Privacy Notice:</strong> Some details of the items are hidden for verification of the owner at the security office. Please visit with proper identification to claim your item.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Info Message */}
+        <div className="mt-4 bg-blue-100 border-l-4 border-blue-400 p-4 rounded-r-lg">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> All verified items are currently available at the administration office.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-4 mb-8">
@@ -150,13 +186,14 @@ const SearchItem = () => {
         ) : filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredItems.map((item) => (
-              <div key={item._id} className="bg-white group relative rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <div key={item._id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                 <div className="aspect-square relative">
                   <img
                     src={item.image?.url || "/placeholder.jpg"}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer"
                     loading="lazy"
+                    onClick={() => setSelectedImage(item)}
                   />
                   <div className="absolute bottom-2 left-2">
                     <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusBadgeClass(item.status)}`}>
@@ -175,17 +212,6 @@ const SearchItem = () => {
                     </span>
                   </div>
                 </div>
-                <button className="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur rounded-full shadow-sm hover:bg-white transition-opacity opacity-0 group-hover:opacity-100">
-                  <svg
-                    className="w-4 h-4 text-gray-700"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </button>
               </div>
             ))}
           </div>
@@ -195,6 +221,34 @@ const SearchItem = () => {
           </div>
         )}
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full">
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="relative">
+              <img
+                src={selectedImage.image?.url || "/placeholder.jpg"}
+                alt={selectedImage.itemName}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+              {selectedImage.code && (
+                <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+                  <p className="text-lg font-mono">Code: {selectedImage.code}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -20,6 +20,7 @@ function GiveToStudent() {
   const [backendError, setBackendError] = useState("");
   const [enlargedImage, setEnlargedImage] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [expandedItems, setExpandedItems] = useState({});
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -30,7 +31,8 @@ function GiveToStudent() {
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-            }
+            },
+            withCredentials:true,
           }
         );
         setItems(response.data);
@@ -143,7 +145,8 @@ function GiveToStudent() {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-          }
+          },
+          withCredentials:true,
         }
       );
 
@@ -192,6 +195,13 @@ function GiveToStudent() {
     setProofImagePreview(null);
   };
 
+  const toggleItemDetails = (itemId) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -234,7 +244,6 @@ function GiveToStudent() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Give To Student</h1>
 
-      {/* Status Messages */}
       {isSuccess && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
           ✅ Handover successful!
@@ -251,7 +260,6 @@ function GiveToStudent() {
         </div>
       )}
 
-      {/* Controls Section */}
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="flex flex-wrap gap-4 mb-4">
           <input
@@ -285,7 +293,6 @@ function GiveToStudent() {
         </div>
       </div>
 
-      {/* Items List */}
       <ul className="space-y-4">
         {filteredItems.map(item => (
           <li key={item._id} className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -315,14 +322,20 @@ function GiveToStudent() {
                     <label className="text-gray-500">Status:</label>
                     <p className="capitalize font-medium">{item.status}</p>
                   </div>
-                  <div>
-                    <label className="text-gray-500">Reported Date:</label>
-                    <p className="font-medium">{formatDate(item.reportedDate)}</p>
-                  </div>
-                  <div>
-                    <label className="text-gray-500">foundLocation:</label>
-                    <p className="capitalize font-medium">{item.foundLocation}</p>
-                  </div>
+                  
+                  {(item.status === "claimed" || expandedItems[item._id]) && (
+                    <>
+                      <div>
+                        <label className="text-gray-500">Reported Date:</label>
+                        <p className="font-medium">{formatDate(item.reportedDate)}</p>
+                      </div>
+                      <div>
+                        <label className="text-gray-500">Found Location:</label>
+                        <p className="capitalize font-medium">{item.foundLocation}</p>
+                      </div>
+                    </>
+                  )}
+                  
                   {item.status === "claimed" && (
                     <div>
                       <label className="text-gray-500">Handover Date:</label>
@@ -330,6 +343,27 @@ function GiveToStudent() {
                     </div>
                   )}
                 </div>
+                
+                {item.status === "verified" && (
+                  <div className="mt-2">
+                    {!expandedItems[item._id] ? (
+                      <button
+                        onClick={() => toggleItemDetails(item._id)}
+                        className="text-blue-600 hover:underline text-sm"
+                      >
+                        View Details
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggleItemDetails(item._id)}
+                        className="text-gray-600 hover:underline text-sm"
+                      >
+                        Hide Details
+                      </button>
+                    )}
+                  </div>
+                )}
+                
                 {item.status === "claimed" && <ClaimedItemDetails item={item} />}
               </div>
 
@@ -345,7 +379,6 @@ function GiveToStudent() {
               </div>
             </div>
 
-            {/* Handover Form */}
             {selectedItem?._id === item._id && (
               <div className="mt-4 pt-4 border-t">
                 <h4 className="text-lg font-semibold mb-4">Handover Details</h4>
@@ -442,7 +475,6 @@ function GiveToStudent() {
         ))}
       </ul>
 
-      {/* Enlarged Image Overlay */}
       {enlargedImage && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
@@ -478,7 +510,6 @@ function GiveToStudent() {
         </div>
       )}
 
-      {/* Camera Modal */}
       {isCameraActive && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center p-4">
           <div className="relative w-full max-w-2xl">

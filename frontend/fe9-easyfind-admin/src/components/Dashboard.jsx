@@ -36,11 +36,12 @@ function Dashboard() {
     const fetchItemStatus = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`,
+          `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
+              Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+            },
+            withCredentials:true,
           }
         );
   

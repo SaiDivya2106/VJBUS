@@ -1,19 +1,29 @@
 // middleware/auth.js
 const jwt = require('jsonwebtoken');
 
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(',') || [];
+
 module.exports = function (req, res, next) {
-  // Get token from header
-  const token = req.header('x-auth-token');
-  if (!token) {
+  const authHeader = req.header('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ msg: 'No token, authorization denied' });
   }
 
-  // Verify token
+  const token = authHeader.split(' ')[1];
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = decoded.admin; // attach admin data to request
+    const decoded = jwt.verify(token, process.env.AUTH_JWT_SECRET);
+    console.log("✅ Decoded admin data:", decoded);
+
+    const email = decoded.email;
+    if (!email || !ADMIN_EMAILS.includes(email)) {
+      return res.status(403).json({ msg: 'Forbidden: Email not authorized' });
+    }
+
+    req.admin = decoded.admin;
     next();
   } catch (err) {
+    console.error("❌ Token verification failed:", err.message);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };

@@ -1,28 +1,55 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { fetchReportedItems } from "../services/api";
+// import { fetchReportedItems } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
 function ReportedItems() {
-  const { user } = useAuth();
+  const { user,token } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
-    const getItems = async () => {
-      try {
-        const response = await fetchReportedItems(user);
-        setItems(response);
-      } catch (err) {
-        setError("Failed to fetch reported items.");
-      } finally {
-        setLoading(false);
+  const getItems = async () => {
+    setLoading(true);
+    try {
+      if (!user?.email) throw new Error("User email is required");
+
+      // Extract roll number from email
+      const atIndex = user.email.indexOf("@");
+      if (atIndex === -1) throw new Error("Invalid email format");
+
+      const rollNo = user.email.substring(0, atIndex);
+
+      const response = await fetch(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/reported/${rollNo}`, {
+        method: "GET",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch reported items");
       }
-    };
+
+      const data = await response.json();
+      setItems(data);
+    } catch (err) {
+      console.error("Failed to fetch reported items:", err);
+      setError("Failed to fetch reported items.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (user?.email) {
     getItems();
-  }, [user.email]);
+  }
+}, [user.email]);
+
 
   const handleDelete = async (id, status) => {
     if (status === "verified" || status === "claimed") return;

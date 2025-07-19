@@ -153,7 +153,8 @@ function UploadItem() {
       await axios.post(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-         }
+         },
+         withCredentials:true,
       });
 
       setIsSuccess(true);

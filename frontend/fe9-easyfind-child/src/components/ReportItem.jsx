@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { submitFoundItem } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const categories = [
   "ID Card/Student Card",
@@ -18,7 +18,7 @@ const categories = [
 ];
 
 const ReportItem = ({ onItemReported }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     itemName: '',
@@ -150,17 +150,27 @@ const ReportItem = ({ onItemReported }) => {
       data.append('reporterRollNo', rollNo);
       data.append('image', image);
 
-      const response = await submitFoundItem(data);
-      if (response.success) {
+      const response = await axios.post(
+        `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`, data, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      console.log("data is here", response)  
+      const res = response.data
+      if (res.success) {
         resetForm();
-        setSuccessMessage('Item successfully reported!');
+        setSuccessMessage('Item successfully reported! Please remember to submit the physical item to the security office.');
         setTimeout(() => {
           setSuccessMessage('');
-          onItemReported?.(response.item);
+          onItemReported?.(res.item);
           navigate('/');
-        }, 2000);
+        }, 10000);
       } else {
-        throw new Error(response.message || 'Failed to report item');
+        throw new Error(res.message || 'Failed to report item');
       }
     } catch (error) {
       setStatus(error.message);
@@ -170,20 +180,51 @@ const ReportItem = ({ onItemReported }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gradient-to-br from-blue-50 to-indigo-50  p-4">
+    <div className="min-h-screen flex items-start justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
       <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-lg">
+        {/* Encouraging Header */}
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-2">🏆</div>
+          <h2 className="text-2xl font-semibold text-blue-700 mb-2">
+            Be a Campus Hero!
+          </h2>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Found something? Help a fellow student by reporting it here. Your kindness makes our campus community stronger! 💙
+          </p>
+        </div>
+
+        {/* Important Notice */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+          <div className="flex items-start">
+            <div className="text-yellow-600 mr-3">⚠️</div>
+            <div>
+              <h3 className="font-semibold text-yellow-800 mb-1">Important Reminder</h3>
+              <p className="text-yellow-700 text-sm">
+                After submitting this form, please take the physical item to the 
+                <span className="font-semibold"> Security Office</span> immediately. 
+                This ensures the owner can retrieve their belongings safely.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {status && <p className="text-red-600 mb-3">{status}</p>}
-        {successMessage && <p className="text-green-600 mb-3">{successMessage}</p>}
-        <h2 className="text-2xl font-semibold text-center mb-4 text-blue-700">
-          Report Found Item
-        </h2>
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <div className="flex items-center">
+              <div className="text-green-600 mr-2">✅</div>
+              <p className="text-green-700 text-sm">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
           <input
             type="text"
             name="itemName"
             value={formData.itemName}
             onChange={handleChange}
-            placeholder="Item Name"
+            placeholder="What did you find? (e.g., iPhone, Keys, Wallet)"
             className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -191,7 +232,7 @@ const ReportItem = ({ onItemReported }) => {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            placeholder="Description"
+            placeholder="Describe the item (color, brand, distinctive features...)"
             rows="3"
             className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
             required
@@ -201,7 +242,7 @@ const ReportItem = ({ onItemReported }) => {
             name="foundLocation"
             value={formData.foundLocation}
             onChange={handleChange}
-            placeholder="Found Location"
+            placeholder="Where exactly did you find it? (Building, room, area)"
             className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -218,20 +259,20 @@ const ReportItem = ({ onItemReported }) => {
             ))}
           </select>
           <div className="relative w-full">
-              <input
-                type="date"
-                 name="reportedDate"
-                 value={formData.reportedDate || ""}
-                onChange={handleChange}
-                className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500 peer"
-                required
-              />
-          {!formData.reportedDate && (
-        <span className="absolute left-3 top-3 text-gray-400 peer-focus:hidden">
-            Select a date
-        </span>
-         )}
-        </div>
+            <input
+              type="date"
+              name="reportedDate"
+              value={formData.reportedDate || ""}
+              onChange={handleChange}
+              className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500 peer"
+              required
+            />
+            {!formData.reportedDate && (
+              <span className="absolute left-3 top-3 text-gray-400 peer-focus:hidden">
+                When did you find it?
+              </span>
+            )}
+          </div>
           
           <div className="flex gap-2">
             <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors">
@@ -241,7 +282,7 @@ const ReportItem = ({ onItemReported }) => {
                 onChange={handleImageChange}
                 className="hidden"
               />
-              📁 Upload Image
+              📁 Upload Photo
             </label>
             <button
               type="button"
@@ -251,7 +292,7 @@ const ReportItem = ({ onItemReported }) => {
               }}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
             >
-              📷 Use Camera
+              📷 Take Photo
             </button>
           </div>
 
@@ -270,9 +311,29 @@ const ReportItem = ({ onItemReported }) => {
             className={`bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 ${loading ? 'opacity-50' : ''}`}
             disabled={loading}
           >
-            {loading ? 'Uploading...' : 'Submit'}
+            {loading ? 'Submitting Report...' : '🚀 Report Found Item'}
           </button>
         </form>
+
+        {/* Next Steps Reminder */}
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
+            <span className="mr-2">📋</span>
+            Next Steps:
+          </h3>
+          <ol className="text-blue-700 text-sm space-y-1">
+            <li>1. Complete this form</li>
+            <li>2. Take the item to the Security Office  </li>
+            <li>3. The owner will be notified automatically</li>
+            <li>4. Feel good about helping someone! 😊</li>
+          </ol>
+        </div>
+
+        {/* Motivational Footer */}
+        <div className="mt-4 text-center text-gray-500 text-xs">
+          <p>✨ Every act of kindness matters ✨</p>
+          <p>Thank you for being an awesome community member!</p>
+        </div>
 
         {isCameraActive && (
           <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4">
