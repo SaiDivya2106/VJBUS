@@ -1,5 +1,5 @@
 import 'express'; // This ensures global types are merged
-import express, { Request, Response, RequestHandler, NextFunction } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -9,16 +9,18 @@ import { authRoutes } from './routes/auth.routes';
 import { studentRoutes } from './routes/student.routes';
 import { mentorRoutes } from './routes/mentor.routes';
 import securityRoutes from './routes/security.routes'; // ✅ correct import
-import cronJob from './utils/cron';
-cronJob.start();
+import userRoutes from './routes/user.routes'; // ✅ new user routes
+import adminRoutes from './routes/admin.routes'; // ✅ new admin routes
+// import cronJob from './utils/cron';
+//cronJob.start();
 
 dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  'http://localhost:3112',
-  'https://dev-gatepass.vjstartup.com',
-  'https://gatepass.vjstartup.com'
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://vnr-outpass-frontend.vercel.app',
 ];
 
 app.use(cors({
@@ -44,6 +46,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/mentor', mentorRoutes);
 app.use('/api/security', securityRoutes); // ✅ changed from '/security'
+app.use('/api/user', userRoutes); // ✅ new user routes
+app.use('/api/admin', adminRoutes); // ✅ new admin routes
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('💥 Uncaught error:', err);
