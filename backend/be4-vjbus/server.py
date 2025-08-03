@@ -1,7 +1,7 @@
 import eventlet
 eventlet.monkey_patch()
 import geopy
-from flask import Flask, request, jsonify,render_template
+from flask import Flask, request, jsonify,render_template, json
 from flask_cors import CORS
 from flask_socketio import SocketIO, join_room, leave_room, send
 import math
@@ -11,6 +11,12 @@ import sqlite3
 import socket
 import sys
 import os
+import threading
+import time
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 user_count={"count":0}
@@ -32,8 +38,11 @@ connected_routes = {}
 tracking_status = {}
 route_subscriptions = {}
 all_routes = []
+yet_to_be = []
 all_ids={}
 all_uis={}
+all_start_locations=json.loads(os.getenv("all_start_locations"))
+all_start_timings=json.loads(os.getenv("all_start_timings"))
 #database connections
 def init_db():
     conn = sqlite3.connect("database.db", check_same_thread=False)
@@ -77,6 +86,24 @@ init_db()
 
 
 #functions to be used later
+
+def auto_start():
+    while True:
+        now_time = datetime.now()
+        current_time_str = now_time.strftime("%H:%M")
+        for key in all_start_locations.keys():
+            start_time = all_start_timings[key]
+            if current_time_str == start_time:
+                print(f"Triggering start_locations for {key} at {now_time.strftime('%H:%M:%S')}")
+                if key in all_ids:
+                    start_locations(all_ids[key])
+        time.sleep(25)  # Check every 25 seconds
+
+# Start the scheduling thread
+thread = threading.Thread(target=auto_start, daemon=True)
+thread.start()
+
+
 def is_in_college(lon, lat):
     COLLEGE=(17.539873, 78.386514)
     # COLLEGE = (17.5479048, 78.394546)
@@ -94,7 +121,7 @@ def log_data(route_id):
             SELECT 1 FROM logs WHERE route_number = ? AND log_date = ?
         """, (route_id, current_date))
 
-        exists = cursor.fetchone()  # Fetch result (None if not found)
+        exists = cursor.fetchone()  # Fetch result (None if f)
 
         # Step 2: If not logged, insert the new log
         if not exists:
@@ -124,9 +151,10 @@ def log_user_count():
         result = cursor.fetchone()
         old_count = result[0] if result else 0 
         if old_count!=0:
+            s=old_count + user_count["count"]
             cursor.execute("""
-                UPDATE user_count set Users_count= ? where date=?
-            """, (old_count + user_count["count"]),current_date)
+                UPDATE user_count set Users_count= ? where date=?   
+            """, (s,current_date))
         else:
             cursor.execute("""
                 INSERT INTO user_count (Date, Users_count) VALUES (?, ?)
@@ -146,6 +174,36 @@ def get_key_by_value(d, target_value):
             return key
     return None
 
+def start_locations(socket_id):
+    if not socket_id:
+        response = {"status": "error", "message": "No socket ID provided","socket_id": request.sid }
+        socketio.emit("admin_start_location_response", response, room=request.sid)
+        return
+    
+    print(f"Admin start location request for socket: {socket_id}")
+
+    # if socket_id not in all_uis.values():
+        # response = {"status": "error", "message": f"Socket ID {socket_id} not found"}
+        # socketio.emit("admin_start_location_response", response, room=request.sid)
+        # return
+    
+    # Get the route ID for this socket
+    route_id = get_key_by_value(all_ids, socket_id)    
+    
+    # Send Start to this specific socket
+    print(f"Sending start to socket {socket_id} (route {route_id})")
+    socketio.emit("admin_start", {
+        "message": "Started by administrator",
+        "socket_id": socket_id,
+        "route_id": route_id
+    }, room=socket_id)
+
+    # Send response back to admin
+    response = {
+        "status": "success", 
+        "message": f"Start signal sent to socket {socket_id} (route {route_id})"
+    }
+    socketio.emit("admin_start_location_response", response)
 
 
 #Socket IO events
@@ -154,14 +212,13 @@ def handle_connect():
     route_id = request.args.get("route_id", "Unkown")
     role= request.args.get("role")
     sid= request.sid
-    if role in ["Driver", "Driver-UI"]:
+    if role in ["Driver"]:
         print(f"New connection: SID={sid}, Role={role}, Route ID={route_id}")
-    # print("Req: ",request.args)
+    print("Req: ",request.args)
     if role=="Driver":
         all_ids[route_id]=request.sid
     
-    if role=="Driver-UI":
-        all_uis[route_id]=request.sid
+
     print("All IDs: ",all_ids)
     print("All UIs: ",all_uis)
 
@@ -184,22 +241,67 @@ def handle_connect():
     socketio.emit("server_message", {"message": f"Route {route_id} connected!"})
     route_id=None
 
+
+@socketio.on("connect_ui")
+def handle_connect_Ui(data):
+    route_id = data["route_id"]
+    sid= request.sid
+    all_uis[route_id]=sid
+    print("All UIs: ",all_uis)
+    socketio.emit("server_message", {"message": f"Route {route_id} connected!"})
+
+
 @socketio.on("check_location")
 def handle_check_location(data):
-    sid = request.sid
-    print(sid)
-    print("Received check_location data: ", data)
     try:
-        driver_location = (data["latitude"], data["longitude"])
-        # Add logic to get the specific start location for the driver
-        # For example, let's assume the target location is a fixed point
-        distance = geodesic(driver_location, (17.519913, 78.377975)).meters
+        print("Received check_location data:  ",data)
+        route_id = data.get("route_id")
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+        heading = data.get("heading")  # New field
+        status = data.get("status")  # New field
+        sid=data.get("socket_id")
 
-        print(f"Driver {sid} checking location. Distance to target: {distance:.2f}m")
-        if distance <= 20050:
+        driver_location = (latitude, longitude)
+        tar_loc=(all_start_locations[route_id][0], all_start_locations[route_id][1])
+        distance = geodesic(driver_location, tar_loc).meters
+
+        # print("All Routes:  ",all_routes)
+        existing_route = next((r for r in yet_to_be if r["route_id"] == route_id), None)
+        # print("latest locations:  ",latest_location)
+        if not existing_route:
+            # Add only once
+            yet_to_be.append({
+                "route_id": route_id,
+                "latitude": latitude,
+                "longitude": longitude,
+                "heading": heading,
+                "status": status,
+                "socketId": sid
+            })
+
+
+        elif existing_route:
+            if status == "stopped" or status != "waiting":
+                yet_to_be.remove(existing_route)
+            else:
+                existing_route["latitude"] = latitude
+                existing_route["longitude"] = longitude
+                existing_route["heading"] = heading
+                existing_route["status"] = status
+                existing_route["socketId"] = sid
+        if distance <= 12500:
+            yet_to_be.remove(existing_route)
             socketio.emit("start_now", {'message': 'You are in the designated area. Start broadcasting.'}, room=sid)
             print(f"✅ Driver {sid} is in the zone. Sending 'start_now' command.")
 
+        socketio.emit("yet_to_be_bradcasted", {
+            "route_id": route_id,
+            "latitude": latitude,
+            "longitude": longitude,
+            "heading": heading,  # Send heading to clients
+            "status": status  # Send status to clients
+        })
     except KeyError as e:
         print(f"Error: Missing key {e} in 'check_location' data from {sid}")
     except Exception as e:
@@ -251,6 +353,7 @@ def handle_location_update(data):
     if is_in_college(longitude, latitude):
         print(f"Bus {route_id} is in college")
         log_data(route_id)
+        # handle_admin_disconnect_socket({ "socket_id": all_ids[route_id] })
 
     return {"status": "received"}
 
@@ -287,23 +390,40 @@ def handle_final_update(data):
 
 @socketio.on("disconnect")
 def handle_disconnect():
+    print("Client disconnected",request)
     session_id = request.sid
-    if session_id in connected_routes:
-        route_id = connected_routes[session_id]
-        if route_id in route_subscriptions:
+    route_id = request.args.get("route_id", "Unkown")
+    role= request.args.get("role")
+    print(f"Session {session_id} disconnected. Route ID: {route_id}, Role: {role}")
+    # Remove from connected_routes & tracking_status
+    route_id = connected_routes.pop(session_id, None)
+    tracking_status.pop(session_id, None)
+
+    # Remove from route_subscriptions
+    if route_id and route_id in route_subscriptions:
+        if session_id in route_subscriptions[route_id]:
             route_subscriptions[route_id].remove(session_id)
-        del connected_routes[session_id]
-        del tracking_status[session_id]
-        # print(f"Route Disconnected {route_id}")
-        socketio.emit("server_message", {"message": f"route {route_id} disconnected!"})
-        print(f"Route {route_id} disconnected. Current connections: {len(connected_routes)}")
-        print(connected_routes)
+
+    if route_id and all_ids.get(route_id) == session_id:
+        del all_ids[route_id]
+    # If this session_id was the UI for the route
+    if route_id and all_uis.get(route_id) == session_id:
+        del all_uis[route_id]
+
+    # for Driver-UI
+    if role=="Driver":
+        user_count["count"] -= 1
+    print(f"All IDs: {all_ids}")
+    print(f"All UIs: {all_uis}")
+
+    socketio.emit("server_message", {"message": f"Route {route_id or 'Unknown'} disconnected!"})
 
 
 @socketio.on("admin_disconnect_socket")
 def handle_admin_disconnect_socket(data):
     socket_id = data.get("socket_id")    
     if not socket_id:
+        print(f"Requested for {socket_id} but not found")
         response = {"status": "error", "message": "No socket ID provided","socket_id": request.sid }
         socketio.emit("admin_disconnect_response", response, room=request.sid)
         return
@@ -326,7 +446,7 @@ def handle_admin_disconnect_socket(data):
     
     # Send force disconnect to this specific socket
     print(f"Sending force_disconnect to socket {socket_id} (route {route_id})")
-    socketio.emit("admin_disconnect", {
+    socketio.emit("disconnect_by_admin", {
         "message": "Disconnected by administrator",
         "socket_id": socket_id,
         "route_id": route_id
@@ -357,7 +477,7 @@ def handle_admin_disconnect_socket(data):
 
 @socketio.on("admin_start_location")
 def handle_admin_start_location(data):
-    socket_id = data.get("socket_id")    
+    socket_id = data.get("socket_id")
     if not socket_id:
         response = {"status": "error", "message": "No socket ID provided","socket_id": request.sid }
         socketio.emit("admin_start_location_response", response, room=request.sid)
@@ -365,13 +485,13 @@ def handle_admin_start_location(data):
     
     print(f"Admin start location request for socket: {socket_id}")
 
-    if socket_id not in all_uis.values():
-        response = {"status": "error", "message": f"Socket ID {socket_id} not found"}
-        socketio.emit("admin_start_location_response", response, room=request.sid)
-        return
+    # if socket_id not in all_uis.values():
+        # response = {"status": "error", "message": f"Socket ID {socket_id} not found"}
+        # socketio.emit("admin_start_location_response", response, room=request.sid)
+        # return
     
     # Get the route ID for this socket
-    route_id = get_key_by_value(all_uis, socket_id)    
+    route_id = get_key_by_value(all_ids, socket_id)    
     
     # Send Start to this specific socket
     print(f"Sending start to socket {socket_id} (route {route_id})")
@@ -386,6 +506,7 @@ def handle_admin_start_location(data):
         "status": "success", 
         "message": f"Start signal sent to socket {socket_id} (route {route_id})"
     }
+    
     socketio.emit("admin_start_location_response", response)
 
 
@@ -436,14 +557,22 @@ def handle_message(data):
 
 @socketio.on("all_uis")
 def get_all_uis(data=None):
-    # print("All UIs: ", all_uis)
-    return {k: all_uis[k] for k in all_uis.keys() - all_ids.keys()}
+    return all_ids
 
 
 @socketio.on("all_connections")
 def get_all_connections(data=None):
     connections = []
     for route in all_routes:
+        route.update({
+            "socketId": route.get("socketId"),
+            "route_id": route.get("route_id"),
+            "status": route.get("status"),
+            "latitude": route.get("latitude"),
+            "longitude": route.get("longitude")
+        })
+        connections.append(route)
+    for route in yet_to_be:
         route.update({
             "socketId": route.get("socketId"),
             "route_id": route.get("route_id"),
