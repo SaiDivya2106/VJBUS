@@ -1,42 +1,12 @@
+# React + Vite
 
-## Setup 
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-### One time setup
-```
-cd python3 -m venv wall_env
-source ~/wall_env/bin/activate
-pip install flask pandas
-pip install Flask-Caching requests
+Currently, two official plugins are available:
 
-```
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### Files Required
+## Expanding the ESLint configuration
 
-Google Form 
-  - Link : https://docs.google.com/forms/d/e/1FAIpQLSfKSfY19CpacWTETh1Nn3A6jpByFuwsbZkF2IIWzbqIltwf5w/viewform
-  - Access 
-  - Make sure it is correct in index.html
-
-Google Sheet
-  - Link https://docs.google.com/spreadsheets/d/14hey-KIdpDL00qnID0jE9HlKzEVu7s8f2PC_rXwLxMY/gviz/tq?tqx=out:csv&gid=616528629
-  - Access : Give view access to all
-  - Make sure it is correct in app.py
-  
-
-### How to start the app
-```
-source ~/wall_env/bin/activate
-cd fe5-wall
-python3 app.py
-```
-
-### Browser
-
-http://10.45.8.187:3014/
-
-
-### Public URL
-http://fakecheck.vnrzone.site/
-http://wall.vnrzone.site
-
-
+If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

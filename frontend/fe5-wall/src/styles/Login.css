@@ -1,0 +1,539 @@
+/* Login Container */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #f3e8ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 28rem; /* Adjusted for better overall responsiveness */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Logo and Branding */
+.login-branding {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: scaleIn 0.6s ease-out;
+}
+
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.logo-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.shield-icon {
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+.app-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.app-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Login Card */
+.login-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: none;
+  animation: slideUp 0.6s ease-out;
+}
+
+.login-header {
+  text-align: center;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.login-content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.login-form {
+  margin-bottom: 1.5rem;
+  /* Centering the Google Sign-In button */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically if height is defined */
+  /* If the GSI button is wider than its content, it will also be centered */
+}
+
+/* Google Login Button specific styling */
+/* This class targets the div that the GSI library renders into */
+.google-login-btn {
+    /* The GSI library inserts an iframe here, so direct styling is limited. */
+    /* It's usually a good idea to let Google's styling dictate the button's look */
+    /* However, you can control its container for centering and margins */
+    display: flex; /* Make the container a flex container */
+    justify-content: center; /* Center the iframe horizontally within this div */
+    width: 100%; /* Ensure it takes full width to allow centering */
+    box-sizing: border-box; /* Include padding/border in width */
+    padding: 0; /* Remove any default padding */
+}
+
+/* The GSI button itself is an iframe. To center it within its parent: */
+.google-login-btn > div { /* This targets the internal div that GSI might use, which contains the iframe */
+    margin: 0 auto; /* This centers the Google button iframe */
+}
+
+
+/* Input Group - Keeping it in case you add other form fields later */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.email-input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: #374151;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.email-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Login Button (generic styling, actual GSI button is managed by Google) */
+/* This is likely no longer directly used for the GSI button, but keeping for other buttons */
+.login-btn {
+  width: 100%;
+  height: 2.75rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  transform: scale(1.02);
+}
+
+.login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Security Message */
+.security-message {
+  background: linear-gradient(135deg, #dbeafe, #f3e8ff);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid #bfdbfe;
+}
+
+.security-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.check-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #10b981;
+}
+
+.security-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.security-quote {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Footer */
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.footer-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Profile Card (for logged-in users) - Renamed from .logout-card for consistency */
+.profile-card {
+  background: rgba(255, 255, 255, 0.9); /* Slightly more opaque */
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem; /* Slightly more rounded */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 28rem; /* Consistent with login-wrapper */
+  margin: 0 auto;
+  padding: 2rem; /* Consistent padding */
+  animation: slideUp 0.6s ease-out; /* Add animation */
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem; /* Increased spacing */
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-icon {
+  width: 2.5rem; /* Larger icon */
+  height: 2.5rem;
+  color: white;
+}
+
+.profile-title { /* Renamed from .logout-title */
+  font-size: 1.75rem; /* Larger title */
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.profile-subtitle { /* Renamed from .logout-subtitle */
+  color: #6b7280;
+  font-size: 0.9rem; /* Slightly larger */
+}
+
+.profile-content { /* Renamed from .logout-content */
+  padding: 0; /* Remove padding as it's handled by .profile-card */
+}
+
+/* Student Information */
+.student-info {
+  margin-bottom: 2rem; /* More space before buttons */
+}
+
+.info-card {
+  background: #f8fafc; /* Light background */
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.25rem; /* Increased padding */
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #edf2f7; /* Subtle separator */
+}
+
+.info-row:last-child {
+  border-bottom: none; /* No border on last row */
+}
+
+.info-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: #1f2937;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Status Badge */
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ecfdf5; /* Light green background */
+  color: #059669; /* Darker green text */
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid #a7f3d0;
+}
+
+.status-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 0.5rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 1rem; /* Space between buttons */
+  margin-bottom: 2rem; /* Space before instructions */
+}
+
+.action-btn {
+  width: 100%;
+  height: 3rem; /* Slightly taller buttons */
+  border: none;
+  border-radius: 0.5rem; /* More rounded */
+  font-weight: 600;
+  font-size: 1rem; /* Larger text */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem; /* More space for icon */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-2px); /* Lift effect */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+}
+
+.home-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.home-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.logout-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+
+/* Instructions */
+.instructions {
+  background: #fef2f2; /* Light red background for warning/info */
+  border: 1px solid #fca5a5;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: left; /* Align text left for readability */
+}
+
+.instructions-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #dc2626; /* Red for emphasis */
+  margin-bottom: 0.75rem;
+}
+
+.instructions-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+  
+  .app-title {
+    font-size: 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.25rem;
+  }
+  
+  .profile-card {
+    padding: 1.5rem;
+    max-width: 95%; /* Adjust for smaller screens */
+  }
+  
+  .user-avatar {
+    width: 4rem;
+    height: 4rem;
+  }
+  
+  .user-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .profile-title {
+    font-size: 1.5rem;
+  }
+  
+  .info-card {
+    padding: 1rem;
+  }
+  
+  .action-btn {
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .instructions-title {
+    font-size: 0.85rem;
+  }
+
+  .instructions-text {
+    font-size: 0.75rem;
+  }
+}

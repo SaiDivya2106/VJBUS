@@ -1,0 +1,26 @@
+:root {
+ --bg-color: #ffffff;
+  --text-color: #000000;
+  --secondary-text: #394252;
+  --primary-color: #3b82f6;
+  --secondary-color: #8b5cf6;
+  --card-bg: #f8fafc;
+  --card-border: rgba(59, 130, 246, 0.2);
+}
+
+body.dark {
+  --bg-color: #121212;
+  --text-color: #f1f5f9;
+  --secondary-text: #d1d5db;
+  --primary-color: #7dd3fc;
+  --secondary-color: #c084fc;
+  --card-bg: #1f2937;
+  --card-border: rgba(125, 211, 252, 0.2);
+}
+
+/* Apply variables */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background 0.3s ease, color 0.3s ease;
+}
