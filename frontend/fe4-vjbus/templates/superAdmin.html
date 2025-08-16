@@ -32,6 +32,23 @@
         h2 {
             margin-top: 0;
             color: #0056b3;
+            position: relative;
+            padding-left: 40px;
+        }
+        .back-button {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #0056b3;
+            padding: 5px;
+        }
+        .back-button:hover {
+            color: #003d82;
         }
         .bus-list {
             list-style-type: none;
@@ -160,7 +177,10 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Bus Monitor</h2>
+            <h2>
+                <button class="back-button" id="backButton">←</button>
+                Bus Monitor
+            </h2>
             <div class="connection-status" id="connectionStatus">🔄 Connecting...</div>
 
             <div class="tabs">
@@ -180,11 +200,25 @@
         </div>
         <div id="map"></div>
     </div>
+    <script>
+        // Add event listener for the back button
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '/admin';
+        });
+    </script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        const socket = io("wss://dev-bus.vjstartup.com", { transports: ['websocket'] });
-
+        const socket = io("wss://dev-bus.vjstartup.com", {
+            transports: ["websocket"],
+            reconnection: true,
+            reconnectionAttempts: 50,
+            reconnectionDelay: 1000,
+            query: {
+                route_id: "Admin", // replace with dynamic route ID if needed
+                role: "Admin"     // or "Student", etc.
+            }
+        });
         // Map setup
         const COLLEGE_POSITION = [17.539873, 78.386514];
         const map = L.map('map').setView(COLLEGE_POSITION, 13);
@@ -214,7 +248,7 @@
         // --- Active UIs Workflow ---
         async function fetchActiveUIs() {
             try {
-                socket.emit("all_uis", null, (data) => {
+                socket.emit("all_drivers", null, (data) => {
                     if (!data || data.length === 0) {
                         throw new Error("No UI data received");
                     }
@@ -250,16 +284,16 @@
         // --- Active Connections Workflow ---
         function fetchActiveConnections() {
             try {
-                socket.emit("all_connections", null, (data) => {
+                socket.emit("all_locations", null, (data) => {
                     if (!data || data.length === 0) {
-                        console.warn("No active connections found.");
+                        console.warn("No active Busses found.");
                     }
                     renderActiveConnections(data);
                     updateMapMarkers(data);
                 });
             } catch (err) {
-                console.error('Failed to fetch Active Connections:', err);
-                activeConnectionsListEl.innerHTML = '<li class="bus-item">Error loading connections.</li>';
+                console.error('Failed to fetch Active Busses:', err);
+                activeConnectionsListEl.innerHTML = '<li class="bus-item">Error loading busses.</li>';
             }
         }
 
@@ -340,7 +374,7 @@
             if (e.target.matches('.disconnect-btn')) {
                 const socketId = e.target.dataset.socketId;
                 if (confirm(`Disconnect socket ${socketId}?`)) {
-                    socket.emit('admin_disconnect_socket', { socket_id: socketId });
+                    socket.emit('admin_stop_location', { socket_id: socketId });
                 }
             }
             // Focus on Map Button
@@ -380,24 +414,8 @@
         socket.on('yet_to_be_bradcasted', () => {
             fetchActiveConnections();
         });
-        // socket.on("yet_to_be_bradcasted",(data1) =>{
-        //     console.log("Yet to be broadcasted data received:", data1);
-        //     socket.emit("all_connections", null, (data) => {
-        //         if (!data || data.length === 0) {
-        //             console.log("Yet to be broadcasted data received:", data1);
-        //             renderActiveConnections(data1);
-        //             updateMapMarkers(data1);
-        //         }
-        //         else{
-        //             const merged = { ...data, ...data1 };
-        //             console.log("Yet to be broadcasted data received:", merged);
-        //             renderActiveConnections(merged);
-        //             updateMapMarkers(merged);
-        //         }
-        //     });
-        // });
 
-        socket.on('admin_disconnect_response', (res) => {
+        socket.on('admin_stop_location_response', (res) => {
             // alert(res.message);
             fetchActiveConnections(); // Refresh list after disconnect
         });

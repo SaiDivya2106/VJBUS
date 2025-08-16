@@ -5,6 +5,10 @@ let allLogs = [];
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "vnradmin@123";
 
+window.onload = function() {
+    document.getElementById('dateFilter').value = '';
+};
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize event listeners
@@ -238,7 +242,7 @@ function displayLogs(logs) {
     
     tableBody.innerHTML = "";
     if (logs.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="3">No matching data</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="3">No matching data. Try changing filters</td></tr>';
         return;
     }
     
@@ -266,7 +270,7 @@ function displayLogs(logs) {
  * Redirect to live location page
  */
 function redirectToLiveLocation() {
-    window.location.href = "/allBus";
+    window.location.href = "/superAdmin";
 }
 
 /**
