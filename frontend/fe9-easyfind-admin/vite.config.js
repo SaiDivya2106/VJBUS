@@ -11,14 +11,11 @@ export default defineConfig({
     port:3110,
     allowedHosts: [
       '127.0.0.1', // or 'localhost' - Important for dev server access
-      'easyfind-admin.vnrzone.site',  // Add this line!
-      '103.248.208.119',    
+      'dev-easyfind-admin.vjstartup.com',
+      'easyfind-admin.vjstartup.com',
+      '103.248.208.119'
     ],
-    strictPort: true,
-    hmr: {
-      host: "easyfind-admin.vnrzone.site",
-      protocol: "wss"
-    }
+    strictPort: true
 
   }
 })
