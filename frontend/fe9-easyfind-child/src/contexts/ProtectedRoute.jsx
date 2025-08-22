@@ -1,52 +1,31 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+const API_URL = import.meta.env.VITE_AUTH_BASE_URL || "http://localhost:3115";
 
 const ProtectedRoute = ({ children }) => {
-  const { token,checkLoginStatus } = useAuth(); 
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, loading, checkLoginStatus } = useAuth();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!token) {
-        setIsAuthenticated(false);
-        setLoading(false);
-        return;
-      }
-
+    let mounted = true;
+    const runCheck = async () => {
       try {
-        const res = await fetch(`https://auth.vjstartup.com/check-auth`, {
-          method: "GET",
-          // headers: {
-          //   Authorization: `Bearer ${token}`,
-          // },
-          // cache: "no-store",
-          credentials: "include",
-        });
-        // const res = await checkLoginStatus();
-        console.log("at the protected route res:",res)
-        const data =await res.json();
-
-        if (res.ok) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (err) {
-        console.error("Auth check failed", err);
-        setIsAuthenticated(false);
+        await checkLoginStatus();
       } finally {
-        setLoading(false);
+        if (mounted) setChecking(false);
       }
     };
 
-    checkAuth();
-  }, [token]);
+    runCheck();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading || checking) return <div>Loading...</div>;
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return children;
 };

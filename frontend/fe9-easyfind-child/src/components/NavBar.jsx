@@ -1,10 +1,10 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Menu, User, LogOut, Search, AlertCircle, Home, Bell } from 'lucide-react';
+import { Menu, User, LogOut, Search, AlertCircle, Home, Bell, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 const navItems = [
-  { path: '/dashboard/home', icon: Home, label: 'Home' },
+  { path: '/dashboard', icon: Home, label: 'Home' },
   { path: '/dashboard/report-item', icon: AlertCircle, label: 'Report Item' },
   { path: '/dashboard/lost-item', icon: Bell, label: 'Lost Item?' },
   { path: '/dashboard/search-item', icon: Search, label: 'Search Item' },
@@ -26,31 +26,32 @@ const Header = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Close menu on outside click
+  // Close menu on Escape key
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    };
-
     if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleEscape);
     }
-    
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [menuOpen]);
 
-  // Close menu on Escape key
   const handleEscape = (event) => {
     if (event.key === 'Escape') {
       setMenuOpen(false);
     }
   };
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (menuOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [menuOpen]);
 
   // Smooth navigation
   const handleNavigation = (path) => {
@@ -62,7 +63,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 bg-white shadow-md">
       <h1 
         className="text-xl sm:text-2xl font-bold text-blue-600 cursor-pointer"
-        onClick={() => navigate('/dashboard/home')}
+        onClick={() => navigate('/dashboard')}
       ><img 
          src="https://res.cloudinary.com/dxql68kht/image/upload/fl_preserve_transparency/v1744206896/Screenshot_2025-04-09_191750_kml7qq.jpg?_s=public-apps" 
          alt="Logo" 
@@ -105,8 +106,22 @@ const Header = () => {
 
           {/* Mobile Menu */}
           {menuOpen && isMobile && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 lg:hidden">
-              <div className="absolute right-0 top-16 w-full max-w-xs h-[calc(100vh-4rem)] bg-white shadow-xl p-4 transform transition-transform">
+            <div 
+              className="fixed inset-0 bg-black/50 lg:hidden"
+              onClick={() => setMenuOpen(false)}
+              aria-modal="true"
+              role="dialog"
+            >
+              <div 
+                className="absolute right-0 top-0 h-full w-80 max-w-[85%] bg-white shadow-xl p-4 transition-transform duration-300 translate-x-0"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-gray-800">Menu</span>
+                  <button aria-label="Close menu" className="p-2 rounded-md hover:bg-gray-100" onClick={() => setMenuOpen(false)}>
+                    <X size={20} />
+                  </button>
+                </div>
                 <div className="flex flex-col gap-2">
                   {navItems.map((item) => (
                     <button

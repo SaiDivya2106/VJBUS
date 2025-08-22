@@ -24,10 +24,9 @@ function ReportedItems() {
 
       const response = await fetch(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/reported/${rollNo}`, {
         method: "GET",
-        // credentials: "include",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
         },
       });
 
@@ -55,7 +54,7 @@ function ReportedItems() {
     if (status === "verified" || status === "claimed") return;
     try {
       await axios.delete(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/reported/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        withCredentials: true,
       });
       setItems(items.filter((item) => item._id !== id));
       setConfirmDelete(null);

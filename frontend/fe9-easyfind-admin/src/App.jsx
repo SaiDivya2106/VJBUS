@@ -52,14 +52,14 @@ const menuItems = [
 function AppContent() {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_AUTH_BASE_URL;
 
   const handleDrawerToggle = () => setOpen(!open);
   const handleLogout = () => {
-    axios.post("https://auth.vjstartup.com/logout",{},{
-      withCredentials: true
-    })
-    localStorage.removeItem('adminToken');
-    window.location.href = '/login';
+    axios.post(`${API_URL}/logout`, {}, { withCredentials: true })
+      .finally(() => {
+        window.location.href = '/login';
+      });
   };
 
   return (

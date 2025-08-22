@@ -13,11 +13,10 @@ function ChangePassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("adminToken");
       const response = await axios.post(
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/change-password`,
         formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
 
       setSnackbar({ open: true, message: response.data.message, severity: "success" });

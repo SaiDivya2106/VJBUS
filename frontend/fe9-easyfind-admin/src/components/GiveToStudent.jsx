@@ -29,10 +29,7 @@ function GiveToStudent() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-            },
-            withCredentials:true,
+            withCredentials: true,
           }
         );
         setItems(response.data);
@@ -138,15 +135,14 @@ function GiveToStudent() {
     formData.append("dateHandovered", new Date(handoverDate).toISOString());
 
     try {
-      const response = await axios.put(
+    const response = await axios.put(
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/${selectedItem._id}/handover`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`
           },
-          withCredentials:true,
+      withCredentials: true,
         }
       );
 

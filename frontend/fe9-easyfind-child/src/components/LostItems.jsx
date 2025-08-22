@@ -15,12 +15,10 @@ function LostItems() {
     const getItems = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
+    const res = await axios.get(
           `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/lost-items/${user.email}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+      withCredentials: true,
           }
         );
         setItems(res.data);
@@ -33,7 +31,7 @@ function LostItems() {
     };
 
     getItems();
-  }, [user?.email,items]);
+  }, [user?.email]);
 
   const handleDelete = async (id) => {
     const remaining = items.filter((i) => i._id !== id);
@@ -41,12 +39,10 @@ function LostItems() {
     setConfirmDelete(null);
 
     try {
-      await axios.delete(
+    await axios.delete(
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/lost/${id}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      withCredentials: true,
         }
       );
     } catch (err) {

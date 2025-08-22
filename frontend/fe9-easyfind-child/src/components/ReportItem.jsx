@@ -150,12 +150,10 @@ const ReportItem = ({ onItemReported }) => {
       data.append('reporterRollNo', rollNo);
       data.append('image', image);
 
-      const response = await axios.post(
+    const response = await axios.post(
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`, data, {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
+      // Cookie-based auth; no Authorization header
         }
       );
 
@@ -180,185 +178,150 @@ const ReportItem = ({ onItemReported }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-      <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-lg">
-        {/* Encouraging Header */}
-        <div className="text-center mb-6">
-          <div className="text-4xl mb-2">🏆</div>
-          <h2 className="text-2xl font-semibold text-blue-700 mb-2">
-            Be a Campus Hero!
-          </h2>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Found something? Help a fellow student by reporting it here. Your kindness makes our campus community stronger! 💙
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-6 px-4 flex justify-center">
+      <div className="w-full max-w-2xl">
+        <div className="bg-white shadow-lg rounded-2xl p-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-blue-700">Report Found Item</h2>
+            <p className="text-sm text-gray-500 mt-1">Share a few details to help us match with lost-item reports.</p>
+          </div>
 
-        {/* Important Notice */}
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
-          <div className="flex items-start">
-            <div className="text-yellow-600 mr-3">⚠️</div>
-            <div>
-              <h3 className="font-semibold text-yellow-800 mb-1">Important Reminder</h3>
-              <p className="text-yellow-700 text-sm">
-                After submitting this form, please take the physical item to the 
-                <span className="font-semibold"> Security Office</span> immediately. 
-                This ensures the owner can retrieve their belongings safely.
-              </p>
+          {status && (
+            <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-red-700 text-sm">
+              {status}
             </div>
-          </div>
-        </div>
-
-        {status && <p className="text-red-600 mb-3">{status}</p>}
-        {successMessage && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-            <div className="flex items-center">
-              <div className="text-green-600 mr-2">✅</div>
-              <p className="text-green-700 text-sm">{successMessage}</p>
-            </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-          <input
-            type="text"
-            name="itemName"
-            value={formData.itemName}
-            onChange={handleChange}
-            placeholder="What did you find? (e.g., iPhone, Keys, Wallet)"
-            className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Describe the item (color, brand, distinctive features...)"
-            rows="3"
-            className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
-            required
-          ></textarea>
-          <input
-            type="text"
-            name="foundLocation"
-            value={formData.foundLocation}
-            onChange={handleChange}
-            placeholder="Where exactly did you find it? (Building, room, area)"
-            className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select Category</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-          <div className="relative w-full">
-            <input
-              type="date"
-              name="reportedDate"
-              value={formData.reportedDate || ""}
-              onChange={handleChange}
-              className="border rounded-lg p-3 w-full shadow-sm focus:ring-2 focus:ring-blue-500 peer"
-              required
-            />
-            {!formData.reportedDate && (
-              <span className="absolute left-3 top-3 text-gray-400 peer-focus:hidden">
-                When did you find it?
-              </span>
-            )}
-          </div>
-          
-          <div className="flex gap-2">
-            <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              📁 Upload Photo
-            </label>
-            <button
-              type="button"
-              onClick={() => {
-                setStatus('');
-                setIsCameraActive(true);
-              }}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              📷 Take Photo
-            </button>
-          </div>
-
-          {imagePreview && (
-            <div className="relative">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="h-32 w-32 object-contain border rounded-md cursor-pointer hover:opacity-80"
-              />
+          )}
+          {successMessage && (
+            <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-green-700 text-sm">
+              {successMessage}
             </div>
           )}
 
-          <button
-            type="submit"
-            className={`bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 ${loading ? 'opacity-50' : ''}`}
-            disabled={loading}
-          >
-            {loading ? 'Submitting Report...' : '🚀 Report Found Item'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+              <input
+                type="text"
+                name="itemName"
+                value={formData.itemName}
+                onChange={handleChange}
+                placeholder="e.g., iPhone, Keys, Wallet"
+                className="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-        {/* Next Steps Reminder */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
-            <span className="mr-2">📋</span>
-            Next Steps:
-          </h3>
-          <ol className="text-blue-700 text-sm space-y-1">
-            <li>1. Complete this form</li>
-            <li>2. Take the item to the Security Office  </li>
-            <li>3. The owner will be notified automatically</li>
-            <li>4. Feel good about helping someone! 😊</li>
-          </ol>
-        </div>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Found Location</label>
+              <input
+                type="text"
+                name="foundLocation"
+                value={formData.foundLocation}
+                onChange={handleChange}
+                placeholder="JSK greens, E block entrance .."
+                className="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-        {/* Motivational Footer */}
-        <div className="mt-4 text-center text-gray-500 text-xs">
-          <p>✨ Every act of kindness matters ✨</p>
-          <p>Thank you for being an awesome community member!</p>
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date Found</label>
+              <input
+                type="date"
+                name="reportedDate"
+                value={formData.reportedDate || ''}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Color, brand, distinctive features..."
+                rows={3}
+                className="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="flex flex-wrap gap-2">
+                <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors">
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                  Upload Photo
+                </label>
+                <button
+                  type="button"
+                  onClick={() => { setStatus(''); setIsCameraActive(true); }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                >
+                  Take Photo
+                </button>
+                {image && (
+                  <span className="text-sm text-gray-600 self-center truncate max-w-[60%]">
+                    {image.name}
+                  </span>
+                )}
+              </div>
+              {imagePreview && (
+                <div className="mt-3">
+                  <img src={imagePreview} alt="Preview" className="h-28 w-28 object-contain border rounded-md" />
+                </div>
+              )}
+            </div>
+
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full md:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {loading ? 'Submitting…' : 'Report Found Item'}
+              </button>
+            </div>
+          </form>
+
+          {/* Next Steps */}
+          <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <h3 className="font-semibold text-blue-800 mb-2">Next Steps</h3>
+            <ol className="list-decimal ml-5 text-blue-700 text-sm space-y-1">
+              <li>Submit this form with the item details</li>
+              <li>Take the item to the Security Office</li>
+              <li>We’ll notify the owner if we find a match</li>
+              <li>Hand over the item when contacted by security</li>
+            </ol>
+          </div>
         </div>
 
         {isCameraActive && (
-          <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
             <div className="w-full max-w-2xl">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="w-full aspect-video rounded-lg"
-              />
+              <video ref={videoRef} autoPlay playsInline className="w-full aspect-video rounded-lg bg-black" />
               <canvas ref={canvasRef} className="hidden" />
-              
               <div className="flex justify-center gap-4 mt-4">
-                <button
-                  onClick={captureImage}
-                  className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100"
-                >
-                  📸 Capture
-                </button>
-                <button
-                  onClick={() => setIsCameraActive(false)}
-                  className="p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600"
-                >
-                  ✕ Close
-                </button>
+                <button onClick={captureImage} className="px-4 py-2 bg-white rounded-md shadow hover:bg-gray-100">Capture</button>
+                <button onClick={() => setIsCameraActive(false)} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Close</button>
               </div>
             </div>
           </div>

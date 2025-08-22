@@ -13,8 +13,9 @@ import ProtectedRoute from "../contexts/ProtectedRoute";
 
 const App = () => {
   return (
-    <AuthProvider>
+    
       <Router>
+        <AuthProvider>
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<GoogleLoginButton />} />
@@ -38,8 +39,8 @@ const App = () => {
           {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        </AuthProvider>
       </Router>
-    </AuthProvider>
   );
 };
 

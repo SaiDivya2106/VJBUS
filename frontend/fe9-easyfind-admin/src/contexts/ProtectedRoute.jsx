@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 
-// Define allowed emails (loaded from your .env file)
-const allowedEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(',') || [];
-const API_URL = "https://auth.vjstartup.com";
+// Use be9 backend for admin auth check (cookie-based)
+const BE_URL = import.meta.env.VITE_EASYFIND_BACKEND_URL;
 
 const ProtectedRoute = ({ children }) => {
   const [isValid, setIsValid] = useState(false);
@@ -12,39 +10,24 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Token from localStorage is still useful for a quick client-side check
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        // 1. Client-side check: Decode token and check for admin email
-        const decoded = jwtDecode(token);
-        const email = decoded?.email;
-
-        if (!email || !allowedEmails.includes(email)) {
-          throw new Error(`Access Denied: ${email} is not an authorized admin.`);
-        }
-
-        // 2. Server-side check: Verify session via HttpOnly cookie
-        const res = await fetch(`${API_URL}/check-auth`, {
+        // Server-side check: Verify session via HttpOnly cookie on be9
+  const res = await fetch(`${BE_URL}/auth/admin/check-auth`, {
           method: "GET",
-          // This sends credentials (like cookies) with the request
-          credentials: "include" 
+          credentials: "include",
+          cache: "no-store",
         });
         
-        if (!res.ok) {
-          throw new Error("Server session validation failed. Please log in again.");
+        const data = await res.json();
+        console.log("at the admin protected route res",res,data);
+        if (res.ok) {
+          setIsValid(true);
+        } else {
+          setIsValid(false);
         }
-
-        // If both checks pass, the user is valid
-        setIsValid(true);
 
       } catch (error) {
         console.error("❌ Admin auth check failed:", error.message);
-        localStorage.removeItem('adminToken'); // Clean up local token
         setIsValid(false);
       } finally {
         setLoading(false);

@@ -133,7 +133,7 @@ router.get('/found',auth, async (req, res) => {
     const foundItems = await Item.find();
     
     if (foundItems.length === 0) {
-      return res.status(404).json({ message: 'No found items available' });
+      return res.status(200).json({ message: 'No found items available' });
     }
 
     res.status(200).json(foundItems);

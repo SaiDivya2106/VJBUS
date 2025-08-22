@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; 
 
 const clientId = "522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com";
-const API_URL = "https://auth.vjstartup.com";
+const BE_URL = import.meta.env.VITE_EASYFIND_BACKEND_URL;
 
 const allowedEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(',') || [];
 console.log("allowed mails",allowedEmails)
@@ -29,18 +29,18 @@ const WrappedGoogleLoginButton = () => {
         return;
       }
 
-      const res = await fetch(`${API_URL}/auth/google`, {
+      // Go through be9 so admin check can be enforced server-side
+      const res = await fetch(`${BE_URL}/auth/admin/login`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ token: idToken }),
       });
 
       if (!res.ok) throw new Error("Login failed");
-      const response = await res.json();
-      localStorage.setItem('adminToken', response.token);
+      // Cookie is set by auth server via be9 proxy; no localStorage
       navigate('/admin');
     } catch (error) {
       const msg = `❌ Login failed: ${error?.response?.data || error.message}`;

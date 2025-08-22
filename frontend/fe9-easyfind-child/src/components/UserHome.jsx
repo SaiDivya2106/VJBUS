@@ -1,6 +1,8 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+const FEEDBACK_EMAIL = import.meta.env.VITE_FEEDBACK_EMAIL || 'support@vjstartup.com';
+
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -174,8 +176,23 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
       </div>
+
+      {/* Footer with Feedback Button */}
+      <footer className="mt-auto w-full border-t border-gray-200 bg-white/80 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-center">
+          <a
+            href={`mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('EasyFind Feedback')}&body=${encodeURIComponent('Hi EasyFind Team,\n\nI would like to share the following feedback:\n\n')}`}
+            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white font-medium shadow hover:bg-blue-700 transition-colors"
+          >
+            Send Feedback
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 2L11 13" />
+              <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+            </svg>
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -30,12 +30,12 @@ const SearchItem = () => {
     setLoading(true);
     try {
       console.log("at the searchItem token from auth context",token)
-      const response = await fetch(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`, {
+    const response = await fetch(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/found`, {
         method: "GET",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+      // Cookie-based auth; no Authorization header
         },
       });
 

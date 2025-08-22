@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const EditItemPage = () => {
-    // const token=localStorage.getItem('adminToken')
+    // Cookie-based auth; no localStorage token
     const [items, setItems] = useState([]);
     const [editItem, setEditItem] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ const EditItemPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const token = localStorage.getItem('token');
+    const token = undefined;
 
     const filteredItems = items.filter(item =>
         item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -22,10 +22,8 @@ const EditItemPage = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const token = localStorage.getItem("adminToken");
                 const res = await axios.get(`${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                    withCredentials:true,
+                    withCredentials: true,
                 });
                 setItems(res.data);
             } catch (err) {
@@ -36,7 +34,7 @@ const EditItemPage = () => {
             }
         };
         fetchItems();
-    }, [token]);
+    }, []);
 
     const handleEditClick = (item) => {
         setEditItem({ 
@@ -63,13 +61,11 @@ const EditItemPage = () => {
 
     const handleUpdate = async () => {
         try {
-            const token = localStorage.getItem("adminToken");
             await axios.put(
                 
                 `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/edit-item/${editItem._id}`,
                 editItem,
-                { headers: { Authorization: `Bearer ${token}` },
-                 withCredentials:true, },
+                { withCredentials: true },
                 
             );
             setItems(items.map(item => item._id === editItem._id ? editItem : item));
@@ -82,11 +78,9 @@ const EditItemPage = () => {
 
     const handleDelete = async () => {
         try {
-            const token = localStorage.getItem("adminToken");
             await axios.delete(
                 `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/edit-item/${deleteId}`,
-                { headers: { Authorization: `Bearer ${token}` },
-                withCredentials:true }
+                { withCredentials: true }
             );
             setItems(items.filter((i) => i._id !== deleteId));
             setShowDeleteModal(false);

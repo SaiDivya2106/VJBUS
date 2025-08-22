@@ -38,10 +38,7 @@ function Dashboard() {
         const response = await axios.get(
           `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/admin/found`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-            },
-            withCredentials:true,
+            withCredentials: true,
           }
         );
   

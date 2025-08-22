@@ -43,7 +43,7 @@ function NotifyLostItems() {
     }
 
     try {
-      await axios.post(
+  await axios.post(
         `${import.meta.env.VITE_EASYFIND_BACKEND_URL}/api/items/lost`,
         { 
           category, 
@@ -53,7 +53,7 @@ function NotifyLostItems() {
           dateLost,
           description 
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+  { withCredentials: true }
       );
 
       setMessage({
