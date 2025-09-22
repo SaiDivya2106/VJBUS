@@ -1,88 +1,137 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import "./NavBar.css";
 
 const NavBar = () => {
-  let navigate = useNavigate();
-  const { user, isAdmin, logout } = useAuth(); // Access the 'isAdmin' state
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const { user, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+  const dropdownRef = useRef();
 
   const handleLogout = async () => {
-    await logout(); // Log out the user/admin
-    navigate("/complaints-website"); // Navigate to the login page
+    await logout();
+    navigate("/complaints-website");
+    setIsNavbarOpen(false); // close navbar after logout
   };
+
+  // Close dropdown when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
-        <div className="logo text-white" onClick={() => navigate("/complaints-website")}>
+        <div
+          className="logo text-white"
+          onClick={() => {
+            navigate("/complaints-website");
+            setIsNavbarOpen(false);
+          }}
+        >
           THRIVE
         </div>
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          onClick={() => setIsNavbarOpen((prev) => !prev)}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav ms-auto mb-lg-0">
-  {/* Show All Complaints only if user is logged in */}
-  {user && (
-    <li className="nav-item">
-      <NavLink className="nav-link" to="/all-complaints">
-        All Complaints
-      </NavLink>
-    </li>
-  )}
+        <div className={`collapse navbar-collapse ${isNavbarOpen ? "show" : ""}`} id="navbarNav">
+          <ul className="navbar-nav ms-auto mb-lg-0">
+            {user && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/all-complaints"
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  All Complaints
+                </NavLink>
+              </li>
+            )}
+            {user && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/user-analysis"
+                  state={{ email: user.email }}
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  User-analysis
+                </NavLink>
+              </li>
+            )}
 
-  {/* Show My Complaints for both users and admins */}
-  {user && (
-    <li className="nav-item">
-      <NavLink
-        className="nav-link"
-        to="/my-complaints"
-        state={{ email: user.email }}
-      >
-        My Complaints
-      </NavLink>
-    </li>
-  )}
 
-  {/* Show Dashboard only if user is an admin */}
-  {isAdmin && (
-    <li className="nav-item">
-      <NavLink className="nav-link" to="/adminpage">
-        Dashboard
-      </NavLink>
-    </li>
-  )}
+            {user && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/my-complaints"
+                  state={{ email: user.email }}
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  My Complaints
+                </NavLink>
+              </li>
+            )}
 
-  {/* Logout button if user/admin is logged in */}
-  <li className="nav-item">
-    {user || isAdmin ? (
-      <NavLink
-        className="nav-link"
-        to="#"
-        onClick={(e) => {
-          e.preventDefault(); // prevent nav
-          handleLogout();
-        }}
-      >
-        Logout
-      </NavLink>
-    ) : (
-      <NavLink className="nav-link" to="/complaints-website">
-        Login
-      </NavLink>
-    )}
-  </li>
-</ul>
+            {isAdmin && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/adminpage"
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  Dashboard
+                </NavLink>
+              </li>
+            )}
 
+            {(user || isAdmin) ? (
+              <li className="nav-item dropdown" ref={dropdownRef} style={{ marginTop: "6px" }}>
+                <img
+                  src={user?.picture || "/default-avatar.png"}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{ width: "30px", height: "30px", cursor: "pointer" }}
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                />
+                {showDropdown && (
+                  <ul
+                    className="dropdown-menu dropdown-menu-end show mt-2"
+                    style={{ minWidth: "110px", right: 0, transform: "translateX(-5px)" }}
+                  >
+                    <li>
+                      <button className="dropdown-item" onClick={handleLogout}>
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            ) : (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/complaints-website"
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  Login
+                </NavLink>
+              </li>
+            )}
+          </ul>
         </div>
       </div>
     </nav>

@@ -2,25 +2,6 @@
   max-width: 1200px;
 }
 
-/* .glass-effect {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  height: 100%; 
-} */
-/* 
-.glass-effect {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(10px);
-  border: 1px solid #e0e0e0;
-} */
-
-/* .glass-effect:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-} */
-
 .status-pending {
   color: #ff9800;
 }
@@ -57,17 +38,6 @@
 }
 
 
-
-/* .status-pill {
-  display: inline-block;
-  padding: 6px 12px;
-  font-weight: bold;
-  font-size: 0.8rem;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 2px solid transparent;
-} */
 
 .status-pill {
   display: inline-block;
@@ -129,9 +99,43 @@
 }
 
 
-.custom-card-container {
+/* .custom-card-container {
   position: relative;
+} */
+/* Ensures all cards have consistent height in grid layout */
+.adminpage .custom-card-container {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  min-height: 340px; /* Adjust this to your visual preference */
 }
+
+/* Ensures consistent behavior for card shadow and interaction */
+.adminpage .card-hover-effect {
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* For the description text container (if needed) */
+.adminpage .card-text-body {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+/* When card is expanded, allow scroll if content is too long */
+.adminpage .expanded-card .card-text-body {
+  overflow: auto;
+  max-height: 250px; /* Prevents overflow from making height too big */
+}
+
+/* Ensure card container columns fill height equally */
+.adminpage .row .col {
+  display: flex;
+}
+
 
 .custom-pencil-button {
   background-color: white !important;
@@ -208,10 +212,106 @@
 
 
 
+.expanded-card {
+  background-color: #fefeff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.card-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.text-secondary.fw-semibold:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+.card-hover-effect {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.filter-controls-wrapper {
+  display: flex;
+  flex-direction: row;          /* All in a row by default */
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;              /* Allow wrap if needed */
+  gap: 12px;
+}
+
+.filter-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.filter-controls .form-select {
+  min-width: 140px;
+  flex: 1 1 auto;
+}
+
+.filter-controls-wrapper button {
+  flex-shrink: 0; /* Prevent button from shrinking weirdly */
+}
 
 
 
 
+/* Desktop/tablet stays same */
+.filter-controls-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Mobile fix */
+@media (max-width: 576px) {
+  .filter-controls-wrapper {
+    flex-direction: column;
+    align-items: stretch; /* full width for dropdowns */
+  }
+
+  .filter-controls-wrapper .analysis-btn {
+    /* width: 100%; */
+    max-width: 220px;
+    margin: 2px auto auto  auto; /* center it */
+    display: flex;
+    justify-content: center;
+  }
+}
+
+
+
+
+/* ✅ Phone: button comes below */
+@media (max-width: 480px) {
+
+   
+  .filter-controls-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-controls {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .filter-controls .form-select {
+    flex: 1 1 48%;
+  }
+
+  .filter-controls-wrapper button {
+    margin-left: 130px;
+    width: 30%;
+    margin-top: 8px;
+  }
+}
 
 
 

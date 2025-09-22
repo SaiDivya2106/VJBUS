@@ -6,6 +6,7 @@
   font-family: 'Arial', sans-serif;
 }
 
+
 .no-complaints-message {
   text-align: center;
   font-size: 1.2rem;
@@ -64,7 +65,8 @@
 
 .user-dashboard-container .user-details h2 {
   font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+  margin-bottom:10px;
  
 }
 
@@ -91,23 +93,28 @@
 
 /* Complaints Cards Section */
 .user-dashboard-container .complaints-cards {
-  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
+
 }
 
-/* Complaint Card */
 .user-dashboard-container .complaint-card {
   border: none;
   border-radius: 15px;
   background: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 380px;
-  min-height: 280px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
 }
+
+
+
+
 
 .user-dashboard-container .complaint-card:hover {
   transform: translateY(-10px);
@@ -241,49 +248,63 @@
 
 /* Admin Updates Section */
 .admin-updates {
-  margin-top: 10px;
-  padding: 10px;
-  border-top: 1px solid #ddd;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
 }
 
 .updates-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
 }
 
+/* Scrollable container */
 .updates-container {
-  max-height: 150px;
+  max-height: 160px;
   overflow-y: auto;
   padding-right: 5px;
 }
 
+/* Each update entry */
 .update-entry {
-  background-color: #f8f9fa;
-  padding: 8px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  border-left: 3px solid #007bff;
+  background-color: #f1f3f5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border-left: 4px solid #6a5af9;
+  transition: background-color 0.3s;
+}
+
+.update-entry:hover {
+  background-color: #e9ecef;
 }
 
 .update-text {
   font-size: 14px;
   color: #333;
-  margin-bottom: 3px;
+  flex: 1;
+  word-break: break-word;
 }
 
 .update-time {
   font-size: 12px;
-  color: #666;
-  display: block;
-  text-align: right;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .no-updates {
   font-size: 14px;
-  color: #888;
+  color: #aaa;
+  font-style: italic;
+  margin-left: 4px;
 }
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -336,7 +357,7 @@
 
   .user-dashboard-container .complaint-card {
       width: 100%; /* Full width for mobile */
-      max-width: 380px; /* Limit the width */
+      /* max-width: 400px;  */
   }
 
   .user-dashboard-container .vote-section {
@@ -354,26 +375,311 @@
 }
 
 @media (max-width: 480px) {
-  /* Further adjustments for very small screens */
-  .user-dashboard-container .page-heading h1 {
-      font-size: 1.8rem;
+  .user-dashboard-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 
+  .dashboard-container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  /* ✅ Keep row layout for avatar + name */
   .user-dashboard-container .user-info {
-      flex-direction: column;
-      align-items: center;
+    flex-direction: row !important;   /* row instead of column */
+    align-items: center !important;   /* keep them aligned */
+    text-align: left !important;      /* name aligns to left */
+    width: 98% !important;
+    margin: 0 auto 1.5rem auto !important;
+    padding: 1.2rem !important;
   }
 
   .user-dashboard-container .user-avatar {
-      margin-bottom: 1rem;
+    margin-right: 1rem !important;
+    display: flex;
+    justify-content: center;
   }
 
-  .user-dashboard-container .complaints-cards {
-      padding: 0;
+  .user-dashboard-container .user-avatar img {
+    width: 80px;
+    height: 80px;
+  }
+
+   .user-dashboard-container .user-details h2 {
+      font-size: 1.3rem !important; 
+    margin: 0;
+  }
+
+  .user-dashboard-container .user-details p {
+    font-size: 1rem;
+    margin: 0;
   }
 }
 
 
 .td{
   margin-left: 65%;
+}
+
+
+
+
+.status-left {
+  min-width: 130px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.status.pending {
+  color: #ffc107;
+}
+
+.status.ongoing {
+  color: #17a2b8;
+}
+
+.status.resolved {
+  color: #28a745;
+}
+
+.timestamp {
+  font-size: 12px;
+}
+
+
+
+
+.user-admin-update-btn {
+  /* background: linear-gradient(to right, #2b5876, #4e4376); */
+  
+  color: #fff;
+  padding: 4px 10px; /* Reduced padding */
+  font-size: 15px;   /* Slightly smaller text */
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.user-admin-update-btn:hover {
+  background-color: #0069d9; /* Darker on hover */
+}
+
+.user-admin-update-btn.expanded {
+  background-color: #0056b3; /* Different shade when expanded */
+}
+
+
+.admin-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  background: linear-gradient(to right, #2c5364, #4c4177); /* Default gradient */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 40% ;
+  white-space: nowrap;
+}
+
+/* Gradient changes on toggle */
+.show-updates-btn {
+  background: linear-gradient(to right, #2c5364, #4c4177);
+}
+
+.hide-updates-btn {
+  background: linear-gradient(to right, #2c5364, #4c4177);
+}
+
+.admin-toggle-btn:hover {
+  transform: scale(1.03);
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .admin-toggle-btn {
+    font-size: 13px;
+    padding: 5px 12px;
+    width:50%;
+  }
+}
+
+.expanded-card {
+  transition: all 0.3s ease;
+}
+
+.admin-updates-section {
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.admin-updates-section {
+  max-height: 600px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+
+
+.card-body-content {
+  max-height: 300px;       /* Collapsed height */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.card-body-content.expanded {
+  max-height: 1000px;      /* Allow full expansion */
+  overflow: visible;
+}
+
+
+
+
+.admin-toggle-btn .arrow-icon {
+  background: white;
+  color: black;
+  padding: 6px 8px;
+  border-radius: 50%;
+  margin-left: 15px;
+  font-size: 12px;
+}
+
+.complaints-cards .col {
+  display: flex;
+}
+
+.complaints-cards .card {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.styled-admin-box {
+  background-color: #f8f9fc; /* light gray/blue */
+  border-left: 4px solid #6ca0dc; /* soft violet-blue */
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+
+.styled-update-text {
+  margin: 0;
+  color: #212529;
+}
+
+.styled-update-time {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+.category-tag1{
+  margin-left: 3rem;
+  padding: 6px 10px;
+}
+
+
+
+
+
+
+
+
+/* Ensures all cards have same height */
+.complaints-card {
+  border-left: 4px solid #8555d8;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-details-btn {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+}
+
+.complaint-title {
+  font-size: 1.1rem;
+}
+
+.complaint-description {
+  font-size: 0.95rem;
+}
+
+
+
+.status.pending {
+  color: #f08c00;
+  border: 1px solid #ffcc80;
+  font-weight: 700;
+  font-size: 0.78rem; 
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+}
+
+.status.ongoing {
+  color: #2b8a3e;
+  border: 1px solid #5d9e66;
+  font-weight: 700;
+  font-size: 0.78rem; 
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+}
+
+.status.resolved {
+  color: #0c8599;
+  border: 1px solid #a5c2d6;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+
+}
+
+.btn-link {
+  color: #6f42c1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+@media (max-width: 576px) {
+  .user-info {
+    justify-content: flex-start; /* align left */
+  }
+
+  .user-avatar img {
+    width: 50px;
+    height: 50px; /* smaller avatar on mobile */
+  }
+
+  .user-details h2 {
+    font-size: 1.2rem; /* smaller text */
+  }
+
+  .user-details p {
+    font-size: 0.9rem;
+  }
 }

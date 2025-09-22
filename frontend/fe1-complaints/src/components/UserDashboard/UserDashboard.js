@@ -1,67 +1,74 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Row, Col } from "react-bootstrap";
-import { FaThumbsUp, FaThumbsDown, FaUserCircle, FaGithub } from "react-icons/fa"; // Icons for upvote/downvote, avatar, and GitHub
-import { useAuth } from "../../Context/AuthContext"; // Import the useAuth hook
-import axios from "axios"; // For making HTTP requests
-import "./UserDashboard.css"; // Import the CSS file
-import { HiOutlineThumbUp } from "react-icons/hi";
-import { HiOutlineThumbDown } from "react-icons/hi";
-import { Clock, CheckCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import { HiOutlineThumbUp, HiOutlineThumbDown } from "react-icons/hi";
+import { Clock, CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
+import { FaPlus, FaCalendarAlt, FaExclamationCircle,FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
+import axios from "axios";
+import { MdOutlineTextsms } from "react-icons/md";
+import "./UserDashboard.css";
 
 const UserDashboard = () => {
-  // Get user details from AuthContext
   const { user } = useAuth();
-  const userEmail = user?.email; // Get the user's email from context
-
-
-  const navigate = useNavigate(); 
-
-
-  // Initialize state for complaints and user details
+  const userEmail = user?.email;
+  const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
-  const [expandedComplaint, setExpandedComplaint] = useState(null);
+  const [expandedCards, setExpandedCards] = useState({});
+
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
-  // Fetch complaints based on the user's email
-  useEffect(() => {
-    if (userEmail) {
-      axios
-        .get(`${baseUrl}/user-api/view-complaints/${userEmail}`)
-        .then((response) => {
-          setComplaints(response.data.complaints);
-        })
-        .catch((error) => {
-          console.error("Error fetching complaints:", error);
-        });
-    }
-  }, [userEmail]); // Run the effect whenever the userEmail changes
+useEffect(() => {
+  if (userEmail) {
+    // Get token from localStorage
+    const token = localStorage.getItem("authToken");
 
-  // Toggle visibility of the full description when clicked
-  const handleExpand = (complaintId) => {
-    setExpandedComplaint(expandedComplaint === complaintId ? null : complaintId);
+    axios
+      .get(`${baseUrl}/user-api/view-complaints/${userEmail}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Add token to headers
+        },
+      })
+      .then((response) => {
+        setComplaints(response.data.complaints);
+      })
+      .catch((error) => {
+        console.error("Error fetching complaints:", error);
+      });
+  }
+}, [userEmail]);
+
+
+  const toggleExpand = (id) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
-  // Function to format date & time
   const formatDateTime = (isoString) => {
+    if (!isoString) return "Date not available";
     const date = new Date(isoString);
-    return date.toLocaleString(); // Converts to readable format (adjustable as needed)
+    return isNaN(date.getTime())
+      ? "Invalid date"
+      : date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
   };
 
   return (
     <div className="user-dashboard-container">
       <div className="dashboard-container">
-        {/* Page Heading */}
-        <div className="page-heading">
+        <div className="page-heading text-center">
           <h1>VNRVJIET Complaint Portal</h1>
           <p>Welcome to the platform where your voice matters!</p>
         </div>
 
-        {/* User Info Section */}
-        <div className="user-info ">
+        <div className="user-info mb-4">
           <div className="user-avatar">
-            <img src={user?.picture} className="rounded-circle"/>
+            <img src={user?.picture} alt="Profile" className="rounded-circle" />
           </div>
           <div className="user-details">
             <h2>Welcome, {user?.name || "User"}</h2>
@@ -69,103 +76,153 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        {/* My Complaints Heading */}
-        <div className="my-complaints-heading">
+        <div className="my-complaints-heading mb-3">
           <h3>My Complaints</h3>
         </div>
 
-        {/* Complaints Section */}
         {complaints.length === 0 ? (
-          <div className="no-complaints-message">
+          <div className="no-complaints-message text-center">
             <p>You haven't raised any complaints yet. Have a concern? Speak up and let your voice be heard!</p>
-            <Button 
-      className="raise-complaint-btn mt-3 px-4 py-2 fw-bold"
-      onClick={() => navigate("/complaint-form")}
-    >
-      Raise a Complaint
-    </Button>
+            <Button className="raise-complaint-btn mt-3 px-4 py-2 fw-bold" onClick={() => navigate("/complaint-form")}>
+              Raise a Complaint
+            </Button>
           </div>
         ) : (
-        <Row className="complaints-cards mx-1 ">
-          {complaints.map((complaint) => (
-            <Col key={complaint._id} className="mb-4">
-
-              <Card className="complaint-card">
-                <Card.Body>
-                  {/* Status Badge at Top Right */}
-                  <div className="status-badge">
-  <div className={`status ${complaint.status.toLowerCase()} flex items-center gap-2`}>
-    {complaint.status.toLowerCase() === "pending" || complaint.status.toLowerCase() === "ongoing" ? (
-      <Clock size={14} className="cs" />
-    ) : (
-      <CheckCircle className="text-green-500  " size={16} />
-    )}
-    <span className=" ms-1 ">{complaint.status}</span>
+          <Row className="gx-4 gy-4">
+            {complaints.map((complaint) => (
+              <Col key={complaint._id} xs={12} sm={6} lg={4}>
+                <Card className=" rounded-4 complaint-card">
+                  <Card.Body className="d-flex flex-column">
+                    {/* Status line only */}
+<div className="status-line d-flex justify-content-between align-items-center mb-2">
+  <div className={`status ${complaint.status.toLowerCase()}`}>
+    {complaint.status}
   </div>
 </div>
 
-                  <Card.Title>{complaint.title}</Card.Title>
-                  <Card.Subtitle className="mb-2.3 text-muted">
-                    <span className="fw-bold fs-6">category:</span> {complaint.category}
-                  </Card.Subtitle>
-
-                  <div className="mb-1  p-2 d-flex align-items-center">
-          <HiOutlineThumbUp className="tu text-success fs-4 " /> {complaint.likes}
-          {/* <span className="mx-2"></span> */}
-          <HiOutlineThumbDown className="td text-danger fs-4  " /> {complaint.dislikes}
-        </div>
-
-
-{/* 
-<div className="mb-1 ms-2 p-2 d-flex align-items-center">
-          <HiOutlineThumbUp className="text-success fs-4 me-1" /> {complaint.likes}
-          <span className="mx-5"></span>
-          <HiOutlineThumbDown className="text-danger fs-4 ms-2 me-1" /> {complaint.dislikes}
-        </div> */}
-
-
-                  {/* Show description, GitHub issue, and Admin Updates only if expanded */}
-                  {expandedComplaint === complaint.complaint_id && (
-                    <>
-                      <Card.Text>
-                        <strong>Description:</strong> {complaint.description}
-                      </Card.Text>
+{/* Date line below status */}
+<div className="d-flex align-items-center text-muted small mb-3 mt-2">
+  <span
+    style={{
+      backgroundColor: "#e0f0ff",
+      color: "#1e90ff",
+      padding: "6px",
+      borderRadius: "10px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "28px",
+      height: "28px",
+      marginRight: "8px",
+    }}
+  >
+    <FaCalendarAlt style={{ fontSize: "14px" }} />
+  </span>
+    <span style={{ color: "#1e90ff", fontWeight: "700" }}>
+    {formatDateTime(complaint.createdAt || complaint.date || complaint.timestamp || complaint.created_on)}
+  </span>
+</div>
 
 
-                      {/* Admin Updates Section */}
+                    <h5 className="fw-bold mb-2">{complaint.title}</h5>
+
+                    <Card.Text className="text-secondary mb-2">
+                      {complaint.description.split(" ").length > 20 ? (
+                        <>
+                          {expandedCards[complaint.complaint_id]
+                            ? complaint.description
+                            : complaint.description.split(" ").slice(0, 20).join(" ") + "..."}
+                          <span
+                            className="ms-2 text-primary"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => toggleExpand(complaint.complaint_id)}
+                          >
+                            {expandedCards[complaint.complaint_id] ? "View less" : "View more"}
+                          </span>
+                        </>
+                      ) : (
+                        complaint.description
+                      )}
+                    </Card.Text>
+
+                    {complaint.comments?.length > 0 && (
+                      <button
+                        className={`admin-toggle-btn mt-2 ${
+                          expandedCards[complaint.complaint_id] ? "hide-updates-btn" : "show-updates-btn"
+                        }`}
+                        onClick={() => toggleExpand(complaint.complaint_id)}
+                      >
+                        Admin Updates
+                        {expandedCards[complaint.complaint_id] ? (
+                          <ChevronUp size={16} className="ms-1" />
+                        ) : (
+                          <ChevronDown size={16} className="ms-1" />
+                        )}
+                      </button>
+                    )}
+
+                    {expandedCards[complaint.complaint_id] && (
                       <div className="admin-updates mt-3">
-                        <h5 className="updates-title">Admin Updates:</h5>
+                        <h6 className="d-flex align-items-center">
+                          <MdOutlineTextsms className="me-2 text-secondary" size={18} /> Admin Updates
+                        </h6>
                         <div className="updates-container">
-                          {complaint.comments && complaint.comments.length > 0 ? (
-                            complaint.comments.map((update) => (
-                              <div key={update.id} className="update-entry">
-                                <p className="update-text">{update.text}</p>
-                                <span className="update-time">{formatDateTime(update.date)}</span>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="no-updates">No updates yet.</p>
-                          )}
+                          {complaint.comments.map((update, index) => (
+<div key={index} className="update-entry">
+  <div className="d-flex justify-content-between align-items-start flex-wrap">
+    
+    {/* EMAIL + ICON */}
+    <div className="d-flex align-items-center mb-1">
+      <FaUser className="me-2 text-purple" size={18} />
+      <div>
+        <strong style={{ fontSize: "14px" }}>{update.email}</strong>
+      </div>
+    </div>
+
+    {/* TIME */}
+    <div className="update-time d-flex align-items-center ms-auto">
+      <Clock size={14} className="me-1 text-muted" />
+      <small>{formatDateTime(update.date)}</small>
+    </div>
+  </div>
+
+  {/* TEXT (own line) */}
+  <div className="mt-1 ps-4">
+    <p className="update-text mb-1">{update.text}</p>
+  </div>
+</div>
+
+                          ))}
                         </div>
                       </div>
-                    </>
-                  )}
+                    )}
 
-<Button
-  className="view-details-btn mt-3"
-  
-  onClick={() => handleExpand(complaint.complaint_id)}
->
-  {expandedComplaint === complaint.complaint_id ? "Hide Details" : "View Details"}
-</Button>
+                    <div className="mt-auto d-flex justify-content-between align-items-center pt-3">
+                      <div className="d-flex align-items-center gap-3">
+                        <span className="text-success d-flex align-items-center">
+                          <HiOutlineThumbUp className="me-1" size={20} />
+                          {complaint.likes}
+                        </span>
+                        <span className="text-danger d-flex align-items-center">
+                          <HiOutlineThumbDown className="me-1" size={20} />
+                          {complaint.dislikes}
+                        </span>
+                      </div>
+                      <span className="category-tag1">{complaint.category}</span>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
 
-
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-        )}</div>
+        <div className="text-center mt-4">
+              <button className="add-complaint-btn" onClick={() => navigate("/complaint-form")}>
+          <FaPlus className="plus-icon" /> Add Complaint
+        </button>
+        </div>
+      </div>
     </div>
   );
 };

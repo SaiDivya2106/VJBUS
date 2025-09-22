@@ -5,23 +5,29 @@ import { Modal } from "react-bootstrap";
 import { CheckCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import "./ComplaintForm.css";
+import { Send } from "react-bootstrap-icons";
+import { PersonFill, TagFill, FileTextFill } from "react-bootstrap-icons";
+import { ChevronDown, ChevronUp } from "react-bootstrap-icons";
 
-const CATEGORIES = [
-  "Infrastructure",
-  "Canteen",
-  "Examination",
-  "Fee Payments and Accounts",
-  "Boys Hostel",
-  "Girls Hostel",
-  "Hostel Food",
-  "Extracurricular and Events",
-  "Security",
-  "Sports",
-  "Housekeeping",
-  "Audio-Visual Equipment",
-  "Parking",
-  "Transport",
-  "Others",
+
+const categoriesList = [
+  { name: "Infrastructure", icon: "🏗" },
+  { name: "Canteen", icon: "🍽" },
+  { name: "Examination", icon: "📖" },
+  { name: "Fee Payments and Accounts", icon: "💳" },
+  { name: "Boys Hostel", icon: "🏠" },
+  { name: "Girls Hostel", icon: "🏡" },
+  { name: "Hostel Food", icon: "🍲" },
+  { name: "Extracurricular and Events", icon: "🏆" },
+  { name: "Security", icon: "🛡" },
+  { name: "Sports", icon: "⚽" },
+  { name: "Housekeeping", icon: "🧹" },
+  { name: "Audio-Visual Equipment", icon: "🎥" },
+  { name: "Parking", icon: "🚗" },
+  { name: "Transport", icon: "🚌" },
+  { name: "Library", icon: "📚" },            // added
+  { name: "IT and Networking", icon: "💻" },  //added
+  { name: "Others", icon: "📦" },
 ];
 
 const ComplaintForm = () => {
@@ -33,26 +39,17 @@ const ComplaintForm = () => {
     category: "",
     description: "",
   });
-
+  const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [warning, setWarning] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
 
+  const displayedCategories = showAll ? categoriesList : categoriesList.slice(0, 7);
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 992);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleCategorySelect = (cat) => setFormData({ ...formData, category: cat });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,7 +72,13 @@ const ComplaintForm = () => {
         user_id: user?.email,
       };
 
-      const response = await axios.post(`${baseUrl}/user-api/add-complaint`, complaintData);
+      const token = localStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${baseUrl}/user-api/add-complaint`,
+        complaintData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       if (response.status === 201) {
         setShowSuccess(true);
@@ -100,24 +103,13 @@ const ComplaintForm = () => {
     setLoading(false);
   };
 
-  // Styles
-  const cardStyle = {
-    maxWidth: "520px",
-    margin: "100px auto 60px auto",
-    padding: "30px",
-    borderRadius: "20px",
-    background: "#fff",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-    fontFamily: "'Segoe UI', sans-serif",
-    width: "90%",
-  };
-
-  const headingStyle = {
-    fontSize: "24px",
+   const headingStyle = {
+    fontSize: "2.3rem",
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: "20px",
+    marginBottom: "25px",
     fontFamily: "serif",
+    color:"black",
   };
 
   const userInfoStyle = {
@@ -133,157 +125,184 @@ const ComplaintForm = () => {
     borderRadius: "50%",
     objectFit: "cover",
     border: "2px solid #007bff",
+
   };
 
-  const usernameStyle = {
-    fontSize: "16px",
-    fontWeight: "600",
-    color: "#2c3e50",
-  };
+const usernameStyle = {
+  fontSize: "20px",
+  color: "#dbe2eaff",
+  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+};
+
 
   const labelStyle = {
     fontWeight: "600",
-    fontSize: "14px",
-    marginBottom: "4px",
-    color: "#333",
-  };
-
-  const inputStyle = {
-    padding: "10px",
-    fontSize: "14px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-    backgroundColor: "#f8f8f8",
-    width: "100%",
-    maxWidth: "100%",
-    boxSizing: "border-box",
-  };
-
-  const twoColumn = {
-    display: "flex",
-    flexDirection: isDesktop ? "row" : "column",
-    gap: "12px",
-    marginBottom: "10px",
-    flexWrap: "wrap",
-  };
-
- const titleFieldStyle = {
-  flex: isDesktop ? "3 1 0%" : "1 1 100%", // 3 parts
-  minWidth: "0",
-};
-
-const categoryFieldStyle = {
-  flex: isDesktop ? "2 1 0%" : "1 1 100%", // 2 parts
-  minWidth: "0",
-};
-
-
-  const buttonStyle = {
-    marginTop: "20px",
-    width: "100%",
-    padding: "12px",
-    borderRadius: "30px",
     fontSize: "15px",
-    fontWeight: "bold",
-    border: "none",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    cursor: "pointer",
-    transition: "0.3s",
+    marginBottom: "8px",
+    color: "#f5eeeeff",
   };
 
-  const textareaStyle = {
-    ...inputStyle,
-    minHeight: "100px",
-    resize: "vertical",
-  };
+const lightBlue = "#4da6ff";
 
   return (
-    <div style={cardStyle}>
-      <h2 style={headingStyle}>Register a Complaint</h2>
+    <div className="complaint-container">
+      {/* <p className="title">Register Complaint</p>
+
+      {user && (
+        <div className="user-info">
+          <img src={user.picture} alt="User Avatar" className="avatar" />
+          <span className="username">{user.name}</span>
+        </div>
+      )} */}
+
+        <h2 style={headingStyle}>Register a Complaint</h2>
+
+      <form className="form" onSubmit={handleSubmit}>
+                 
 
       <div style={userInfoStyle}>
         <img src={user?.picture} alt="User Avatar" style={avatarStyle} />
-        <span style={usernameStyle}>{user?.name}</span>
+        {/* <span style={usernameStyle}>{user?.name}</span> */}
+        <span style={{ fontSize: "20px", color: "#f9f3f3ff", fontFamily: "serif" }}>
+  {user?.name}
+</span>
+
       </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="complaint-form"
-        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-      >
-        <div style={twoColumn}>
-          <div style={titleFieldStyle}>
-            <label style={labelStyle}>Title:</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Short title"
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={categoryFieldStyle}>
-            <label style={labelStyle}>Category:</label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              style={inputStyle}
-              required
-            >
-              <option value="">Select...</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="input-group">
+           <label style={labelStyle}>
+  <span className="icon-circle">
+    <PersonFill size={18} color={lightBlue} />
+  </span>
+  Complaint Title *
+</label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Enter a clear, descriptive title..."
+            required
+          />
         </div>
 
-        <label style={labelStyle}>Description:</label>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Explain the issue clearly..."
-          style={textareaStyle}
-          required
-        ></textarea>
+        <div className="input-group">
+  {/* Label is in its own block */}
+  <div className="category-label-wrapper">
+    <label style={labelStyle}>
+      <span className="icon-circle">
+        <TagFill size={18} color={lightBlue} />
+      </span>
+      Category
+    </label>
+  </div>
 
-        <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Submitting..." : "Register Complaint"}
-        </button>
-      </form>
+  {/* Category grid comes below the label */}
+  <div className="category-grid">
+    {formData.category ? (
+      <button
+        type="button"
+        className="category-btn active"
+        onClick={() => setFormData({ ...formData, category: "" })}
+      >
+        <span className="icon">
+          {categoriesList.find((cat) => cat.name === formData.category)?.icon}
+        </span>
+        <span>{formData.category}</span>
+      </button>
+    ) : (
+      <>
+        {displayedCategories.map((cat) => (
+          <button
+            key={cat.name}
+            type="button"
+            className={`category-btn ${
+              formData.category === cat.name ? "active" : ""
+            }`}
+            onClick={() => handleCategorySelect(cat.name)}
+          >
+            <span className="icon">{cat.icon}</span>
+            <span>{cat.name}</span>
+          </button>
+        ))}
 
-      {warning && (
-        <p
-          style={{
-            color: "red",
-            fontWeight: "bold",
-            marginTop: "10px",
-            textAlign: "center",
-          }}
+        <button
+          type="button"
+          className="category-btn more-btn"
+          onClick={() => setShowAll(!showAll)}
         >
-          ⚠️ {warning}
-        </p>
-      )}
+          <span className="icon-circle">
+            {showAll ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </span>
+          {showAll ? "Show Less" : "More Options"}
+        </button>
+      </>
+    )}
+  </div>
+</div>
 
-      {message && (
-        <p style={{ color: "red", textAlign: "center", marginTop: "10px" }}>
-          {message}
-        </p>
-      )}
+
+
+
+      
+
+
+        <div className="input-group">
+<label style={labelStyle}>
+  <span className="icon-circle">
+    <FileTextFill size={18} color={lightBlue} />
+  </span>
+  Detailed Description :
+</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Please provide a comprehensive description of your issue..."
+            rows="5"
+            required
+          />
+        </div>
+          {/* ⚠️ Complaint Warning Note */}
+  {/* <p className="complaint-note mt-3">
+  <i className="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+  False or invalid complaints are strictly prohibited.Only genuine issues will be considered.
+
+</p> */}
+
+<p className="complaint-note mt-3 d-flex align-items-center" style={{ marginLeft: '0', paddingLeft: '0' }}>
+  <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+  <span>False or invalid complaints are strictly prohibited. Only genuine issues will be considered.</span>
+</p>
+
+
+
+        <button type="submit" className="submit-btn" disabled={loading}>
+          <Send style={{ marginRight: "8px", verticalAlign: "middle" }} size={18} color="#fff" />
+          {loading ? "Submitting..." : "Register Complaint"}
+        </button> 
+
+
+
+
+
+
+        {/* {warning && <p className="form-warning mt-3">⚠ {warning}</p>} */}
+        {warning && (
+  <p className="form-warning mt-3  ml-2">
+    <span className="text-danger ">⚠</span>{" "}
+    
+    <span className="text-white">{warning}</span>
+  </p>
+)}
+
+        {message && <p className="form-message">{message}</p>}
+      </form>
 
       <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
         <Modal.Body className="text-center p-5">
           <CheckCircleFill className="success-icon" />
           <h5 className="text-success">Complaint Registered Successfully!</h5>
-        </Modal.Body>
+        </Modal.Body>  
       </Modal>
     </div>
   );
@@ -294,7 +313,110 @@ export default ComplaintForm;
 
 
 
+// import { useState } from "react";
+//  import "./ComplaintForm.css";
+//  import {
+//   Building2,
+//   Utensils,
+//   BookOpen,
+//   CreditCard,
+//   Home,
+//   Briefcase,
+//   Shield,
+//   Dumbbell,
+//   Users,
+//   Film,
+//   Car,
+//   Bus,
+//   Book,
+// } from "lucide-react";
+// const ComplaintForm = () => {
+//   const [category, setCategory] = useState(null);
+//   const [showAll, setShowAll] = useState(false);
 
 
+//   const categories = [
+//   { name: "Infrastructure", icon: "🏗️" },
+//   { name: "Canteen", icon: "🍽️" },
+//   { name: "Examination", icon: "📖" },
+//   { name: "Fee Payments and Accounts", icon: "💳" },
+//   { name: "Boys Hostel", icon: "🏠" },
+//   { name: "Girls Hostel", icon: "🏡" },
+//   { name: "Hostel Food", icon: "🍲" },
+//   { name: "Extracurricular and Events", icon: "🏆" }, 
+//   { name: "Security", icon: "🛡️" },
+//   { name: "Sports", icon: "⚽" },
+//   { name: "Housekeeping", icon: "🧹" },
+//   { name: "Audio-Visual Equipment", icon: "🎥" },
+//   { name: "Parking", icon: "🚗" },
+//   { name: "Transport", icon: "🚌" },
+//   { name: "Others", icon: "📦" },
+// ];
+
+//   // Decide which categories to show
+//   const displayedCategories = showAll ? categories : categories.slice(0, 7);
+
+//   return (
+//     <div className="complaint-container">
+    
+//       {/* Complaint Form */}
+//       <form className="form ">
+//         <p className="reg">Register Complaint</p>
+//           <p>GURUMETKAL BHARATH</p>
+//         {/* Complaint Title */}
+//         <div className="input-group">
+//           <label>Complaint Title *</label>
+//           <input
+//             type="text"
+//             placeholder="Enter a clear, descriptive title..."
+//           />
+//         </div>
+
+// <div className="input-group">
+//       <label>Category *</label>
+//       <div className="category-grid">
+//         {displayedCategories.map((cat) => (
+//           <button
+//             key={cat.name}
+//             type="button"
+//             className={`category-btn ${category === cat.name ? "active" : ""}`}
+//             onClick={() => setCategory(cat.name)}
+//           >
+//               <span className="icon">{cat.icon}</span>
+//             <span>{cat.name}</span>
+//           </button>
+//         ))}
+
+//         {/* Show More / Show Less card */}
+//         <button
+//           type="button"
+//           className="category-btn more-btn"
+//           onClick={() => setShowAll(!showAll)}
+//         >
+//           {showAll ? "Show Less" : "More Options"}
+//         </button>
+//       </div>
+//     </div>
+
+
+//         {/* Description */}
+//         <div className="input-group">
+//           <label>Detailed Description *</label>
+//           <textarea
+//             placeholder="Please provide a comprehensive description of your issue..."
+//             rows="5"
+//           ></textarea>
+//         </div>
+
+//         {/* Submit */}
+//         <button type="submit" className="submit-btn">
+//           Submit Complaint
+//         </button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default ComplaintForm;
 
 

@@ -9,6 +9,7 @@ import { IoMdSend } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCategoryAlt } from "react-icons/bi";
+import { useAuth } from "../../Context/AuthContext";
 
 const ComplaintsDetails = () => {
   const { complaint_id } = useParams();
@@ -16,6 +17,7 @@ const ComplaintsDetails = () => {
   const [complaint, setComplaint] = useState(null);
   const [status, setStatus] = useState("");
   const [newComment, setNewComment] = useState("");
+  const {user}=useAuth()
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
   const formatDate = (isoString) => {
@@ -34,9 +36,18 @@ const ComplaintsDetails = () => {
   useEffect(() => {
     const fetchComplaint = async () => {
       try {
-        const response = await axios.get(
-          `${baseUrl}/admin-api/view-complaint/${complaint_id}`
-        );
+// Get token from localStorage
+const token = localStorage.getItem("authToken");
+
+const response = await axios.get(
+  `${baseUrl}/admin-api/view-complaint/${complaint_id}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Add Bearer token
+    },
+  }
+);
+
         const complaintData = response.data.complaint;
         setComplaint({
           ...complaintData,
@@ -55,10 +66,19 @@ const ComplaintsDetails = () => {
     setStatus(updatedStatus);
 
     try {
-      await axios.put(
-        `${baseUrl}/admin-api/update-status/${complaint_id}`,
-        { status: updatedStatus }
-      );
+// Get token from localStorage
+const token = localStorage.getItem("authToken");
+
+await axios.put(
+  `${baseUrl}/admin-api/update-status/${complaint_id}`,
+  { status: updatedStatus },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Add Bearer token
+    },
+  }
+);
+
       setComplaint((prev) => ({ ...prev, status: updatedStatus }));
       toast.success(`Status updated to: ${updatedStatus}`, {
         position: "top-right",
@@ -73,35 +93,70 @@ const ComplaintsDetails = () => {
     }
   };
 
-  const handleCommentSubmit = async () => {
-    if (!newComment.trim()) return;
+ const handleCommentSubmit = async () => {
+  if (!newComment.trim()) return;
 
-    const newCommentObj = {
-      id: (complaint.comments.length || 0) + 1,
-      date: new Date().toISOString(),
-      text: newComment,
-    };
-
-    try {
-      await axios.post(
-        `${baseUrl}/admin-api/complaints/${complaint_id}/comment`,
-        { comment: newCommentObj }
-      );
-      setComplaint((prev) => ({
-        ...prev,
-        comments: [...(prev.comments || []), newCommentObj],
-      }));
-      setNewComment("");
-    } catch (error) {
-      console.error("Error adding comment:", error);
-    }
+  const newCommentObj = {
+    id: (complaint.comments.length || 0) + 1,
+    date: new Date().toISOString(),
+    text: newComment,
   };
+
+  try {
+   // Get token from localStorage
+const token = localStorage.getItem("authToken");
+
+await axios.post(
+  `${baseUrl}/admin-api/complaints/${complaint_id}/comment`,
+  {
+    text: newComment,
+    adminEmail: user.email,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Add Bearer token
+    },
+  }
+);
+
+
+    // Add comment to UI manually
+    setComplaint((prev) => ({
+      ...prev,
+      comments: [
+        ...(prev.comments || []),
+        {
+          id: new Date().getTime(),
+          text: newComment,
+          date: new Date().toISOString(),
+          email: user.email,
+        },
+      ],
+    }));
+
+    setNewComment(""); // clear the input
+  } catch (error) {
+    console.error("Error adding comment:", error);
+  }
+};
+
 
   const handleDeleteComplaint = async () => {
     if (!window.confirm("Are you sure you want to delete this complaint?")) return;
 
     try {
-      await axios.delete(`${baseUrl}/admin-api/delete-complaint/${complaint_id}`);
+      // Get token from localStorage
+const token = localStorage.getItem("authToken");
+
+await axios.delete(
+  `${baseUrl}/admin-api/delete-complaint/${complaint_id}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Add Bearer token
+    },
+  }
+);
+
       alert("Complaint has been deleted successfully.");
       navigate("/adminpage");
     } catch (error) {
@@ -121,17 +176,22 @@ const ComplaintsDetails = () => {
     <div className="complaint-page">
       <ToastContainer />
       <div className="container">
-        <button className="btn btn-outline-secondary mb-3 mt-3" onClick={handleBackClick}>
+        <button className="btn btn-outline-primary mb-3 mt-3" onClick={handleBackClick}>
           <i className="bi bi-arrow-left"></i> Back
         </button>
 
-        {/* DELETE BUTTON MOVED TO TOP */}
-        <div className="delete-button-wrapper mb-3">
-          <button className="btn btn-danger btn-sm" onClick={handleDeleteComplaint}>
-            <i className="bi bi-trash3-fill me-1"></i> Delete 
-          </button>
-        </div>
-           <h1 className="page-title fs-2 fw-bold text-center my-4">Complaint Details</h1>
+<div className="complaint-header-wrapper d-flex justify-content-between align-items-center mt-4 mb-3 px-2">
+  <h1 className="page-title fs-2 fw-bold mb-0">Complaint Details</h1>
+  <button
+    className="btn btn-danger delete-icon-btn"
+    onClick={handleDeleteComplaint}
+    title="Delete Complaint"
+  >
+    <i className="bi bi-trash3-fill"></i>
+  </button>
+</div>
+
+
         {/* MAIN SECTION (No Card) */}
         <div className="content-section">
           <div className="top-row">
@@ -190,7 +250,7 @@ const ComplaintsDetails = () => {
                   <div className="comment-header">
   <div className="author-wrapper">
     <span className="comment-avatar">👤</span>
-    <span className="comment-author">{comment.author || "Admin Team"}</span>
+    <span className="comment-author">{user.name || "Admin Team"}</span>
   </div>
   <div className="comment-date">{formatDate(comment.date)}</div>
 </div>

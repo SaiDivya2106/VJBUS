@@ -9,6 +9,7 @@ import ComplaintsDetails from './components/ComplaintsDetails/ComplaintsDetails'
 import UserDashboard from './components/UserDashboard/UserDashboard';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 import AdminAnalysis from './components/AdminAnalysis/AdminAnalysis';
+import UserAnalysis from './components/UserAnalysis/UserAnalysis';
 
 function App() {
   let router = createBrowserRouter([
@@ -21,7 +22,8 @@ function App() {
         {path:'complaints-website',element:<LandingPage/>},
         { path: 'complaint-form', element: <ComplaintForm /> },
         { path: 'adminpage', element: <AdminPage /> },
-        {path:'admin-analysis',element:<AdminAnalysis/>},
+        { path: 'admin-analysis', element: <AdminAnalysis /> },
+        {path:'user-analysis',element:<UserAnalysis/>},
         {path:'my-complaints',element:<UserDashboard/>},
         {
           path: 'complaints-details/:complaint_id', // ✅ Moved outside AdminPage
