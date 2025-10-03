@@ -17,6 +17,8 @@ const UserDashboard = () => {
   const [expandedCards, setExpandedCards] = useState({});
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
+  const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+
 
 useEffect(() => {
   if (userEmail) {
@@ -93,12 +95,22 @@ useEffect(() => {
               <Col key={complaint._id} xs={12} sm={6} lg={4}>
                 <Card className=" rounded-4 complaint-card">
                   <Card.Body className="d-flex flex-column">
-                    {/* Status line only */}
-<div className="status-line d-flex justify-content-between align-items-center mb-2">
-  <div className={`status ${complaint.status.toLowerCase()}`}>
-    {complaint.status}
+{/* Complaint image with status overlay (same as Home) */}
+<div className="complaint-image-wrapper mt-2 mb-3">
+  <Card.Img
+    variant="top"
+    src={complaint.image || DEFAULT_IMAGE}
+    alt="complaint"
+    className="complaint-image rounded-3"
+    style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
+  />
+  <div className="status-overlay">
+    <span className={`status-pill ${complaint.status.toLowerCase()}`}>
+      {complaint.status}
+    </span>
   </div>
 </div>
+
 
 {/* Date line below status */}
 <div className="d-flex align-items-center text-muted small mb-3 mt-2">

@@ -14,6 +14,14 @@ dist-ssr
 backend/be4-vjbus/test.py
 
 .env
+backend/be1-complaints/.env
+frontend/fe1-complaints/.env
+
+# Ignore env files
+.env
+*.env
+*/.env
+
 
 # Logs
 logs

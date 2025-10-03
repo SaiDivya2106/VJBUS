@@ -67,7 +67,7 @@ const NavBar = () => {
                   state={{ email: user.email }}
                   onClick={() => setIsNavbarOpen(false)}
                 >
-                  User-analysis
+                  Dashboard
                 </NavLink>
               </li>
             )}
@@ -93,7 +93,7 @@ const NavBar = () => {
                   to="/adminpage"
                   onClick={() => setIsNavbarOpen(false)}
                 >
-                  Dashboard
+                  Resolve
                 </NavLink>
               </li>
             )}

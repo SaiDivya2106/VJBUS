@@ -77,3 +77,11 @@
     margin-bottom: 10px;
   }
 }
+
+/* Hover effect stays the same */
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: #ffcba1;
+}
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #fb923c !important;
+}
