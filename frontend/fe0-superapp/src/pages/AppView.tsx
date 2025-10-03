@@ -15,7 +15,7 @@ const apps = [
     id: "complaints",
     name: "Complaints",
     description: "Register complaints and grievances",
-    url: "https://complaints.vjstartup.com/"
+    url: "https://dev-complaints.vjstartup.com/"
   },
   {
     id: "fake-news",
@@ -46,6 +46,42 @@ const apps = [
     name: "Placements",
     description: "Help students get placements",
     url: "https://placements.vjstartup.com/"
+  },
+  {
+    id: "doubts",
+    name: "Doubts",
+    description: "Ask doubts during seminars and talks",
+    url: "https://undoubt-ai.vercel.app/"
+  },
+  {
+    id: "problemhub",
+    name: "ProblemHub",
+    description: "Report Community Problems that you see in day to day",
+    url: "https://www.vjstartup.com/problems"
+  },
+  {
+    id: "ideahub",
+    name: "IdeaHub",
+    description: "Ideas and Solutions that may transform society around you",
+    url: "https://www.vjstartup.com/ideas"
+  },
+  {
+    id: "outpass",
+    name: "Outpass",
+    description: "Student pass to leave campus",
+    url: "https://outpass.vjstartup.com/"
+  },
+  {
+    id: "keys",
+    name: "Keys",
+    description: "Campus room keys handover",
+    url: "https://vnr-keys.vercel.app/"
+  },
+  {
+    id: "hostel",
+    name: "Hostel",
+    description: "Mention your food taking preferences",
+    url: "https://hostel.vjstartup.com/"
   }
 ];
 

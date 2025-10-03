@@ -25,7 +25,13 @@ import {
   Send,
   X,
   LogIn,
-  LogOut
+  LogOut,
+  HelpCircle,
+  AlertTriangle,
+  Lightbulb,
+  Shield,
+  Key,
+  Home
 } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
@@ -40,6 +46,7 @@ interface App {
   category: string;
   color: string;
   gradient: string;
+  newTab?: boolean; // Optional field to open in new tab
 }
 
 const apps: App[] = [
@@ -112,6 +119,70 @@ const apps: App[] = [
     category: "Career",
     color: "bg-indigo-500",
     gradient: "from-indigo-500 to-indigo-600"
+  },
+  {
+    id: "doubts",
+    name: "Doubts",
+    description: "Ask doubts during seminars and talks",
+    url: "https://undoubt-ai.vercel.app/",
+    icon: HelpCircle,
+    category: "Academic",
+    color: "bg-emerald-500",
+    gradient: "from-emerald-500 to-emerald-600",
+    newTab: true // External service - open in new tab
+  },
+  {
+    id: "problemhub",
+    name: "ProblemHub",
+    description: "Report Community Problems that you see in day to day",
+    url: "https://www.vjstartup.com",
+    icon: AlertTriangle,
+    category: "Innovation",
+    color: "bg-red-600",
+    gradient: "from-red-600 to-red-700",
+    newTab: true // External service - open in new tab
+  },
+  {
+    id: "ideahub",
+    name: "IdeaHub",
+    description: "Ideas and Solutions that may transform society around you",
+    url: "https://www.vjstartup.com/ideas",
+    icon: Lightbulb,
+    category: "Innovation",
+    color: "bg-yellow-500",
+    gradient: "from-yellow-500 to-yellow-600",
+    newTab: true // External service - open in new tab
+  },
+  {
+    id: "outpass",
+    name: "Outpass",
+    description: "Student pass to leave campus",
+    url: "https://outpass.vjstartup.com/",
+    icon: Shield,
+    category: "Student Services",
+    color: "bg-blue-600",
+    gradient: "from-blue-600 to-blue-700"
+  },
+  {
+    id: "keys",
+    name: "Keys",
+    description: "Campus room keys handover",
+    url: "https://vnr-keys.vercel.app/",
+    icon: Key,
+    category: "Facilities",
+    color: "bg-gray-600",
+    gradient: "from-gray-600 to-gray-700",
+    newTab: true // External service - open in new tab
+  },
+  {
+    id: "hostel",
+    name: "Hostel",
+    description: "Mention your food taking preferences",
+    url: "https://hostel.vjstartup.com/",
+    icon: Home,
+    category: "Student Services",
+    color: "bg-pink-500",
+    gradient: "from-pink-500 to-pink-600"
   }
   //   {
   //   id: "student-activity",
@@ -143,7 +214,13 @@ const Index = () => {
 } = useAuth();
 
   const openApp = (app: App) => {
-    navigate(`/app/${app.id}`);
+    if (app.newTab) {
+      // Open in new tab
+      window.open(app.url, '_blank');
+    } else {
+      // Navigate to the embedded app view
+      navigate(`/app/${app.id}`);
+    }
   };
 
 
