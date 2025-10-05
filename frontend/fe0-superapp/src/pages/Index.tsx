@@ -64,7 +64,7 @@ const apps: App[] = [
     id: "complaints",
     name: "Complaints",
     description: "Register complaints and grievances",
-    url: "https://dev-complaints.vjstartup.com/",
+    url: "https://complaints.vjstartup.com/",
     icon: FileWarning,
     category: "Student Services",
     color: "bg-orange-500",
@@ -110,27 +110,27 @@ const apps: App[] = [
     color: "bg-yellow-500",
     gradient: "from-yellow-500 to-yellow-600"
   },
-  {
-    id: "student-placements",
-    name: "Placements",
-    description: "Help students get placements",
-    url: "https://placements.vjstartup.com/",
-    icon: Newspaper,
-    category: "Career",
-    color: "bg-indigo-500",
-    gradient: "from-indigo-500 to-indigo-600"
-  },
-  {
-    id: "doubts",
-    name: "Doubts",
-    description: "Ask doubts during seminars and talks",
-    url: "https://undoubt-ai.vercel.app/",
-    icon: HelpCircle,
-    category: "Academic",
-    color: "bg-emerald-500",
-    gradient: "from-emerald-500 to-emerald-600",
-    newTab: true // External service - open in new tab
-  },
+  // {
+  //   id: "student-placements",
+  //   name: "Placements",
+  //   description: "Help students get placements",
+  //   url: "https://placements.vjstartup.com/",
+  //   icon: Newspaper,
+  //   category: "Career",
+  //   color: "bg-indigo-500",
+  //   gradient: "from-indigo-500 to-indigo-600"
+  // },
+  // {
+  //   id: "doubts",
+  //   name: "Doubts",
+  //   description: "Ask doubts during seminars and talks",
+  //   url: "https://undoubt-ai.vercel.app/",
+  //   icon: HelpCircle,
+  //   category: "Academic",
+  //   color: "bg-emerald-500",
+  //   gradient: "from-emerald-500 to-emerald-600",
+  //   newTab: true // External service - open in new tab
+  // },
   {
     id: "problemhub",
     name: "ProblemHub",
@@ -139,8 +139,7 @@ const apps: App[] = [
     icon: AlertTriangle,
     category: "Innovation",
     color: "bg-red-600",
-    gradient: "from-red-600 to-red-700",
-    newTab: true // External service - open in new tab
+    gradient: "from-red-600 to-red-700"
   },
   {
     id: "ideahub",
@@ -150,8 +149,7 @@ const apps: App[] = [
     icon: Lightbulb,
     category: "Innovation",
     color: "bg-yellow-500",
-    gradient: "from-yellow-500 to-yellow-600",
-    newTab: true // External service - open in new tab
+    gradient: "from-yellow-500 to-yellow-600"
   },
   {
     id: "outpass",
@@ -248,12 +246,12 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 py-6 sm:py-8">
+        <div className="px-3 sm:px-6 py-4 sm:py-8">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Superman-style logo with shield design */}
               <div className="relative group">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all duration-300 border-4 border-blue-800/20">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all duration-300 border-4 border-blue-800/20">
                   {/* Shield shape background */}
                   <div className="absolute inset-2 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-xl shadow-inner flex items-center justify-center">
                     {/* Inner glow effect */}
@@ -265,35 +263,35 @@ const Index = () => {
                   <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-8 h-2 bg-white/20 rounded-full blur-sm"></div>
                 </div>
                 {/* Floating elements around logo */}
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-300 group-hover:animate-pulse">
+                <div className="absolute -top-2 -right-2 hidden sm:flex w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-300 group-hover:animate-pulse">
                   <div className="w-3 h-3 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full"></div>
                 </div>
                 {/* Glow effect */}
                 <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:bg-blue-400/30 transition-all duration-300 -z-10"></div>
               </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+              <div className="truncate">
+                <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-700 bg-clip-text text-transparent truncate">
                   Campus Life
                 </h1>
-                <p className="text-gray-600 mt-1 font-medium">Student Centric Campus Automation Suite</p>
+                <p className="text-gray-600 mt-1 font-medium hidden sm:block">Student Centric Campus Automation Suite</p>
               </div>
             </div>
             
 {isAuthenticated ? (
   <Button
     onClick={logout}
-    className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2.5 font-medium"
+    className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-6 py-2.5 font-medium"
   >
     <LogOut className="h-4 w-4" />
-    Logout
+    <span className="hidden sm:inline">Logout</span>
   </Button>
 ) : (
   <Button
     onClick={login}
-    className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2.5 font-medium"
+    className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-6 py-2.5 font-medium"
   >
     <LogIn className="h-4 w-4" />
-    Login
+    <span className="hidden sm:inline">Login</span>
   </Button>
 )}
 
@@ -451,19 +449,17 @@ const Index = () => {
           </div>
         )}
       </div>
+          {isLoginModalOpen && (
+            <LoginModal
+              onClose={() => setLoginModalOpen(false)}
+              onLogin={() => {
+                setLoginModalOpen(false);
+                setIsAuthenticated(true); // Trigger UI refresh
+              }}
+            />
+          )}
     </div>
-    
   );
-  {isLoginModalOpen && (
-  <LoginModal
-    onClose={() => setLoginModalOpen(false)}
-    onLogin={() => {
-      setLoginModalOpen(false);
-      setIsAuthenticated(true); // Trigger UI refresh
-    }}
-  />
-)}
-
 };
 
 export default Index;
