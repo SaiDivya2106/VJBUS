@@ -1,9 +1,10 @@
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+// removed unused Card/CardContent/Badge imports after switching to compact tiles
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -13,20 +14,12 @@ import {
   MessageCircleQuestion,
   Award,
   Library,
-  Newspaper,
-  ExternalLink,
-  Navigation,
-  FileText,
-  Users,
-  Settings,
-  Book,
-  Calendar,
   MessageCircle,
+  ExternalLink,
   Send,
   X,
   LogIn,
   LogOut,
-  HelpCircle,
   AlertTriangle,
   Lightbulb,
   Shield,
@@ -308,68 +301,76 @@ const Index = () => {
       {/* Apps Grid */}
       <div className="px-4 sm:px-6 py-12">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Mobile: icons-only grid */}
+          <div className="sm:hidden grid grid-cols-4 gap-2 py-2">
             {apps.map((app, index) => (
-              <Card
-                key={app.id}
-                className="group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 relative overflow-hidden rounded-2xl hover:bg-white/95"
-                onClick={() => openApp(app)}
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                }}
-              >
-                {/* Gradient accent bar */}
-                <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${app.gradient} shadow-sm`}></div>
-                
-                <CardContent className="p-6 relative">
-                  <div className="flex items-start justify-between mb-4">
-                    {/* Enhanced detailed icon design */}
-                    <div className={`relative p-5 rounded-3xl bg-gradient-to-br ${app.gradient} shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110 border-2 border-white/20`}>
-                      {/* Icon background glow */}
-                      <div className="absolute inset-0 bg-white/10 rounded-3xl"></div>
-                      {/* Main icon */}
-                      <app.icon className="h-8 w-8 text-white relative z-10 drop-shadow-lg" />
-                      {/* Inner highlight */}
-                      <div className="absolute top-2 left-2 w-4 h-2 bg-white/20 rounded-full blur-sm"></div>
-                      {/* Floating dot indicator */}
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-white/90 rounded-full flex items-center justify-center shadow-md">
-                        <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
-                      </div>
-                      {/* Outer glow effect */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${app.gradient} rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10`}></div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-300" />
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-gray-100/80 text-gray-700 border-0 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm hidden sm:block"
-                      >
-                        {app.category}
-                      </Badge>
-                    </div>
+              <div key={app.id} className="flex justify-center" style={{ animationDelay: `${index * 40}ms` }}>
+                <button
+                  onClick={() => openApp(app)}
+                  aria-label={app.name}
+                  title={app.name}
+                  className="group flex flex-col items-center gap-1 bg-white/0 rounded-md p-0.5 w-18 h-20"
+                >
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${app.gradient}`}>
+                    <app.icon className="h-6 w-6 text-white" />
                   </div>
-                  
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors duration-300 leading-tight">
-                      {app.name}
-                    </h3>
-                    <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed text-sm font-medium hidden sm:block">
-                      {app.description}
-                    </p>
-                  </div>
-
-                  {/* Enhanced hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                  
-                  {/* Action indicator */}
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-3 group-hover:translate-y-0">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                      <ExternalLink className="h-4 w-4 text-white" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  {/* small label helps recognition on mobile without taking much space */}
+                  <span className="text-[11px] text-gray-800 mt-1 text-center truncate w-full">{app.name}</span>
+                </button>
+              </div>
             ))}
+          </div>
+
+          {/* Desktop: full card grid */}
+          <div className="hidden sm:block">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {apps.map((app, index) => (
+                <Card
+                  key={app.id}
+                  className="group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 relative overflow-hidden rounded-2xl hover:bg-white/95"
+                  onClick={() => openApp(app)}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${app.gradient} shadow-sm`}></div>
+                  <CardContent className="p-6 relative">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`relative p-5 rounded-3xl bg-gradient-to-br ${app.gradient} shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110 border-2 border-white/20`}>
+                        <div className="absolute inset-0 bg-white/10 rounded-3xl"></div>
+                        <app.icon className="h-8 w-8 text-white relative z-10 drop-shadow-lg" />
+                        <div className="absolute top-2 left-2 w-4 h-2 bg-white/20 rounded-full blur-sm"></div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-white/90 rounded-full flex items-center justify-center shadow-md">
+                          <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
+                        </div>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${app.gradient} rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10`}></div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-300" />
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-gray-100/80 text-gray-700 border-0 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm"
+                        >
+                          {app.category}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors duration-300 leading-tight">
+                        {app.name}
+                      </h3>
+                      <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed text-sm font-medium">
+                        {app.description}
+                      </p>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-3 group-hover:translate-y-0">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
+                        <ExternalLink className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -433,7 +434,7 @@ const Index = () => {
                   type="text"
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder="Type your message..."
                   className="flex-1 bg-gray-50/80 border border-gray-200/80 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-300 backdrop-blur-sm font-medium"
                 />

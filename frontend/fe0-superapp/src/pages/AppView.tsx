@@ -15,7 +15,7 @@ const apps = [
     id: "complaints",
     name: "Complaints",
     description: "Register complaints and grievances",
-    url: "https://dev-complaints.vjstartup.com/"
+    url: "https://complaints.vjstartup.com/"
   },
   {
     id: "fake-news",
@@ -180,11 +180,11 @@ const AppView = () => {
               Open in New Tab
             </Button>
             {isAuthenticated ? (
-              <Button onClick={logout} className="text-gray-800 border border-gray-300 flex items-center gap-2 shadow-sm">
+              <Button onClick={logout} variant="outline" className="bg-white/90 text-gray-700 border border-gray-300 flex items-center gap-2 shadow-sm">
                 Logout
               </Button>
             ) : (
-              <Button onClick={login} className="text-gray-800 border border-gray-300 flex items-center gap-2 shadow-sm">
+              <Button onClick={login} variant="outline" className="bg-white/90 text-gray-700 border border-gray-300 flex items-center gap-2 shadow-sm">
                 <LogIn className="h-4 w-4" />
                 Login
               </Button>
