@@ -204,14 +204,28 @@ const Index = () => {
   setIsAuthenticated
 } = useAuth();
 
+  const [animatingAppId, setAnimatingAppId] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const navigateToApp = (app: App) => {
+    navigate(`/app/${app.id}`);
+  };
+
   const openApp = (app: App) => {
     if (app.newTab) {
-      // Open in new tab
+      // Open in new tab immediately
       window.open(app.url, '_blank');
-    } else {
-      // Navigate to the embedded app view
-      navigate(`/app/${app.id}`);
+      return;
     }
+
+    // Play a 0.5s animation: zoom selected tile and move others away
+    if (isAnimating) return; // prevent double clicks
+    setAnimatingAppId(app.id);
+    setIsAnimating(true);
+
+    setTimeout(() => {
+      navigateToApp(app);
+    }, 500); // match animation duration
   };
 
 
@@ -303,31 +317,41 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           {/* Mobile: icons-only grid */}
           <div className="sm:hidden grid grid-cols-3 gap-4 py-2">
-            {apps.map((app, index) => (
-              <div key={app.id} className="flex justify-center" style={{ animationDelay: `${index * 40}ms` }}>
-                <button
-                  onClick={() => openApp(app)}
-                  aria-label={app.name}
-                  title={app.name}
-                  className="group flex flex-col items-center gap-1 bg-white/0 rounded-md p-1 w-24 h-24"
+            {apps.map((app, index) => {
+              const isSelected = animatingAppId === app.id && isAnimating;
+              const isOtherAnimating = isAnimating && animatingAppId !== app.id;
+              return (
+                <div
+                  key={app.id}
+                  className="flex justify-center"
+                  style={{ animationDelay: `${index * 40}ms` }}
                 >
-                  <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${app.gradient}`}>
-                    <app.icon className="h-8 w-8 text-white" />
-                  </div>
-                  {/* small label helps recognition on mobile without taking much space */}
-                  <span className="text-[12px] text-gray-800 mt-1 text-center truncate w-full">{app.name}</span>
-                </button>
-              </div>
-            ))}
+                  <button
+                    onClick={() => openApp(app)}
+                    aria-label={app.name}
+                    title={app.name}
+                    className={`group flex flex-col items-center gap-1 bg-white/0 rounded-md p-1 w-24 h-24 transition-transform duration-500 ${isSelected ? 'scale-125 z-50' : ''} ${isOtherAnimating ? 'translate-y-6 opacity-30' : ''}`}
+                  >
+                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${app.gradient}`}>
+                      <app.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <span className="text-[12px] text-gray-800 mt-1 text-center truncate w-full">{app.name}</span>
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           {/* Desktop: full card grid */}
           <div className="hidden sm:block">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {apps.map((app, index) => (
+              {apps.map((app, index) => {
+                const isSelected = animatingAppId === app.id && isAnimating;
+                const isOtherAnimating = isAnimating && animatingAppId !== app.id;
+                return (
                 <Card
                   key={app.id}
-                  className="group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 relative overflow-hidden rounded-2xl hover:bg-white/95"
+                  className={`group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 relative overflow-hidden rounded-2xl hover:bg-white/95 ${isSelected ? 'scale-105 z-50' : ''} ${isOtherAnimating ? 'translate-x-8 opacity-40' : ''}`}
                   onClick={() => openApp(app)}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
