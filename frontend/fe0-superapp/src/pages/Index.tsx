@@ -57,7 +57,7 @@ const apps: App[] = [
     id: "complaints",
     name: "Complaints",
     description: "Register complaints and grievances",
-    url: "https://complaints.vjstartup.com/",
+    url: "https://thrive.vjstartup.com/",
     icon: FileWarning,
     category: "Student Services",
     color: "bg-orange-500",
