@@ -1,39 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
-import {
-  FaSearch,
-
-  FaPlus,
-  FaCalendarAlt,
-  FaUser,
-} from "react-icons/fa";
-import { HiOutlineThumbUp, HiOutlineThumbDown } from "react-icons/hi";
-import { BsChevronDown } from "react-icons/bs";
-import { FiFileText } from "react-icons/fi";
+import { Search, ThumbsUp, ThumbsDown, ChevronDown, FileX } from "lucide-react";
+import { FaPlus, FaCalendarAlt, FaUser, FaUserEdit } from "react-icons/fa";
 import { MdOutlineTextsms } from "react-icons/md";
-import { Card, Container, Row, Col } from "react-bootstrap";
+import { Card, Container, Row, Col, Modal } from "react-bootstrap";
+import { CheckCircleFill } from "react-bootstrap-icons";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import "./Home.css";
 
 const CATEGORIES = [
-  "Infrastructure",
-  "Canteen",
-  "Examination",
-  "Fee Payments and Accounts",
-  "Boys Hostel",
-  "Girls Hostel",
-  "Hostel Food",
-  "Extracurricular and Events",
-  "Security",
-  "Sports",
-  "Housekeeping",
-  "Audio-Visual Equipment",
-  "Parking",
-  "Transport",
-  "Library",
-  "IT and Networking",
-  "Others",
+  "Infrastructure", "Canteen", "Examination", "Fee Payments and Accounts",
+  "Boys Hostel", "Girls Hostel", "Hostel Food", "Extracurricular and Events",
+  "Security", "Sports", "Housekeeping", "Audio-Visual Equipment",
+  "Parking", "Transport", "Library", "IT and Networking", "Others"
 ];
 
 const STATUSES = ["Pending", "Ongoing", "Resolved"];
@@ -49,35 +29,39 @@ const Home = () => {
   const [userVotes, setUserVotes] = useState({});
   const [expandedCard, setExpandedCard] = useState(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [editComplaint, setEditComplaint] = useState(null);
+  const [editForm, setEditForm] = useState({ title: "", description: "", category: "" });
+  const [editImage, setEditImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [popupMessage, setPopupMessage] = useState("");
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
-  const DEFAULT_IMAGE =
-  "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+  const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
 
+  const showPopup = (message) => {
+    setPopupMessage(message);
+    setTimeout(() => setPopupMessage(""), 2000);
+  };
 
   useEffect(() => {
     fetchComplaints();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryFilter, statusFilter]);
 
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const url = `${baseUrl}/user-api/filter-complaints?category=${categoryFilter}&status=${statusFilter}`;
       const token = localStorage.getItem("authToken");
-
-      const res = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const url = `${baseUrl}/user-api/filter-complaints?category=${categoryFilter}&status=${statusFilter}`;
+      const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       const data = res.data?.complaints || [];
       setComplaints(data);
 
-      // Track votes
       const votes = {};
       data.forEach((complaint) => {
         if (Array.isArray(complaint.votedUsers)) {
-          const userVote = complaint.votedUsers.find((v) => v.email === user?.email);
+          const userVote = complaint.votedUsers.find(v => v.email === user?.email);
           if (userVote) votes[complaint.complaint_id] = userVote.vote;
         }
       });
@@ -91,111 +75,175 @@ const Home = () => {
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "Unknown Date";
-    const date = new Date(timestamp);
-    return date.toDateString();
+    return new Date(timestamp).toDateString();
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 1500 * 1024) {
+        alert("File too large! Please upload ≤ 1.5MB.");
+        return;
+      }
+      setEditImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeEditImage = () => {
+    setEditImage(null);
+    setImagePreview(null);
+  };
+
+  const submitEditComplaint = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      let imageUrl = editComplaint.image;
+
+      if (editImage) {
+        const imgData = new FormData();
+        imgData.append("file", editImage);
+        imgData.append("upload_preset", "complaint_uploads");
+        const uploadRes = await axios.post(
+          "https://api.cloudinary.com/v1_1/dbsrpikci/image/upload",
+          imgData
+        );
+        imageUrl = uploadRes.data.secure_url;
+      }
+
+      const updatedData = { ...editForm, image: imageUrl };
+      await axios.put(
+        `${baseUrl}/user-api/edit-complaint/${editComplaint.complaint_id}`,
+        updatedData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setComplaints(prev =>
+        prev.map(c => c.complaint_id === editComplaint.complaint_id ? { ...c, ...updatedData } : c)
+      );
+
+      setEditComplaint(null);
+      setEditImage(null);
+      setImagePreview(null);
+      setShowSaveSuccess(true);
+      setTimeout(() => setShowSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error("Error editing complaint:", err);
+    }
   };
 
   const toggleDescription = (complaintId) => {
-    setExpandedDescriptions((prev) => ({
-      ...prev,
-      [complaintId]: !prev[complaintId],
-    }));
+    setExpandedDescriptions(prev => ({ ...prev, [complaintId]: !prev[complaintId] }));
   };
 
   const handleVote = async (id, type) => {
     const prevVote = userVotes[id];
     try {
       const token = localStorage.getItem("authToken");
-      const url = `${baseUrl}/user-api/${
-        type === "upvote" ? "like" : "dislike"
-      }-complaint/${id}`;
-      await axios.post(
-        url,
-        { email: user?.email },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const url = `${baseUrl}/user-api/${type === "upvote" ? "like" : "dislike"}-complaint/${id}`;
+      await axios.post(url, { email: user?.email }, { headers: { Authorization: `Bearer ${token}` } });
 
-      setUserVotes((prevVotes) => {
+      setUserVotes(prevVotes => {
         if (prevVote === type) {
           const updatedVotes = { ...prevVotes };
           delete updatedVotes[id];
           return updatedVotes;
-        } else {
-          return { ...prevVotes, [id]: type };
         }
+        return { ...prevVotes, [id]: type };
       });
 
-      setComplaints((prevComplaints) =>
-        prevComplaints.map((complaint) => {
-          if (complaint.complaint_id !== id) return complaint;
-          let likes = complaint.likes;
-          let dislikes = complaint.dislikes;
+      setComplaints(prevComplaints =>
+        prevComplaints.map(c => {
+          if (c.complaint_id !== id) return c;
+          let likes = c.likes;
+          let dislikes = c.dislikes;
 
           if (prevVote === "upvote") likes = Math.max(0, likes - 1);
           if (prevVote === "downvote") dislikes = Math.max(0, dislikes - 1);
 
-          if (prevVote === type) {
-            return { ...complaint, likes, dislikes };
-          } else {
+          if (prevVote !== type) {
             if (type === "upvote") likes += 1;
             else dislikes += 1;
-            return { ...complaint, likes, dislikes };
           }
+          return { ...c, likes, dislikes };
         })
       );
 
       if (expandedCard && expandedCard.complaint_id === id) {
-        let updatedLikes = expandedCard.likes;
-        let updatedDislikes = expandedCard.dislikes;
+        let likes = expandedCard.likes;
+        let dislikes = expandedCard.dislikes;
 
-        if (prevVote === "upvote") updatedLikes = Math.max(0, updatedLikes - 1);
-        if (prevVote === "downvote") updatedDislikes = Math.max(0, updatedDislikes - 1);
-
+        if (prevVote === "upvote") likes = Math.max(0, likes - 1);
+        if (prevVote === "downvote") dislikes = Math.max(0, dislikes - 1);
         if (prevVote !== type) {
-          if (type === "upvote") updatedLikes += 1;
-          else updatedDislikes += 1;
+          if (type === "upvote") likes += 1;
+          else dislikes += 1;
         }
-
-        setExpandedCard({
-          ...expandedCard,
-          likes: updatedLikes,
-          dislikes: updatedDislikes,
-        });
+        setExpandedCard({ ...expandedCard, likes, dislikes });
       }
     } catch (err) {
       console.error("Error updating vote:", err);
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "Pending":
-        return <span className="status-pill status-pending">Pending</span>;
-      case "Ongoing":
-        return <span className="status-pill status-ongoing">Ongoing</span>;
-      case "Resolved":
-        return <span className="status-pill status-resolved">Resolved</span>;
-      default:
-        return null;
+  const handleEditComplaint = (complaint) => {
+    setEditComplaint(complaint);
+    setEditForm({ title: complaint.title, description: complaint.description, category: complaint.category });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDeleteComplaint = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
+    try {
+      const token = localStorage.getItem("authToken");
+      const res = await axios.delete(`${baseUrl}/user-api/delete-complaint/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 200) {
+        setComplaints(prev => prev.filter(c => c.complaint_id !== id));
+        setShowDeleteSuccess(true);
+        setTimeout(() => setShowDeleteSuccess(false), 3000);
+        if (expandedCard?.complaint_id === id) setExpandedCard(null);
+        if (editComplaint?.complaint_id === id) setEditComplaint(null);
+      }
+    } catch (err) {
+      console.error("Error deleting complaint:", err.response?.data || err.message);
     }
   };
 
-  const filteredComplaints = complaints.filter((complaint) => {
-    const matchesSearch =
-      complaint.title.toLowerCase().includes(search.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter ? complaint.category === categoryFilter : true;
-    const matchesStatus = statusFilter ? complaint.status === statusFilter : true;
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "Pending": return <span className="status-pill status-pending">Pending</span>;
+      case "Ongoing": return <span className="status-pill status-ongoing">Ongoing</span>;
+      case "Resolved": return <span className="status-pill status-resolved">Resolved</span>;
+      default: return null;
+    }
+  };
+
+  const filteredComplaints = complaints.filter(c => {
+    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase()) || c.description.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = categoryFilter ? c.category === categoryFilter : true;
+    const matchesStatus = statusFilter ? c.status === statusFilter : true;
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   return (
     <Container className="mt-5 home-container mb-2">
+      {popupMessage && (
+        <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "rgba(0,0,0,0.8)", color: "#fff", padding: "15px 25px", borderRadius: "10px", fontSize: "1.1rem", zIndex: 2000, textAlign: "center" }}>
+          {popupMessage}
+        </div>
+      )}
+
       {/* Filters + Search */}
       <div className="container mt-4 mb-4">
         <div className="d-flex flex-wrap justify-content-center gap-3">
           <div className="search-container">
-            <FaSearch className="search-icon" size={20} />
+            <Search className="search-icon" size={20} />
             <input
               type="text"
               placeholder="Search complaints..."
@@ -239,7 +287,7 @@ const Home = () => {
         </div>
       ) : filteredComplaints.length === 0 ? (
         <div className="text-center text-muted mt-5 mb-5 fs-5 d-flex flex-column align-items-center">
-          <FiFileText size={64} className="iconn mb-3 text-secondary" />
+          <FileX size={64} className="iconn mb-3 text-secondary" />
           <h5 className="text-dark fw-semibold">No complaints available</h5>
         </div>
       ) : (
@@ -248,89 +296,173 @@ const Home = () => {
             {filteredComplaints.map((complaint) => (
               <Col key={complaint.complaint_id} lg={4} md={6} sm={12}>
                 <Card className="card-hover-effect p-3 glass-effect rounded-4 custom-card-container w-100 d-flex flex-column">
-                  {/* Image with status badge overlay */}
-                 <div className="complaint-image-wrapper mt-3 mb-2">
-  <Card.Img
-    variant="top"
-    src={complaint.image || DEFAULT_IMAGE}
-    alt="complaint"
-    className="complaint-image"
-  />
-  <div className="status-overlay">{getStatusBadge(complaint.status)}</div>
+                {/* Image with status badge overlay
+                  <div className="complaint-image-wrapper mt-3 mb-2">
+   <Card.Img
+     variant="top"
+     src={complaint.image || DEFAULT_IMAGE}
+     alt="complaint"
+     className="complaint-image"/>
+   <div className="status-overlay">{getStatusBadge(complaint.status)}</div>
+ </div> */}
+
+
+
+
+
+
+
+
+
+<div className="d-flex align-items-start justify-content-between position-relative">
+  {/* Status badge on the left */}
+    <div
+    className="status-overlay position-absolute"
+    style={{ top: "12px", left: "16px", zIndex: 3 }}
+  >
+    {getStatusBadge(complaint.status)}
+  </div>
+
+        
+  
+    
+
+  {/* Complaint image in the center */}
+  <div className="complaint-image-wrapper mx-2">
+    <Card.Img
+      variant="top"
+      src={complaint.image || DEFAULT_IMAGE}
+      alt="complaint"
+      className="complaint-image"
+    />
+  </div>
+
+  {/* Edit icon on the right if user owns complaint and status is Pending */}
+  {/* {complaint.user_id === user?.email && complaint.status === "Pending" && (
+    <div className="ms-auto d-flex align-items-center">
+      <FaUserEdit
+        size={28}
+        className="pencill-icon"
+        onClick={() => handleEditComplaint(complaint)}
+        style={{ cursor: "pointer" }}
+      />
+    </div>
+  )} */}
 </div>
 
-                  <Card.Text
-                    className="mt-3 mb-0"
-                    style={{ fontSize: "0.9rem", fontWeight: "600", color: "#1e90ff" }}
-                  >
-                    <span
-                      style={{
-                        backgroundColor: "#e0f0ff",
-                        color: "#1e90ff",
-                        padding: "6px",
-                        borderRadius: "10px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "28px",
-                        height: "28px",
-                        marginRight: "8px",
-                      }}
-                    >
-                      <FaCalendarAlt style={{ fontSize: "14px" }} />
-                    </span>
-                    {formatDate(complaint.timestamp)}
-                  </Card.Text>
 
-                  <Card.Title className="fw-bold text-dark mt-3 fs-4">{complaint.title}</Card.Title>
+
+
+
+                
+{/* date+edit */}
+ <div className="d-flex align-items-center justify-content-between mt-3 mb-0">
+  <div className="d-flex align-items-center text-primary fw-semibold" style={{ fontSize: "0.9rem" }}>
+    <span
+      style={{
+        backgroundColor: "#e0f0ff",
+        color: "#1e90ff",
+        padding: "6px",
+        borderRadius: "10px",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "28px",
+        height: "28px",
+        marginRight: "8px",
+      }}
+    >
+      <FaCalendarAlt style={{ fontSize: "14px" }} />
+    </span>
+    {formatDate(complaint.timestamp)}
+  </div>
+
+  {complaint.user_id === user?.email && complaint.status === "Pending" && (
+   <FaUserEdit
+  size={26}
+  className="edit-icon-purple"
+  onClick={() => handleEditComplaint(complaint)}
+/>
+
+  )}
+</div>
+
+
+
+                  <Card.Title className="fw-bold text-dark mt-3 fs-4">
+                    {complaint.title}
+                  </Card.Title>
                   <Card.Text className="text-secondary mb-2">
                     {expandedDescriptions[complaint.complaint_id]
                       ? complaint.description
                       : `${complaint.description.substring(0, 250)}${
                           complaint.description.length > 250 ? "..." : ""
                         }`}
-
                     {complaint.description.length > 250 && (
                       <span
                         className="view-more-link ms-2"
                         onClick={() => toggleDescription(complaint.complaint_id)}
-                        style={{ color: "#007bff", cursor: "pointer", fontWeight: 500 }}
+                        style={{
+                          color: "#007bff",
+                          cursor: "pointer",
+                          fontWeight: 500,
+                        }}
                       >
-                        {expandedDescriptions[complaint.complaint_id] ? "View Less" : "View More"}
+                        {expandedDescriptions[complaint.complaint_id]
+                          ? "View Less"
+                          : "View More"}
                       </span>
                     )}
                   </Card.Text>
 
                   {complaint.comments && complaint.comments.length > 0 && (
-                    <button className="admin-update-btn" onClick={() => setExpandedCard(complaint)}>
-                      Show Admin Updates <BsChevronDown size={18} />
+                    <button
+                      className="admin-update-btn"
+                      onClick={() => setExpandedCard(complaint)}
+                    >
+                      Show Admin Updates <ChevronDown size={18} />
                     </button>
                   )}
 
+                  {/* Footer: category + edit/delete + votes */}
                   <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
-                    <span className="category-tag px-2 py-1 rounded-pill me-auto" style={{ fontSize: "0.8rem" }}>
+                    <span
+                      className="category-tag px-2 py-1 rounded-pill me-auto"
+                      style={{ fontSize: "0.8rem" }}
+                    >
                       {complaint.category}
                     </span>
+
+
+
                     <div className="d-flex align-items-center gap-3 ms-auto">
                       <button
                         className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-                          userVotes[complaint.complaint_id] === "upvote" ? "bg-success text-white" : "text-success"
+                          userVotes[complaint.complaint_id] === "upvote"
+                            ? "bg-success text-white"
+                            : "text-success"
                         }`}
-                        onClick={() => handleVote(complaint.complaint_id, "upvote")}
+                        onClick={() =>
+                          handleVote(complaint.complaint_id, "upvote")
+                        }
                         style={{ fontSize: "1rem" }}
                       >
-                        <HiOutlineThumbUp size={20} /> {/* smaller icon */}
+                        <ThumbsUp size={20} />
                         {complaint.likes}
                       </button>
 
                       <button
                         className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-                          userVotes[complaint.complaint_id] === "downvote" ? "bg-danger text-white" : "text-danger"
+                          userVotes[complaint.complaint_id] === "downvote"
+                            ? "bg-danger text-white"
+                            : "text-danger"
                         }`}
-                        onClick={() => handleVote(complaint.complaint_id, "downvote")}
+                        onClick={() =>
+                          handleVote(complaint.complaint_id, "downvote")
+                        }
                         style={{ fontSize: "1rem" }}
                       >
-                        <HiOutlineThumbDown size={20} /> {/* smaller icon */}
+                        <ThumbsDown size={20} />
                         {complaint.dislikes}
                       </button>
                     </div>
@@ -342,108 +474,328 @@ const Home = () => {
         </div>
       )}
 
-      {/* Floating expanded card */}
-      {expandedCard && (
-        <div className="overlay" onClick={() => setExpandedCard(null)}>
-          <Card className="popup-card rounded-4 card-background-gradient" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setExpandedCard(null)}>
-              ✕
-            </button>
 
-            {/* Expanded image with badge overlay */}
-            <div className="complaint-image-wrapper mt-3 mb-2">
-  <Card.Img
-    variant="top"
-    src={expandedCard.image || DEFAULT_IMAGE}
-    alt="complaint"
-    className="complaint-image rounded-3"
-    style={{ maxHeight: "300px", objectFit: "cover", width: "100%" }}
+      {/* Floating expanded card for Admin Updates */}
+{expandedCard && (
+  <div className="overlay" onClick={() => setExpandedCard(null)}>
+    <Card
+      className="popup-card rounded-4 card-background-gradient p-4"
+      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+    >
+      {/* Close button */}
+      <button
+        className="close-btn"
+        onClick={() => setExpandedCard(null)}
+      >
+        ✕
+      </button>
+
+      {/* Status badge */}
+      <div className="mb-2">{getStatusBadge(expandedCard.status)}</div>
+
+      {/* Date */}
+      <Card.Text
+        className="mt-1 mb-2"
+        style={{
+          fontSize: "0.9rem",
+          fontWeight: "600",
+          color: "#1e90ff",
+        }}
+      >
+        <span
+          style={{
+            backgroundColor: "#d4dbe2ff",
+            color: "#1e90ff",
+            padding: "6px",
+            borderRadius: "10px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "28px",
+            height: "28px",
+            marginRight: "8px",
+          }}
+        >
+          <FaCalendarAlt style={{ fontSize: "14px" }} />
+        </span>
+        {formatDate(expandedCard.timestamp)}
+      </Card.Text>
+
+      {/* Title & Description */}
+      <Card.Title className="fw-bold text-dark mt-3 fs-4">
+        {expandedCard.title}
+      </Card.Title>
+      <Card.Text className="text-dark mb-3">{expandedCard.description}</Card.Text>
+
+      {/* Admin Comments */}
+      <div className="admin-updates mb-3">
+        <h5 className="mb-2">
+          <MdOutlineTextsms className="me-2" /> Admin Updates:
+        </h5>
+        {expandedCard.comments.map((comment) => (
+          <div
+            key={comment.id}
+            className="update-entry mb-2 p-3"
+            style={{
+              backgroundColor: "#f8f9fa",
+              borderLeft: "4px solid purple",
+              borderRadius: "10px",
+            }}
+          >
+            <div className="d-flex align-items-center mb-1">
+              <FaUser className="me-2 text-purple" size={18} />
+              <strong>{comment.email}</strong>
+            </div>
+            <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer: category + votes */}
+      <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
+        <span
+          className="category-tag px-2 py-1 rounded-pill me-auto"
+          style={{ fontSize: "0.8rem" }}
+        >
+          {expandedCard.category}
+        </span>
+
+        <div className="d-flex align-items-center gap-3 ms-auto">
+          <button
+            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
+              userVotes[expandedCard.complaint_id] === "upvote"
+                ? "bg-success text-white"
+                : "text-success"
+            }`}
+            onClick={() => handleVote(expandedCard.complaint_id, "upvote")}
+            style={{ fontSize: "1rem" }}
+          >
+            <ThumbsUp size={20} />
+            {expandedCard.likes}
+          </button>
+
+          <button
+            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
+              userVotes[expandedCard.complaint_id] === "downvote"
+                ? "bg-danger text-white"
+                : "text-danger"
+            }`}
+            onClick={() => handleVote(expandedCard.complaint_id, "downvote")}
+            style={{ fontSize: "1rem" }}
+          >
+            <ThumbsDown size={20} />
+            {expandedCard.dislikes}
+          </button>
+        </div>
+      </div>
+    </Card>
+  </div>
+)}
+
+{editComplaint && (
+  <div className="overlay" onClick={() => setEditComplaint(null)}>
+    <Card
+      className="popup-card rounded-4 card-background-gradient p-3"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Close button – top-right corner */}
+      <button
+        className="close-btn"
+        onClick={() => setEditComplaint(null)}
+      >
+        ✕
+      </button>
+
+      {/* Header with delete button moved slightly left */}
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h5 className="mb-0">Edit or delete your Complaint</h5>
+        <button
+          className="btn btn-danger btn-icon btn-sm delete-btn"
+          onClick={() => handleDeleteComplaint(editComplaint.complaint_id)}
+        >
+          <i className="bi bi-trash"></i>
+        </button>
+      </div>
+
+      {/* Complaint Title */}
+      {/* <div className="form-group mb-2">
+        <label className="form-label d-flex align-items-center">
+          <span className="label-icon purple me-2">
+            <i className="bi bi-info-lg"></i>
+          </span>
+          Title
+        </label>
+        <input
+          type="text"
+          name="title"
+          className="form-control"
+          value={editForm.title}
+          onChange={handleEditChange}
+        />
+      </div>
+
+
+      <div className="form-group mb-2">
+        <label className="form-label d-flex align-items-center">
+          <span className="label-icon dark-purple me-2">
+            <i className="bi bi-card-text text-light"></i>
+          </span>
+          Description
+        </label>
+        <textarea
+          name="description"
+          className="form-control"
+          rows={3}
+          value={editForm.description}
+          onChange={handleEditChange}
+        />
+      </div> */}
+
+
+      {/* Complaint Title */}
+<div className="form-group mb-2">
+  <label className="form-label d-flex align-items-center">
+    <span className="label-icon purple me-2">
+      <i className="bi bi-info-lg"></i>
+    </span>
+    Title
+  </label>
+  <input
+    type="text"
+    name="title"
+    className="form-control"
+    value={editForm.title}
+    onChange={handleEditChange} // ✅ Removed onFocus select
   />
-  <div className="status-overlay">{getStatusBadge(expandedCard.status)}</div>
+</div>
+
+{/* Description */}
+<div className="form-group mb-2">
+  <label className="form-label d-flex align-items-center">
+    <span className="label-icon dark-purple me-2">
+      <i className="bi bi-card-text text-light"></i>
+    </span>
+    Description
+  </label>
+  <textarea
+    name="description"
+    className="form-control"
+    rows={4} // ✅ increased for better visibility
+    value={editForm.description}
+    onChange={handleEditChange} // ✅ Removed onFocus select
+  />
 </div>
 
 
-            <Card.Text
-              className="mt-3 mb-0"
-              style={{ fontSize: "0.9rem", fontWeight: "600", color: "#1e90ff" }}
-            >
-              <span
-                style={{
-                  backgroundColor: "#d4dbe2ff",
-                  color: "#1e90ff",
-                  padding: "6px",
-                  borderRadius: "10px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "28px",
-                  height: "28px",
-                  marginRight: "8px",
-                }}
-              >
-                <FaCalendarAlt style={{ fontSize: "14px" }} />
-              </span>
-              {formatDate(expandedCard.timestamp)}
-            </Card.Text>
+      {/* Category */}
+      <div className="form-group mb-2">
+        <label className="form-label d-flex align-items-center">
+          <span className="label-icon orange me-2">
+            <i className="bi bi-tag text-light"></i>
+          </span>
+          Category
+        </label>
+        <select
+  name="category"
+  className="form-control"
+  value={editForm.category}
+  disabled
+>
+  {CATEGORIES.map((cat) => (
+    <option key={cat} value={cat}>
+      {cat}
+    </option>
+  ))}
+</select>
 
-            <Card.Title className="ctb fw-bold text-dark mt-3 fs-4">{expandedCard.title}</Card.Title>
-            <Card.Text className=" text-dark mb-2">{expandedCard.description}</Card.Text>
+      </div>
 
-            <div className="admin-updates">
-              <h5>
-                <MdOutlineTextsms /> Admin Updates:
-              </h5>
-              {expandedCard.comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="update-entry mb-3 p-3"
-                  style={{ backgroundColor: "#f8f9fa", borderLeft: "4px solid purple", borderRadius: "10px" }}
-                >
-                  <div className="d-flex align-items-center mb-1">
-                    <FaUser className="me-2 text-purple" size={18} />
-                    <strong>{comment.email}</strong>
-                  </div>
-                  <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
-              <span className="category-tag px-2 py-1 rounded-pill me-auto" style={{ fontSize: "0.8rem" }}>
-                {expandedCard.category}
-              </span>
-              <div className="d-flex align-items-center gap-3 ms-auto">
-                <button
-                  className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-                    userVotes[expandedCard.complaint_id] === "upvote" ? "bg-success text-white" : "text-success"
-                  }`}
-                  onClick={() => handleVote(expandedCard.complaint_id, "upvote")}
-                  style={{ fontSize: "1rem" }}
-                >
-                  <HiOutlineThumbUp size={20} />
-                  {expandedCard.likes}
-                </button>
-
-                <button
-                  className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-                    userVotes[expandedCard.complaint_id] === "downvote" ? "bg-danger text-white" : "text-danger"
-                  }`}
-                  onClick={() => handleVote(expandedCard.complaint_id, "downvote")}
-                  style={{ fontSize: "1rem" }}
-                >
-                  <HiOutlineThumbDown size={20} />
-                  {expandedCard.dislikes}
+      {/* Image Upload */}
+      <div className="form-group mb-2">
+        <label className="form-label d-flex align-items-center">
+          <span className="label-icon blue me-2">
+            <i className="bi bi-image text-light"></i>
+          </span>
+          Update Image (Optional)
+        </label>
+        <div className="upload-box-wrapper">
+          <div className="upload-box">
+            {!imagePreview && !editComplaint.image ? (
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="file-input"
+                  id="edit-file-upload"
+                  style={{ display: "none" }}
+                />
+                <label htmlFor="edit-file-upload" className="upload-placeholder">
+                  <div className="upload-icon">⬆</div>
+                  <span className="upload-text">Upload Image</span>
+                </label>
+              </>
+            ) : (
+              <div className="image-preview">
+                <img src={imagePreview || editComplaint.image} alt="Preview" />
+                <button type="button" className="remove-btn" onClick={removeEditImage}>
+                  ×
                 </button>
               </div>
-            </div>
-          </Card>
+            )}
+          </div>
+          <p className="file-size-note text-dark">≤ 1.5MB</p>
         </div>
-      )}
+      </div>
+      
 
-      <button className="add-complaint-btn" onClick={() => navigate("/complaint-form")}>
-        <FaPlus className="plus-icon" /> Add Complaint
+      {/* Save Button */}
+      <div className="modal-footer mt-2 text-center">
+        <button
+          className="btn btn-primary save-btn"
+          onClick={submitEditComplaint}
+        >
+          <i className="bi bi-save me-2"></i> Save Changes
+        </button>
+      </div>
+    </Card>
+  </div>
+)}
+  <Modal
+    show={showDeleteSuccess}
+    onHide={() => setShowDeleteSuccess(false)}
+    centered
+  >
+    <Modal.Body className="text-center p-5">
+      <CheckCircleFill size={50} color="green" className="mb-3" />
+      <h5 className="text-success">Complaint Deleted Successfully!</h5>
+    </Modal.Body>
+  </Modal>
+  <Modal
+  show={showSaveSuccess}
+  onHide={() => setShowSaveSuccess(false)}
+  centered
+>
+  <Modal.Body className="text-center p-5">
+    <CheckCircleFill size={50} color="green" className="mb-3" />
+    <h5 className="text-success">Complaint Saved Successfully!</h5>
+  </Modal.Body>
+</Modal>
+
+
+
+
+
+      {/* Add Complaint Button */}
+      <button
+        className="add-complaint-btn"
+        onClick={() => navigate("/complaint-form")}
+      >
+        <FaPlus className="plus-icon" /> Add Support-Request
       </button>
 
+
+      
       <div
         className="feedback-button"
         onClick={() =>
@@ -456,6 +808,8 @@ const Home = () => {
         <MdOutlineTextsms size={20} />
         <span>Feedback</span>
       </div>
+
+      <div style={{ height: "40px" }}></div>
     </Container>
   );
 };

@@ -64,7 +64,7 @@ useEffect(() => {
     <div className="user-dashboard-container">
       <div className="dashboard-container">
         <div className="page-heading text-center">
-          <h1>VNRVJIET Complaint Portal</h1>
+          <h1>VNRVJIET Support-Request Portal</h1>
           <p>Welcome to the platform where your voice matters!</p>
         </div>
 
@@ -79,14 +79,14 @@ useEffect(() => {
         </div>
 
         <div className="my-complaints-heading mb-3">
-          <h3>My Complaints</h3>
+          <h3>My Support-Requests</h3>
         </div>
 
         {complaints.length === 0 ? (
           <div className="no-complaints-message text-center">
-            <p>You haven't raised any complaints yet. Have a concern? Speak up and let your voice be heard!</p>
+            <p>You haven't raised any Requests yet. Have a concern? Speak up and let your voice be heard!</p>
             <Button className="raise-complaint-btn mt-3 px-4 py-2 fw-bold" onClick={() => navigate("/complaint-form")}>
-              Raise a Complaint
+              Raise a Support-Request
             </Button>
           </div>
         ) : (
@@ -231,7 +231,7 @@ useEffect(() => {
 
         <div className="text-center mt-4">
               <button className="add-complaint-btn" onClick={() => navigate("/complaint-form")}>
-          <FaPlus className="plus-icon" /> Add Complaint
+          <FaPlus className="plus-icon" /> Add Support-Request
         </button>
         </div>
       </div>
