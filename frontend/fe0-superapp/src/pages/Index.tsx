@@ -28,8 +28,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
-import LoginModal from "./LoginModal";
-
 interface App {
   id: string;
   name: string;
@@ -479,15 +477,6 @@ const Index = () => {
           </div>
         )}
       </div>
-          {isLoginModalOpen && (
-            <LoginModal
-              onClose={() => setLoginModalOpen(false)}
-              onLogin={() => {
-                setLoginModalOpen(false);
-                setIsAuthenticated(true);
-              }}
-            />
-          )}
     </div>
   );
 };
