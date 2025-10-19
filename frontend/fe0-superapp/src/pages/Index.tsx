@@ -351,9 +351,8 @@ const Index = () => {
                   return (
                     <Card
                       key={app.id}
-                      className={`group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 relative overflow-hidden rounded-2xl hover:bg-white/95 ${isSelected ? 'scale-105 z-50' : ''} ${isOtherAnimating ? 'translate-x-8 opacity-40' : ''}`}
-                      onClick={() => openApp(app)}
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className={`group cursor-pointer border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 relative overflow-hidden rounded-2xl hover:bg-white/95`}
+                      onClick={() => navigateToApp(app)}
                     >
                   <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${app.gradient} shadow-sm`}></div>
                   <CardContent className="p-6 relative">
@@ -368,9 +367,8 @@ const Index = () => {
                         <div className={`absolute inset-0 bg-gradient-to-br ${app.gradient} rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10`}></div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-300" />
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className="bg-gray-100/80 text-gray-700 border-0 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm"
                         >
                           {app.category}
@@ -387,9 +385,15 @@ const Index = () => {
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
                     <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-3 group-hover:translate-y-0">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(app.url, "_blank");
+                        }}
+                        className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg"
+                      >
                         <ExternalLink className="h-4 w-4 text-white" />
-                      </div>
+                      </button>
                     </div>
                   </CardContent>
                   </Card>
@@ -480,7 +484,7 @@ const Index = () => {
               onClose={() => setLoginModalOpen(false)}
               onLogin={() => {
                 setLoginModalOpen(false);
-                setIsAuthenticated(true); // Trigger UI refresh
+                setIsAuthenticated(true);
               }}
             />
           )}
