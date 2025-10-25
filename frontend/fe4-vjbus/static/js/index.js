@@ -1,5 +1,5 @@
 // ===== CONFIGURATION CONSTANTS =====
-const API_URL = "https://dev-auth.vjstartup.com";
+const API_URL = "https://auth.vjstartup.com";
 let socket; // Will be initialized after scripts are loaded
 
 // ===== GLOBAL VARIABLES =====
@@ -10,6 +10,7 @@ let markers = {};
 let firstRecenter = {};
 let map;
 const fixedLatLng = [17.539896, 78.386511];
+// const fixedLatLng=[17.1,78.1]
 let routes = []; // Initialize as empty array, will be populated from API
 let activeRoutes = new Set();
 
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         document.getElementById('floating-recenter-btn').onclick = function() {
             if (selectedRoute && markers[selectedRoute]) {
                 let markerPosition = markers[selectedRoute].getLatLng();
-                map.setView([markerPosition.lat - 0.008, markerPosition.lng], 13);
+                map.setView([markerPosition.lat - 0.008, markerPosition.lng], 15);
             }
         };
 
@@ -89,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 function initializeMap() {
     map = L.map('map', {
         center: fixedLatLng,
-        zoom: 13,
+        zoom: 15,
         attributionControl: false  // Disable default attribution control
     });
 
@@ -115,7 +116,7 @@ function addFixedMarker() {
     
     const emojiIcon = L.divIcon({
         className: 'emoji-marker',
-        html: '<div style="font-size: 25px;">🏁</div>',
+        html: '<div style="font-size: 25px;"></div>',
         iconSize: [50, 50],
         iconAnchor: [15, 15]
     });
@@ -379,7 +380,7 @@ function setupEventListeners() {
         recenterBtn.addEventListener("click", function() {
             if (selectedRoute && markers[selectedRoute]) {
                 let markerPosition = markers[selectedRoute].getLatLng();
-                map.setView([markerPosition.lat - 0.008, markerPosition.lng], 13);
+                map.setView([markerPosition.lat - 0.008, markerPosition.lng], 15);
             }
         });
     }
@@ -597,9 +598,9 @@ function fill_tracking_info() {
     if (!routeInfo) return;
 
     if (sRoute !== "") {
-        routeInfo.innerHTML = `Hello ${userName}👋 <br> Tracking ${sRoute} 🔴`;
+        routeInfo.innerHTML = `Hello👋 <br> Tracking ${sRoute} 🔴`;
     } else {
-        routeInfo.innerHTML = `Hello ${userName}👋 <br>No Route Being Tracked 🔴`;
+        routeInfo.innerHTML = `Hello👋 <br>No Route Being Tracked 🔴`;
     }
     
     if (isLogged) {
@@ -707,7 +708,7 @@ function setupSocketEvents() {
     });
     
     socket.on("all_connections_update", function(connections) {
-        console.log("Received all_connections_update:", connections);
+        console.log("Received all_connections_Fupdate:", connections);
         
         // Clear previous active routes
         activeRoutes.clear();
@@ -797,7 +798,7 @@ function setupSocketEvents() {
             
             const routeInfo = document.querySelector(".route_info");
             if (routeInfo) {
-                routeInfo.innerHTML = `Hello ${userName}👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🟢`;
+                routeInfo.innerHTML = `Hello👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🟢`;
             }
             
             latestBusLocation = `${data.longitude},${data.latitude}`;
@@ -822,7 +823,7 @@ function setupSocketEvents() {
             // Auto-center map on first update for this route
             if (!firstRecenter[selectedRoute]) {
                 firstRecenter[selectedRoute] = true;
-                map.setView([data.latitude, data.longitude], 13);
+                map.setView([data.latitude, data.longitude], 15);
             }
         } else if (data.status === "stopped") {
             
@@ -849,7 +850,7 @@ function setupSocketEvents() {
             if (markers[selectedRoute] && markers[selectedRoute]._map) {
                 markers[selectedRoute].remove();
                 if (routeInfo) {
-                    routeInfo.innerHTML = `Hello ${userName}👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🔴`;
+                    routeInfo.innerHTML = `Hello👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🔴`;
                 }
             }
             
