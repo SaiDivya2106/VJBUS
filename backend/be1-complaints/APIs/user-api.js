@@ -3,17 +3,17 @@ const asyncHandler = require("express-async-handler");
 const dotenv = require("dotenv");
 const axios = require("axios");
 const bodyParser = require("body-parser");
-const Sentiment = require("sentiment"); // ✅ Correct import
+const Sentiment = require("sentiment");
 const natural = require("natural");
 const validWords = new Set(require("an-array-of-english-words"));
-const sentiment = new Sentiment(); // ✅ Initialize Sentiment instance
-const nodemailer=require("nodemailer");
+const sentiment = new Sentiment();
+const nodemailer = require("nodemailer");
 const verifyGoogleToken = require("../Middleware/verifyGoogleToken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 
 // -------------------- MULTER (memory storage) --------------------
-const storage = multer.memoryStorage(); 
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // -------------------- Cloudinary Config --------------------
@@ -23,60 +23,71 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
-
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const userApp = exp.Router();
-userApp.use(exp.json()); // Middleware to parse JSON
+userApp.use(exp.json());
 
 let complaintsCollectionObj;
 let adminsCollectionObj;
 
 // Middleware to get the collection object from the app
 userApp.use((req, res, next) => {
-    complaintsCollectionObj = req.app.get("complaintsCollectionObj");
-    adminsCollectionObj= req.app.get('adminsCollectionObj');
-    next();
+  complaintsCollectionObj = req.app.get("complaintsCollectionObj");
+  adminsCollectionObj = req.app.get("adminsCollectionObj");
+  next();
 });
 
-// Function to check for offensive language
+// -------------------- Utility Functions --------------------
 function containsOffensiveLanguage(text) {
-  const offensiveWords = ["offensive", "abusive", "hate", "stupid"];
+  const offensiveWords = [
+    "offensive", "abusive", "hate", "stupid", "fuck", "shit",
+    "idiot", "bastard", "bloody",
+  ];
   return offensiveWords.some((word) => text.toLowerCase().includes(word));
 }
 
-// Function to check for meaningless complaints
 function isMeaninglessComplaint(text) {
-  const tokenizer = new natural.WordTokenizer();
-  const words = tokenizer.tokenize(text.toLowerCase());
+  if (!text || typeof text !== "string") return true;
 
-  const meaningfulWords = words.filter(
-    (word) => validWords.has(word) && !natural.stopwords.includes(word)
+  const cleaned = text.trim().toLowerCase();
+
+  if (cleaned.length < 10) return true;
+  if (/(.)\1{3,}/.test(cleaned)) return true;
+  if (!cleaned.includes(" ") && !validWords.has(cleaned)) return true;
+
+  const symbolRatio = (cleaned.match(/[^a-z\s]/gi) || []).length / cleaned.length;
+  if (symbolRatio > 0.3) return true;
+
+  const tokenizer = new natural.WordTokenizer();
+  const words = tokenizer.tokenize(cleaned);
+  if (words.length === 0) return true;
+
+  const meaningful = words.filter(
+    (w) => validWords.has(w) && !natural.stopwords.includes(w)
   );
 
-  return meaningfulWords.length < 2;
+  const ratio = meaningful.length / words.length;
+  if (meaningful.length < 2 || ratio < 0.3) return true;
+
+  return false;
 }
 
-
-// ------------------ ADD COMPLAINT ------------------
+// -------------------- ADD COMPLAINT --------------------
 userApp.post(
   "/add-complaint",
   verifyGoogleToken,
   asyncHandler(async (req, res) => {
     const { complaint_id, title, description, category, user_id, github_issue, image } = req.body;
 
-    // Validate required fields
     if (!complaint_id || !title || !description || !category || !user_id) {
       return res.status(400).json({
         message: "Complaint ID, title, description, category, and user ID are required",
       });
     }
 
-    // Sentiment analysis
     const result = sentiment.analyze(description);
 
-    // Check offensive language or negative sentiment
     if (result.score < -3 || containsOffensiveLanguage(description)) {
       return res.status(400).json({
         message: "Your complaint contains offensive or abusive language. Please revise it.",
@@ -84,10 +95,9 @@ userApp.post(
       });
     }
 
-    // Check meaningless complaint
-    if (isMeaninglessComplaint(description)) {
+    if (isMeaninglessComplaint(title) || isMeaninglessComplaint(description)) {
       return res.status(400).json({
-        message: "Your complaint seems meaningless. Please provide a valid complaint.",
+        message: "Your complaint seems meaningless. Please provide a valid title and description.",
       });
     }
 
@@ -98,7 +108,7 @@ userApp.post(
       category,
       user_id,
       github_issue: github_issue || null,
-      image: image || null, // Store Cloudinary URL directly
+      image: image || null,
       timestamp: new Date().toISOString(),
       likes: 0,
       dislikes: 0,
@@ -118,7 +128,6 @@ userApp.post(
           timeStyle: "short",
         });
 
-        // Notify admins
         const admins = await adminsCollectionObj.find({ category }).toArray();
         if (admins.length > 0) {
           const transporter = nodemailer.createTransport({
@@ -146,7 +155,7 @@ userApp.post(
                   <li><strong>Submitted on:</strong> ${formattedTimestamp}</li>
                   ${image ? `<li><strong>Image:</strong> <a href="${image}">View Image</a></li>` : ""}
                 </ul>
-                <p><a href="https://complaints.vjstartup.com">View and manage the complaint</a></p>
+                <p><a href="https://thrive.vjstartup.com">View and manage the complaint</a></p>
                 <p>Please take action as soon as possible.</p>
                 <p>Regards,<br>Complaint Management System</p>
               `,
@@ -171,10 +180,9 @@ userApp.post(
   })
 );
 
-//GET Complaints Summary
-userApp.get("/complaints/summary",verifyGoogleToken, async (req, res) => {
+// -------------------- GET COMPLAINT SUMMARY --------------------
+userApp.get("/complaints/summary", verifyGoogleToken, async (req, res) => {
   try {
-    // ✅ Fix: Add .toArray() to get actual documents
     const allComplaints = await complaintsCollectionObj.find().toArray();
 
     const summary = {
@@ -183,43 +191,29 @@ userApp.get("/complaints/summary",verifyGoogleToken, async (req, res) => {
       pending: 0,
       ongoing: 0,
       categories: {},
-      topCategory: null
+      topCategory: null,
     };
 
     allComplaints.forEach((comp) => {
       const status = comp.status;
       const category = comp.category;
 
-      // Increment status counters
       if (status === "Resolved") summary.resolved++;
       else if (status === "Pending") summary.pending++;
       else if (status === "Ongoing") summary.ongoing++;
 
-      // Initialize category if not exists
       if (!summary.categories[category]) {
-        summary.categories[category] = {
-          category,
-          total: 0,
-          resolved: 0,
-          pending: 0,
-          ongoing: 0,
-          resolvedPercentage: 0
-        };
+        summary.categories[category] = { category, total: 0, resolved: 0, pending: 0, ongoing: 0, resolvedPercentage: 0 };
       }
 
-      // Update category counts
       summary.categories[category].total++;
       summary.categories[category][status.toLowerCase()]++;
     });
 
-    // Calculate resolved percentage for each category
     Object.values(summary.categories).forEach((cat) => {
-      if (cat.total > 0) {
-        cat.resolvedPercentage = Math.round((cat.resolved / cat.total) * 100);
-      }
+      if (cat.total > 0) cat.resolvedPercentage = Math.round((cat.resolved / cat.total) * 100);
     });
 
-    // Find top performing category based on resolved percentage
     let topPercentage = 0;
     Object.values(summary.categories).forEach((cat) => {
       if (cat.resolvedPercentage > topPercentage) {
@@ -235,161 +229,169 @@ userApp.get("/complaints/summary",verifyGoogleToken, async (req, res) => {
   }
 });
 
+// -------------------- VIEW COMPLAINTS --------------------
+userApp.get("/view-complaints/:userId", verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { userId } = req.params;
 
-  
-
-// GET API to fetch complaints of a specific user and count of pending, resolved, and ongoing complaints
-userApp.get("/view-complaints/:userId",verifyGoogleToken, asyncHandler(async (req, res) => {
-  const { userId } = req.params; // Get the userId from the URL parameter
-
-  // Fetch the complaints of the specific user
   const complaints = await complaintsCollectionObj
-    .find({ user_id: userId }) // Filter by userId
-    .sort({ timestamp: -1 }) // Sort by timestamp in descending order (most recent first)
+    .find({ user_id: userId })
+    .sort({ timestamp: -1 })
     .toArray();
 
-  // Count complaints by status
   const counts = {
-    pending: complaints.filter(complaint => complaint.status === 'Pending').length,
-    resolved: complaints.filter(complaint => complaint.status === 'Resolved').length,
-    ongoing: complaints.filter(complaint => complaint.status === 'Ongoing').length
+    pending: complaints.filter((c) => c.status === "Pending").length,
+    resolved: complaints.filter((c) => c.status === "Resolved").length,
+    ongoing: complaints.filter((c) => c.status === "Ongoing").length,
   };
 
-  res.status(200).json({
-    complaints,
-    counts
-  });
+  res.status(200).json({ complaints, counts });
 }));
 
+// -------------------- EDIT COMPLAINT --------------------
+userApp.put(
+  "/edit-complaint/:complaint_id",
+  verifyGoogleToken,
+  asyncHandler(async (req, res) => {
+    const { complaint_id } = req.params;
+    const { title, description, category, image } = req.body;
 
-//To fetch Users Complaints
+    if (!complaint_id) return res.status(400).json({ message: "Complaint ID is required." });
+    if (!title || !description) return res.status(400).json({ message: "Title and description are required." });
 
-userApp.get("/my-complaints/:user_id",verifyGoogleToken, asyncHandler(async (req, res) => {
-  const userId = req.params.user_id; // Extract user_id from request parameters
+    const existingComplaint = await complaintsCollectionObj.findOne({ complaint_id });
+    if (!existingComplaint) return res.status(404).json({ message: "Complaint not found." });
+
+    const result = sentiment.analyze(description);
+    if (result.score < -3 || containsOffensiveLanguage(description)) {
+      return res.status(400).json({
+        message: "Your complaint contains offensive or abusive language. Please revise it.",
+      });
+    }
+
+    if (isMeaninglessComplaint(title) || isMeaninglessComplaint(description)) {
+      return res.status(400).json({
+        message: "Your complaint seems meaningless. Please provide a valid title and description.",
+      });
+    }
+
+    const updateResult = await complaintsCollectionObj.updateOne(
+      { complaint_id },
+      { $set: { title, description, category, image } }
+    );
+
+    if (updateResult.modifiedCount === 0) return res.status(400).json({ message: "No changes made." });
+
+    const updatedComplaint = await complaintsCollectionObj.findOne({ complaint_id });
+
+    res.status(200).json({
+      message: "Complaint updated successfully.",
+      complaint: updatedComplaint,
+    });
+  })
+);
+
+userApp.delete("/delete-complaint/:complaint_id", verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { complaint_id } = req.params;
+  const userEmail = req.user.email;
+
+  const complaint = await complaintsCollectionObj.findOne({ complaint_id });
+  if (!complaint) return res.status(404).json({ message: "Complaint not found" });
+  if (complaint.user_id !== userEmail) return res.status(403).json({ message: "Unauthorized" });
+
+  const deleteResult = await complaintsCollectionObj.deleteOne({ complaint_id });
+  if (deleteResult.deletedCount === 0) return res.status(500).json({ message: "Failed to delete complaint" });
+
+  res.status(200).json({ message: "Complaint deleted successfully" });
+}));
+
+// -------------------- MY COMPLAINTS --------------------
+userApp.get("/my-complaints/:user_id", verifyGoogleToken, asyncHandler(async (req, res) => {
+  const userId = req.params.user_id;
 
   const userComplaints = await complaintsCollectionObj
-      .find({ user_id: userId }) // Filter complaints by user_id
-      .sort({ timestamp: -1 }) // Sort by timestamp (most recent first)
-      .toArray();
+    .find({ user_id: userId })
+    .sort({ timestamp: -1 })
+    .toArray();
 
   res.status(200).json({ complaints: userComplaints });
 }));
 
-
-
-// POST API to like a complaint
+// -------------------- LIKE COMPLAINT --------------------
 userApp.post("/like-complaint/:complaint_id", verifyGoogleToken, asyncHandler(async (req, res) => {
   const { complaint_id } = req.params;
   const { email } = req.body;
-
-  if (!email) {
-      return res.status(400).json({ message: "User email is required" });
-  }
+  if (!email) return res.status(400).json({ message: "User email is required" });
 
   const complaint = await complaintsCollectionObj.findOne({ complaint_id });
-
-  if (!complaint) {
-      return res.status(404).json({ message: "Complaint not found" });
-  }
+  if (!complaint) return res.status(404).json({ message: "Complaint not found" });
 
   let votedUsers = Array.isArray(complaint.votedUsers) ? complaint.votedUsers : [];
-  const existingVoteIndex = votedUsers.findIndex(user => user.email === email);
-
+  const existingVoteIndex = votedUsers.findIndex((user) => user.email === email);
   let updateQuery = {};
 
   if (existingVoteIndex !== -1) {
-      if (votedUsers[existingVoteIndex].vote === "upvote") {
-          // User already liked, so remove like
-          updateQuery = {
-              $inc: { likes: -1 },
-              $pull: { votedUsers: { email } }
-          };
-      } else {
-          // User previously disliked, switch to like
-          updateQuery = {
-              $inc: { likes: 1, dislikes: -1 },
-              $set: { [`votedUsers.${existingVoteIndex}.vote`]: "upvote" }
-          };
-      }
+    if (votedUsers[existingVoteIndex].vote === "upvote") {
+      updateQuery = { $inc: { likes: -1 }, $pull: { votedUsers: { email } } };
+    } else {
+      votedUsers[existingVoteIndex].vote = "upvote";
+      updateQuery = { $inc: { likes: 1, dislikes: -1 }, $set: { votedUsers } };
+    }
   } else {
-      // First-time like
-      updateQuery = {
-          $inc: { likes: 1 },
-          $push: { votedUsers: { email, vote: "upvote" } }
-      };
+    updateQuery = { $inc: { likes: 1 }, $push: { votedUsers: { email, vote: "upvote" } } };
   }
 
   await complaintsCollectionObj.updateOne({ complaint_id }, updateQuery);
-
   res.status(200).json({ message: "Like updated successfully" });
 }));
 
-userApp.post("/dislike-complaint/:complaint_id",verifyGoogleToken, asyncHandler(async (req, res) => {
+// -------------------- DISLIKE COMPLAINT --------------------
+userApp.post("/dislike-complaint/:complaint_id", verifyGoogleToken, asyncHandler(async (req, res) => {
   const { complaint_id } = req.params;
   const { email } = req.body;
-
-  if (!email) {
-      return res.status(400).json({ message: "User email is required" });
-  }
+  if (!email) return res.status(400).json({ message: "User email is required" });
 
   const complaint = await complaintsCollectionObj.findOne({ complaint_id });
-
-  if (!complaint) {
-      return res.status(404).json({ message: "Complaint not found" });
-  }
+  if (!complaint) return res.status(404).json({ message: "Complaint not found" });
 
   let votedUsers = Array.isArray(complaint.votedUsers) ? complaint.votedUsers : [];
-  const existingVoteIndex = votedUsers.findIndex(user => user.email === email);
-
+  const existingVoteIndex = votedUsers.findIndex((user) => user.email === email);
   let updateQuery = {};
 
   if (existingVoteIndex !== -1) {
-      if (votedUsers[existingVoteIndex].vote === "downvote") {
-          // User already disliked, so remove dislike
-          updateQuery = {
-              $inc: { dislikes: -1 },
-              $pull: { votedUsers: { email } }
-          };
-      } else {
-          // User previously liked, switch to dislike
-          updateQuery = {
-              $inc: { likes: -1, dislikes: 1 },
-              $set: { [`votedUsers.${existingVoteIndex}.vote`]: "downvote" }
-          };
-      }
+    if (votedUsers[existingVoteIndex].vote === "downvote") {
+      updateQuery = { $inc: { dislikes: -1 }, $pull: { votedUsers: { email } } };
+    } else {
+      votedUsers[existingVoteIndex].vote = "downvote";
+      updateQuery = { $inc: { likes: -1, dislikes: 1 }, $set: { votedUsers } };
+    }
   } else {
-      // First-time dislike
-      updateQuery = {
-          $inc: { dislikes: 1 },
-          $push: { votedUsers: { email, vote: "downvote" } }
-      };
+    updateQuery = { $inc: { dislikes: 1 }, $push: { votedUsers: { email, vote: "downvote" } } };
   }
 
   await complaintsCollectionObj.updateOne({ complaint_id }, updateQuery);
-
   res.status(200).json({ message: "Dislike updated successfully" });
 }));
 
-// Helper function to get the start and end of the week or month
+// -------------------- DATE RANGE HELPER --------------------
 function getDateRange(dateRange) {
-    const now = new Date();
-    let startDate, endDate;
+  const now = new Date();
+  let startDate, endDate;
 
-    if (dateRange === "weekly") {
-        startDate = new Date(now.setDate(now.getDate() - now.getDay()));
-        endDate = new Date(now.setDate(now.getDate() + 6));
-    } else if (dateRange === "monthly") {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    } else {
-        return null;
-    }
+  if (dateRange === "weekly") {
+    startDate = new Date(now.setDate(now.getDate() - now.getDay()));
+    endDate = new Date(now.setDate(now.getDate() + 6));
+  } else if (dateRange === "monthly") {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  } else {
+    return null;
+  }
 
-    return { startDate, endDate };
+  return { startDate, endDate };
 }
 
-// GET API to filter complaints with text-based search
-userApp.get("/filter-complaints",verifyGoogleToken, asyncHandler(async (req, res) => {
+// -------------------- FILTER COMPLAINTS --------------------
+userApp.get("/filter-complaints", verifyGoogleToken, asyncHandler(async (req, res) => {
   const { category, status, dateRange, searchKeyword } = req.query;
   let query = {};
 
@@ -397,11 +399,18 @@ userApp.get("/filter-complaints",verifyGoogleToken, asyncHandler(async (req, res
   if (category) query.category = category;
   if (status) query.status = status;
   if (dateRange) {
-      const { startDate, endDate } = getDateRange(dateRange);
-      if (startDate && endDate) query.timestamp = { $gte: startDate, $lte: endDate };
+    const { startDate, endDate } = getDateRange(dateRange);
+    if (startDate && endDate) query.timestamp = { $gte: startDate, $lte: endDate };
   }
 
-  const complaints = await complaintsCollectionObj.find(query).sort({ timestamp: -1 }).toArray();
+  const complaints = await complaintsCollectionObj
+    .find(query)
+    .sort({ timestamp: -1 })
+    .toArray();
+
   res.status(200).json({ complaints });
 }));
+
+
+// -------------------- EXPORT --------------------
 module.exports = userApp;

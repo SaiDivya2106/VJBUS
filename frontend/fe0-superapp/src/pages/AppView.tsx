@@ -13,9 +13,9 @@ const apps = [
   },
   {
     id: "complaints",
-    name: "Complaints",
-    description: "Register complaints and grievances",
-    url: "https://complaints.vjstartup.com/"
+    name: "Thrive",
+    description: "Register Support Requests, Issues",
+    url: "https://thrive.vjstartup.com/"
   },
   {
     id: "fake-news",

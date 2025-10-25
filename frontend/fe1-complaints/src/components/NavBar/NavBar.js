@@ -55,7 +55,7 @@ const NavBar = () => {
                   to="/all-complaints"
                   onClick={() => setIsNavbarOpen(false)}
                 >
-                  All Complaints
+                  All Support-Requests
                 </NavLink>
               </li>
             )}
@@ -81,7 +81,7 @@ const NavBar = () => {
                   state={{ email: user.email }}
                   onClick={() => setIsNavbarOpen(false)}
                 >
-                  My Complaints
+                  My Requests
                 </NavLink>
               </li>
             )}
