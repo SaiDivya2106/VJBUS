@@ -121,56 +121,59 @@ userApp.post(
     try {
       const resultInsert = await complaintsCollectionObj.insertOne(newComplaint);
 
-      if (resultInsert.acknowledged) {
-        const formattedTimestamp = new Date(newComplaint.timestamp).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          dateStyle: "long",
-          timeStyle: "short",
-        });
+     if (resultInsert.acknowledged) {
+  const formattedTimestamp = new Date(newComplaint.timestamp).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "long",
+    timeStyle: "short",
+  });
 
-        const admins = await adminsCollectionObj.find({ category }).toArray();
-        if (admins.length > 0) {
-          const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: process.env.ADMIN_EMAIL,
-              pass: process.env.ADMIN_PASS,
-            },
-          });
+  const admins = await adminsCollectionObj.find({ category }).toArray();
+  if (admins.length > 0) {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.ADMIN_EMAIL,
+        pass: process.env.ADMIN_PASS,
+      },
+    });
 
-          const mailPromises = admins.map((admin) => {
-            const mailOptions = {
-              from: process.env.ADMIN_EMAIL,
-              to: admin.email,
-              subject: `New Complaint in ${category}`,
-              html: `
-                <p>Dear Admin,</p>
-                <p>A new complaint has been submitted in your assigned category: <strong>${category}</strong>.</p>
-                <p><strong>Complaint Details:</strong></p>
-                <ul>
-                  <li><strong>Title:</strong> ${title}</li>
-                  <li><strong>Description:</strong> ${description}</li>
-                  <li><strong>Complaint ID:</strong> ${complaint_id}</li>
-                  <li><strong>Status:</strong> Pending</li>
-                  <li><strong>Submitted on:</strong> ${formattedTimestamp}</li>
-                  ${image ? `<li><strong>Image:</strong> <a href="${image}">View Image</a></li>` : ""}
-                </ul>
-                <p><a href="https://thrive.vjstartup.com">View and manage the complaint</a></p>
-                <p>Please take action as soon as possible.</p>
-                <p>Regards,<br>Complaint Management System</p>
-              `,
-            };
-            return transporter.sendMail(mailOptions);
-          });
+    const mailPromises = admins.map((admin) => {
+      const mailOptions = {
+        from: process.env.ADMIN_EMAIL,
+        to: admin.email,
+        subject: `New Complaint in ${category}`,
+        html: `
+          <p>Dear Admin,</p>
+          <p>A new complaint has been submitted in your assigned category: <strong>${category}</strong>.</p>
+          <p><strong>Complaint Details:</strong></p>
+          <ul>
+            <li><strong>Title:</strong> ${title}</li>
+            <li><strong>Description:</strong> ${description}</li>
+            <li><strong>Complaint ID:</strong> ${complaint_id}</li>
+            <li><strong>Status:</strong> Pending</li>
+            <li><strong>Submitted on:</strong> ${formattedTimestamp}</li>
+            ${image ? `<li><strong>Image:</strong> <a href="${image}">View Image</a></li>` : ""}
+          </ul>
+          <p><a href="https://thrive.vjstartup.com">View and manage the complaint</a></p>
+          <p>Please take action as soon as possible.</p>
+          <p>Regards,<br>Complaint Management System</p>
+        `,
+      };
+      return transporter.sendMail(mailOptions);
+    });
 
-          await Promise.all(mailPromises);
-        }
+    await Promise.all(mailPromises);
+  }
 
-        res.status(201).json({
-          message: "Complaint added successfully and email sent to all admins in category",
-          complaint: newComplaint,
-        });
-      } else {
+  // 👇 remove user_id before sending back the response
+  const { user_id, ...complaintWithoutUserId } = newComplaint;
+
+  res.status(201).json({
+    message: "Complaint added successfully and email sent to all admins in category",
+    complaint: complaintWithoutUserId, // 👈 user_id excluded here
+  });
+} else {
         res.status(500).json({ message: "Failed to add complaint" });
       }
     } catch (error) {
@@ -304,17 +307,32 @@ userApp.delete("/delete-complaint/:complaint_id", verifyGoogleToken, asyncHandle
   res.status(200).json({ message: "Complaint deleted successfully" });
 }));
 
-// -------------------- MY COMPLAINTS --------------------
-userApp.get("/my-complaints/:user_id", verifyGoogleToken, asyncHandler(async (req, res) => {
-  const userId = req.params.user_id;
 
-  const userComplaints = await complaintsCollectionObj
-    .find({ user_id: userId })
-    .sort({ timestamp: -1 })
-    .toArray();
+// -------------------- MY COMPLAINTS (ANONYMOUS) --------------------
+userApp.get(
+  "/my-complaints/:user_id",
+  verifyGoogleToken,
+  asyncHandler(async (req, res) => {
+    const userId = req.params.user_id;
 
-  res.status(200).json({ complaints: userComplaints });
-}));
+    const complaints = await complaintsCollectionObj
+      .find({ user_id: userId })
+      .project({ user_id: 0 }) // 👈 ensures user_id excluded
+      .sort({ timestamp: -1 })
+      .toArray();
+
+    const counts = {
+      pending: complaints.filter((c) => c.status === "Pending").length,
+      resolved: complaints.filter((c) => c.status === "Resolved").length,
+      ongoing: complaints.filter((c) => c.status === "Ongoing").length,
+    };
+
+    res.status(200).json({ complaints, counts });
+  })
+);
+
+
+
 
 // -------------------- LIKE COMPLAINT --------------------
 userApp.post("/like-complaint/:complaint_id", verifyGoogleToken, asyncHandler(async (req, res) => {
@@ -391,25 +409,29 @@ function getDateRange(dateRange) {
 }
 
 // -------------------- FILTER COMPLAINTS --------------------
-userApp.get("/filter-complaints", verifyGoogleToken, asyncHandler(async (req, res) => {
-  const { category, status, dateRange, searchKeyword } = req.query;
-  let query = {};
+userApp.get(
+  "/filter-complaints",
+  verifyGoogleToken,
+  asyncHandler(async (req, res) => {
+    const { category, status, dateRange, searchKeyword } = req.query;
+    let query = {};
 
-  if (searchKeyword) query.$text = { $search: searchKeyword };
-  if (category) query.category = category;
-  if (status) query.status = status;
-  if (dateRange) {
-    const { startDate, endDate } = getDateRange(dateRange);
-    if (startDate && endDate) query.timestamp = { $gte: startDate, $lte: endDate };
-  }
+    if (searchKeyword) query.$text = { $search: searchKeyword };
+    if (category) query.category = category;
+    if (status) query.status = status;
+    if (dateRange) {
+      const { startDate, endDate } = getDateRange(dateRange);
+      if (startDate && endDate) query.timestamp = { $gte: startDate, $lte: endDate };
+    }
 
-  const complaints = await complaintsCollectionObj
-    .find(query)
-    .sort({ timestamp: -1 })
-    .toArray();
+    const complaints = await complaintsCollectionObj
+      .find(query, { projection: { user_id: 0 ,votedUsers: 0 } }) // 👈 exclude user_id field
+      .sort({ timestamp: -1 })
+      .toArray();
 
-  res.status(200).json({ complaints });
-}));
+    res.status(200).json({ complaints });
+  })
+);
 
 
 // -------------------- EXPORT --------------------
