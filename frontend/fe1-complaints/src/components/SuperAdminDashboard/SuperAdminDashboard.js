@@ -14,13 +14,14 @@ const SuperAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ category: "", reason: "" });
   const [expanded, setExpanded] = useState({});
+  const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
   useEffect(() => {
     const fetchFlaggedComplaints = async () => {
       try {
         setLoading(true);
         const { data } = await axios.post(
-          "http://localhost:6101/admin-api/superadmin/flagged-complaints",
+          `${baseUrl}/admin-api/superadmin/flagged-complaints`,
           { email: user?.email }
         );
         setComplaints(data);
@@ -44,7 +45,7 @@ const SuperAdminDashboard = () => {
   const handleAction = async (complaintId) => {
     try {
       await axios.post(
-        `http://localhost:6101/admin-api/superadmin/complaints/${complaintId}/action`,
+        `${baseUrl}/admin-api/superadmin/complaints/${complaintId}/action`,
         { action: actionType, note, email: user?.email }
       );
       setComplaints(prev => prev.filter(c => c.complaint_id !== complaintId));
@@ -60,7 +61,7 @@ const SuperAdminDashboard = () => {
   const emptyState = (
     <div className="text-center mt-5">
       <FaExclamationTriangle size={60} className="text-muted mb-3" />
-      <h5 className="text-muted">No flagged complaints available</h5>
+      <h5 className="text-muted">No flagged Requests available</h5>
       <p className="text-muted">Everything looks clean for now.</p>
     </div>
   );
@@ -70,7 +71,7 @@ const SuperAdminDashboard = () => {
 
   return (
     <Container className="py-5">
-      <h2 className="text-center mb-4 fw-bold">⚠️ Super Admin - Flagged Complaints</h2>
+      <h2 className="text-center mb-4 fw-bold">⚠️ Super Admin - Flagged Requests</h2>
 
       {/* Filters */}
       <Row className="mb-4 justify-content-center" style={{ gap: "5px" }}>
@@ -100,7 +101,7 @@ const SuperAdminDashboard = () => {
       {loading ? (
         <div className="text-center my-5">
           <Spinner animation="border" variant="primary" />
-          <p className="mt-3 text-muted">Loading flagged complaints...</p>
+          <p className="mt-3 text-muted">Loading flagged requests...</p>
         </div>
       ) : filteredComplaints.length === 0 ? (
         emptyState

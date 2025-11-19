@@ -10,6 +10,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCategoryAlt } from "react-icons/bi";
 import { useAuth } from "../../Context/AuthContext";
+import ComplaintCategoryWithFlag from "../ComplaintCategoryWithFlag/ComplaintCategoryWithFlag";
 
 const ComplaintsDetails = () => {
   const { complaint_id } = useParams();
@@ -34,39 +35,32 @@ const ComplaintsDetails = () => {
   };
   
   useEffect(() => {
-  const fetchComplaint = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
+    const fetchComplaint = async () => {
+      try {
+// Get token from localStorage
+const token = localStorage.getItem("authToken");
 
-      const response = await axios.get(
-        `${baseUrl}/admin-api/view-complaint/${complaint_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+const response = await axios.get(
+  `${baseUrl}/admin-api/view-complaint/${complaint_id}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Add Bearer token
+    },
+  }
+);
 
-      const complaintData = response.data.complaint;
-      setComplaint({
-        ...complaintData,
-        comments: complaintData.comments || [],
-      });
-      setStatus(complaintData.status);
-
-    } catch (error) {
-      console.error("Error fetching complaint details:", error);
-
-      // ⭐ If unauthorized (token expired/invalid)
-      if (error.response && error.response.status === 401) {
-        localStorage.removeItem("authToken");
-        navigate("/complaints-website");
+        const complaintData = response.data.complaint;
+        setComplaint({
+          ...complaintData,
+          comments: complaintData.comments || [],
+        });
+        setStatus(complaintData.status);
+      } catch (error) {
+        console.error("Error fetching complaint details:", error);
       }
-    }
-  };
-
-  fetchComplaint();
-}, [complaint_id]);
+    };
+    fetchComplaint();
+  }, [complaint_id]);
 
   const handleStatusChange = async (e) => {
     const updatedStatus = e.target.value;
@@ -78,17 +72,13 @@ const token = localStorage.getItem("authToken");
 
 await axios.put(
   `${baseUrl}/admin-api/update-status/${complaint_id}`,
-  { 
-    status: updatedStatus,
-    adminEmail: user.email   // ✅ send admin's email
-  },
+  { status: updatedStatus },
   {
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ keep the token for verification
+      Authorization: `Bearer ${token}`, // Add Bearer token
     },
   }
 );
-
 
       setComplaint((prev) => ({ ...prev, status: updatedStatus }));
       toast.success(`Status updated to: ${updatedStatus}`, {
@@ -163,14 +153,10 @@ await axios.delete(
   `${baseUrl}/admin-api/delete-complaint/${complaint_id}`,
   {
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ keep token
-    },
-    data: {
-      adminEmail: user.email, // ✅ send admin email to backend
+      Authorization: `Bearer ${token}`, // Add Bearer token
     },
   }
 );
-
 
       alert("Complaint has been deleted successfully.");
       navigate("/adminpage");
@@ -196,7 +182,7 @@ await axios.delete(
         </button>
 
 <div className="complaint-header-wrapper d-flex justify-content-between align-items-center mt-4 mb-3 px-2">
-  <h1 className="page-title fs-2 fw-bold mb-0">Request Details</h1>
+  <h1 className="page-title fs-2 fw-bold mb-0">Complaint Details</h1>
   <button
     className="btn btn-danger delete-icon-btn"
     onClick={handleDeleteComplaint}
@@ -209,19 +195,38 @@ await axios.delete(
 
         {/* MAIN SECTION (No Card) */}
         <div className="content-section">
-          <div className="top-row">
+<div className="top-row d-flex justify-content-between align-items-center position-relative">
+  {/* Category badge */}
   <span className="categoryb">
     <BiCategoryAlt size={18} /> {complaint.category}
   </span>
-  <div className="engagement-box">
-    <div className="likes">
+
+  {/* Likes/Dislikes */}
+  <div className="engagement-box d-flex gap-3">
+    <div className="likes d-flex align-items-center gap-1">
       <HiOutlineThumbUp size={24} /> {complaint.likes}
     </div>
-    <div className="dislikes">
+    <div className="dislikes d-flex align-items-center gap-1">
       <HiOutlineThumbDown size={24} /> {complaint.dislikes}
     </div>
   </div>
+
+  {/* Flag button - top-right corner with z-index */}
+  <div
+    className="position-absolute"
+    style={{ top: "10px", right: "10px", zIndex: 10 }}
+  >
+    <ComplaintCategoryWithFlag
+      complaintId={complaint.complaint_id}
+      baseUrl={baseUrl}
+      complaint={complaint}
+      user={user}
+      onFlagged={() => toast.success("Complaint flagged successfully!")}
+    />
+  </div>
 </div>
+
+
 
 
           <h1 className="h4 fw-bold">{complaint.title}</h1>

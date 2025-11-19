@@ -10,11 +10,13 @@ adminApp.use(exp.json()); // Middleware to parse JSON
 let complaintsCollectionObj;
 let adminsCollectionObj;
 let flaggedusersCollectionObj;
+let superAdminCollectionObj;
 
 // Middleware to get the collection object from the app
 adminApp.use((req, res, next) => {
     complaintsCollectionObj = req.app.get('complaintsCollectionObj');
     adminsCollectionObj= req.app.get('adminsCollectionObj');
+    superAdminCollectionObj=req.app.get('superAdminCollectionObj');
     flaggedusersCollectionObj=req.app.get('flaggedusersCollectionObj')
     next();
 });
@@ -521,6 +523,245 @@ adminApp.post(
     });
   })
 );
+
+
+// ✅ Check if given email is Super Admin
+adminApp.post(
+  "/superadmin/check",
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const superAdmin = await superAdminCollectionObj.findOne({ email });
+
+    if (!superAdmin) {
+      return res.status(403).json({ isSuperAdmin: false, message: "Not a Super Admin" });
+    }
+
+    res.json({ isSuperAdmin: true, message: "Super Admin verified" });
+  })
+);
+
+
+// ✅ Flag a complaint (without async IIFE)
+adminApp.post('/flag-complaint/:id',verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log("params",req.params)
+  const { reason, note, flaggedBy } = req.body;
+
+  console.log("Request body:", req.body);
+
+  if (!reason || !flaggedBy) {
+    return res.status(400).json({ message: "Reason and flaggedBy are required" });
+  }
+
+  // Verify admin email
+  const admin = await adminsCollectionObj.findOne({ email: flaggedBy });
+  console.log("Admin found:", admin);
+  if (!admin) {
+    return res.status(404).json({ message: "Admin not found" });
+  }
+  const comp= await complaintsCollectionObj.findOne({ complaint_id: id.toString() });
+console.log("Complaint found:", comp);
+
+
+  // Update complaint with flag details
+  const result = await complaintsCollectionObj.updateOne(
+    { complaint_id: id.toString()},
+    {
+      $set: {
+        flagged: {
+          isFlagged: true,
+          reason,
+          note: note || "",
+          flaggedBy: admin.email,
+          flaggedAt: new Date()
+        }
+      }
+    }
+  );
+
+  console.log(result)
+
+  if (result.modifiedCount === 0) {
+    return res.status(404).json({ message: "Complaint not found or could not be flagged" });
+  }
+
+  console.log("Complaint flagged successfully");
+
+  // Fetch complaint after update
+  const complaint = await complaintsCollectionObj.findOne({ complaint_id: id });
+  const userEmail = complaint.user_id;
+
+  // Fetch all super admins
+  const superAdmins = await superAdminCollectionObj.find({}).toArray();
+  console.log("Super admins found:", superAdmins);
+
+  if (!superAdmins.length) {
+    console.warn("No super admins found to notify.");
+    return res.json({ message: "Complaint flagged successfully, but no super admins to notify" });
+  }
+
+  const superAdminEmails = superAdmins.map(sa => sa.email);
+  console.log("Super admin emails:", superAdminEmails);
+
+  // Send email
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.ADMIN_EMAIL,
+        pass: process.env.ADMIN_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.ADMIN_EMAIL,
+      to: superAdminEmails,
+      subject: `⚠️ Complaint Flagged: "${complaint.title}"`,
+      html: `
+        <p>Dear Super Admin,</p>
+        <p>A complaint has been <b>flagged</b> by admin <b>${admin.name || admin.email}</b>.</p>
+        <p><b>Complaint Title:</b> ${complaint.title}</p>
+        <p><b>Complaint Description:</b> ${complaint.description}</p>
+        <p><b>Flag Reason:</b> ${reason}</p>
+        <p><b>Note:</b> ${note || "No extra details"}</p>
+        <p><b>Flagged At:</b> ${new Date().toLocaleString()}</p>
+        <p>User who raised this complaint: ${userEmail}</p>
+        <p>Please review this complaint in the admin dashboard.</p>
+        <p>- Complaint Management System</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Flag email sent to Super Admins:", superAdminEmails);
+  } catch (error) {
+    console.error("❌ Failed to send flag email:", error);
+  }
+
+  // Final response
+  res.json({ message: "Complaint flagged successfully" });
+}));
+
+// Get all flagged complaints (only for Super Admins)
+adminApp.post('/superadmin/flagged-complaints', asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const superAdmin = await superAdminCollectionObj.findOne({ email });
+  if (!superAdmin) return res.status(403).json({ message: "Access denied. Super Admin only." });
+
+  const flaggedComplaints = await complaintsCollectionObj
+    .find({ "flagged.isFlagged": true })
+    .sort({ "flagged.flaggedAt": -1 })
+    .toArray();
+
+  res.json(flaggedComplaints);
+}));
+
+
+
+// Super Admin takes action on flagged complaint
+adminApp.post('/superadmin/complaints/:id/action', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { action, note, email } = req.body; // ✅ email from req.body
+
+  // ✅ Verify Super Admin
+  const superAdmin = await superAdminCollectionObj.findOne({ email });
+  if (!superAdmin) {
+    return res.status(403).json({ message: "Access denied. Super Admin only." });
+  }
+
+  // ✅ Fetch complaint
+  const complaint = await complaintsCollectionObj.findOne({ complaint_id: id });
+  if (!complaint) {
+    return res.status(404).json({ message: "Complaint not found" });
+  }
+
+  // ❌ Ensure complaint is flagged before taking action
+  if (!complaint.flagged || !complaint.flagged.isFlagged) {
+    return res.status(400).json({ message: "Complaint is not flagged. No action required." });
+  }
+
+  let updateQuery = {};
+
+  if (action === "valid") {
+    // Just unflag and mark as reviewed
+    updateQuery = {
+      $set: {
+        flagged: { isFlagged: false },
+        superAdminAction: {
+          action: "valid",
+          note: note || "",
+          reviewedBy: email,
+          reviewedAt: new Date()
+        }
+      }
+    };
+  } 
+  else if (action === "warn") {
+    // Unflag and send warning email
+    updateQuery = {
+      $set: {
+        flagged: { isFlagged: false },
+        superAdminAction: {
+          action: "warn",
+          note: note || "",
+          reviewedBy: email,
+          reviewedAt: new Date()
+        }
+      }
+    };
+
+    // 🔥 Send warning email
+    (async () => {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.ADMIN_EMAIL,
+            pass: process.env.ADMIN_PASS
+          }
+        });
+
+        const mailOptions = {
+          from: process.env.ADMIN_EMAIL,
+          to: complaint.user_id, // complaint raiser email
+          subject: `⚠️ Warning Regarding Your Complaint: "${complaint.title}"`,
+          html: `
+            <p>Dear User,</p>
+            <p>Your complaint titled "<b>${complaint.title}</b>" was flagged and reviewed by the Super Admin.</p>
+            <p><b>Action Taken:</b> Warning</p>
+            <p><b>Reason/Note:</b> ${note || "No additional details provided"}</p>
+            <p>Please raise complaints responsibly.</p>
+            <p>- Complaint Management Team</p>
+          `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log("⚠️ Warning email sent to:", complaint.user_id);
+      } catch (err) {
+        console.error("❌ Failed to send warning email:", err);
+      }
+    })();
+  } 
+  else {
+    return res.status(400).json({ message: "Invalid action. Allowed: valid | warn" });
+  }
+
+  // ✅ Update DB
+  await complaintsCollectionObj.updateOne({ complaint_id: id }, updateQuery);
+
+  res.json({ message: `Action '${action}' applied successfully by Super Admin` });
+}));
+
+
+
+
+
+
 
 
 

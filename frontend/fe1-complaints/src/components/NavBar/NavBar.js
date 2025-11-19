@@ -3,18 +3,49 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import "./NavBar.css";
 
+
 const NavBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const dropdownRef = useRef();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false); // ✅ track super admin
+  const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
   const handleLogout = async () => {
     await logout();
     navigate("/complaints-website");
     setIsNavbarOpen(false); // close navbar after logout
   };
+
+   // ✅ Check if user is SuperAdmin when navbar loads
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      if (!user?.email) return;
+
+      try {
+        const res = await fetch(`${baseUrl}/admin-api/superadmin/check`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email }),
+        });
+
+        const data = await res.json();
+        if (res.ok && data.isSuperAdmin) {
+          setIsSuperAdmin(true);
+        } else {
+          setIsSuperAdmin(false);
+        }
+      } catch (err) {
+        console.error("Error checking superadmin:", err);
+        setIsSuperAdmin(false);
+      }
+    };
+
+    checkSuperAdmin();
+  }, [user]);
+
 
   // Close dropdown when clicked outside
   useEffect(() => {
@@ -94,6 +125,13 @@ const NavBar = () => {
                   onClick={() => setIsNavbarOpen(false)}
                 >
                   Resolve
+                </NavLink>
+              </li>
+            )}
+                        {isSuperAdmin && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/superadmin-dashboard" onClick={() => setIsNavbarOpen(false)}>
+                  SuperAdmin
                 </NavLink>
               </li>
             )}

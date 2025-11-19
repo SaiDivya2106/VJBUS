@@ -636,6 +636,7 @@ try {
           expandedCardId === complaint.complaint_id ? "expanded-card" : ""
         }`}
       >
+        
         {/* Image with status overlay */}
         <div className="complaint-image-wrapper position-relative mb-3">
           <Card.Img
@@ -645,17 +646,16 @@ try {
             className="complaint-image rounded-3"
             style={{ height: "200px", objectFit: "cover", width: "100%" }}
           />
-          <div
-            className="status-overlay"
-            style={{
-              position: "absolute",
-              top: "12px",
-              left: "12px",
-              zIndex: 3
-            }}
-          >
-            {getStatusBadge(complaint.status)}
-          </div>
+<div className="status-overlay">
+  {complaint.flagged === true || complaint.flagged?.isFlagged === true ? (
+    <span className="badge bg-danger p-2 text-white" style={{ fontSize: "0.85rem" }}>
+      Flagged
+    </span>
+  ) : (
+    getStatusBadge(complaint.status)
+  )}
+</div>
+
         </div>
 
         {/* Date and Edit on the same line */}

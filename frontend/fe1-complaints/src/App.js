@@ -10,7 +10,7 @@ import UserDashboard from './components/UserDashboard/UserDashboard';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 import AdminAnalysis from './components/AdminAnalysis/AdminAnalysis';
 import UserAnalysis from './components/UserAnalysis/UserAnalysis';
-
+import SuperAdminDashboard from './components/SuperAdminDashboard/SuperAdminDashboard'
 function App() {
   let router = createBrowserRouter([
     {
@@ -32,6 +32,8 @@ function App() {
         {
           path:'',element:<Navigate to="all-complaints"/>
 
+        },{
+          path:'/superadmin-dashboard',element:<SuperAdminDashboard/>
         }
         
       ]

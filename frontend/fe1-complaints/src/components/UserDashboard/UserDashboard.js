@@ -688,7 +688,19 @@ const UserDashboard = () => {
                         )}
                       </div>
                       <div className="status-overlay position-absolute" style={{ top: "8px", left: "8px", zIndex: 3 }}>
-                        {getStatusBadge(complaint.status)}
+                        {/* STATUS OR FLAG BADGE */}
+{complaint.flagged?.isFlagged ? (
+  <span
+    className="flagged-pill"
+    onClick={() => setExpandedCard(complaint)}
+    style={{ cursor: "pointer" }}
+  >
+    🚩 Flagged
+  </span>
+) : (
+  getStatusBadge(complaint.status)
+)}
+
                       </div>
                     </div>
 
@@ -761,8 +773,38 @@ const UserDashboard = () => {
     <Card className="popup-card rounded-4 card-background-gradient p-4">
       <button className="close-btn" onClick={() => setExpandedCard(null)}>✕</button>
 
-      {/* Status Badge */}
-      <div className="mb-2">{getStatusBadge(expandedCard.status)}</div>
+{/* FLAGGED OR STATUS */}
+{expandedCard.flagged?.isFlagged ? (
+  <div
+    className="flagged-alert-box"
+    style={{
+      background: "#ffe6e6",
+      border: "1px solid #ff4d4d",
+      padding: "12px",
+      borderRadius: "10px",
+      color: "#cc0000",
+      marginBottom: "15px"
+    }}
+  >
+    <strong style={{ fontSize: "1rem" }}>🚩 This request has been flagged</strong>
+    <div style={{ marginTop: "8px" }}>
+      <p style={{ marginBottom: "4px" }}>
+        <strong>Reason:</strong> {expandedCard.flagged.reason}
+      </p>
+      {expandedCard.flagged.note && (
+        <p style={{ marginBottom: "4px" }}>
+          <strong>Note:</strong> {expandedCard.flagged.note}
+        </p>
+      )}
+      <p style={{ marginBottom: "0px", fontSize: "0.9rem" }}>
+        <strong>Flagged By:</strong> {expandedCard.flagged.flaggedBy}
+      </p>
+    </div>
+  </div>
+) : (
+  <div className="mb-2">{getStatusBadge(expandedCard.status)}</div>
+)}
+
 
       {/* Date */}
       <Card.Text className="mt-1 mb-2" style={{ fontSize: "0.9rem", fontWeight: 600, color: "#1e90ff" }}>

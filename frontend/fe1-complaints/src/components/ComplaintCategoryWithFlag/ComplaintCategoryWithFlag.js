@@ -22,6 +22,7 @@ const ComplaintCategoryWithFlag = ({ complaintId, complaint, onFlagged }) => {
   // Check if the complaint is already flagged
   const isAlreadyFlagged =
     complaint?.flagged === true || complaint?.flagged?.isFlagged === true;
+  const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
   const handleFlagSubmit = async () => {
     if (!selectedReason) return;
@@ -29,7 +30,7 @@ const ComplaintCategoryWithFlag = ({ complaintId, complaint, onFlagged }) => {
     try {
       setIsSubmitting(true); // start loading
       const token = localStorage.getItem("authToken"); // assuming your auth token
-      const url = `http://localhost:6101/admin-api/flag-complaint/${complaintId}`;
+      const url = `${baseUrl}/admin-api/flag-complaint/${complaintId}`;
 
       // POST request to backend
       const response = await axios.post(

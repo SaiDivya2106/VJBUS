@@ -483,17 +483,31 @@ const handleDeleteComplaint = async (id) => {
   };
 
   const filteredComplaints = complaints.filter((complaint) => {
-    const matchesSearch =
-      complaint.title.toLowerCase().includes(search.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter
-      ? complaint.category === categoryFilter
-      : true;
-    const matchesStatus = statusFilter
-      ? complaint.status === statusFilter
-      : true;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  // ❌ Exclude flagged complaints
+  const isFlagged =
+    complaint.flagged === true ||
+    complaint.flagged?.isFlagged === true;
+
+  if (isFlagged) return false;
+
+  // Text search
+  const matchesSearch =
+    complaint.title.toLowerCase().includes(search.toLowerCase()) ||
+    complaint.description.toLowerCase().includes(search.toLowerCase());
+
+  // Category
+  const matchesCategory = categoryFilter
+    ? complaint.category === categoryFilter
+    : true;
+
+  // Status
+  const matchesStatus = statusFilter
+    ? complaint.status === statusFilter
+    : true;
+
+  return matchesSearch && matchesCategory && matchesStatus;
+});
+
 
  return (
     <Container className="mt-5 home-container mb-2">

@@ -20,9 +20,11 @@ mc.connect('mongodb://127.0.0.1:27017')
     const complaintsCollectionObj = dbObj.collection('complaintsCollection');
     const adminsCollectionObj = dbObj.collection('adminsCollection');
     const flaggedusersCollectionObj = dbObj.collection('flaggedusersCollection');
+    const superAdminCollectionObj=dbObj.collection('superAdminCollection')
     app.set('complaintsCollectionObj', complaintsCollectionObj);
     app.set('adminsCollectionObj', adminsCollectionObj);
     app.set('flaggedusersCollectionObj', flaggedusersCollectionObj);
+    app.set('superAdminCollectionObj',superAdminCollectionObj);
     console.log('DB connection success');
   })
   .catch(err => {

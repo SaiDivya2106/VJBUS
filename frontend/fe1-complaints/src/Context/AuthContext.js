@@ -13,23 +13,33 @@ export const AuthProvider = ({ children }) => {
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
-  useEffect(() => {
+ useEffect(() => {
+  // Attach token globally
+  axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // Handle token expiry globally
   const interceptor = axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error?.response?.status === 401) {
-        console.log("⛔ Token expired — logging out automatically");
+      const status = error?.response?.status;
 
-        logout(); // Use your existing logout function
+      if (status === 401 || status === 403) {
+        console.log("⛔ Token expired — logging out");
 
-        // Redirect user to login page
+        logout();
         window.location.href = "/complaints-website";
       }
+
       return Promise.reject(error);
     }
   );
 
-  // Cleanup
   return () => axios.interceptors.response.eject(interceptor);
 }, []);
 
