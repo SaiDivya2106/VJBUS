@@ -134,6 +134,14 @@ app.put('/api/update-status/:id', (req, res) => {
 });
 
 // Start server
+app.get("/health", (req, res) => {
+    res.status(200).json({ 
+        status: "healthy",
+        service: "wall-be", 
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

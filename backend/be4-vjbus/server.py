@@ -540,6 +540,15 @@ def handle_message(data):
     }, room=room)
 
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'service': 'bus-be',
+        'timestamp': datetime.now().isoformat()
+    }), 200
+
+
 if __name__ == "__main__":
     thread.start()
     socketio.run(app, host="0.0.0.0", port=PORT, debug=True)

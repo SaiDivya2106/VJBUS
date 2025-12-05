@@ -54,6 +54,13 @@ app.use(cookieParser());
 app.get("/" ,(req,res)=>{
     res.send("Hello world")
 })
+app.get("/health", (req, res) => {
+    res.status(200).json({ 
+        status: "healthy",
+        service: "easyfind-be", 
+        timestamp: new Date().toISOString()
+    });
+});
 app.use("/auth", authRoutes);
 app.use("/api/items/admin", adminRoutes);
 app.use("/api/items", userRoutes);
