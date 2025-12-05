@@ -9,6 +9,9 @@ import { IoMdSend } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiCategoryAlt } from "react-icons/bi";
+import { FaDoorOpen } from "react-icons/fa";
+import { FiWifi, FiClock } from "react-icons/fi";
+import { IoMdCall } from "react-icons/io";
 import { useAuth } from "../../Context/AuthContext";
 import ComplaintCategoryWithFlag from "../ComplaintCategoryWithFlag/ComplaintCategoryWithFlag";
 
@@ -237,6 +240,48 @@ await axios.delete(
             </span>
            
           </div>
+
+          {/* IT & Networking details (if present) */}
+          {(() => {
+            const cat = (complaint.category || "").toString().toLowerCase();
+            const isIt = cat.includes("it") && cat.includes("network");
+            const itRoom = complaint.it_details?.room_number || complaint.room_number;
+            const itSpeed = complaint.it_details?.internet_speed || complaint.internet_speed;
+            const itDuration = complaint.it_details?.issue_duration || complaint.issue_duration;
+            const itMobile = complaint.it_details?.mobile_number || complaint.mobile_number;
+
+            if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+              return (
+                <div className="it-details-inline mb-3" style={{ color: "#333" }}>
+                  {itRoom && (
+                    <div className="d-flex align-items-center mb-1">
+                      <FaDoorOpen style={{ marginRight: 8, color: "#6c757d" }} />
+                      <small style={{ color: "#555" }}><strong>Room:</strong> {itRoom}</small>
+                    </div>
+                  )}
+                  {itSpeed && (
+                    <div className="d-flex align-items-center mb-1">
+                      <FiWifi style={{ marginRight: 8, color: "#6c757d" }} />
+                      <small style={{ color: "#555" }}><strong>Internet Speed:</strong> {itSpeed}</small>
+                    </div>
+                  )}
+                  {itDuration && (
+                    <div className="d-flex align-items-center mb-1">
+                      <FiClock style={{ marginRight: 8, color: "#6c757d" }} />
+                      <small style={{ color: "#555" }}><strong>Duration:</strong> {itDuration}</small>
+                    </div>
+                  )}
+                  {itMobile && (
+                    <div className="d-flex align-items-center mb-1">
+                      <IoMdCall style={{ marginRight: 8, color: "#6c757d" }} />
+                      <small style={{ color: "#555" }}><strong>Mobile:</strong> {itMobile}</small>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          })()}
 
           <p className="mt-2 description-text">{complaint.description}</p>
 

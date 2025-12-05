@@ -398,7 +398,7 @@ const UserDashboard = () => {
   const [userVotes, setUserVotes] = useState({});
   const [expandedCard, setExpandedCard] = useState(null);
   const [editComplaint, setEditComplaint] = useState(null);
-  const [editForm, setEditForm] = useState({ title: "", description: "", category: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", category: "", room_number: "", internet_speed: "", issue_duration: "", mobile_number: "" });
   const [editImage, setEditImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
@@ -456,6 +456,15 @@ const UserDashboard = () => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
     return date.toDateString();
+  };
+
+  const isITCategory = (category) => {
+    if (!category) return false;
+    const c = String(category).toLowerCase().replace(/&/g, "and").trim();
+    if (c === "it") return true;
+    if (c.includes("it") && c.includes("network")) return true;
+    if (c.includes("it and networking") || c.includes("it networking") || c.includes("it/networking")) return true;
+    return false;
   };
 
   const handleImageChange = (e) => {
@@ -526,10 +535,15 @@ const UserDashboard = () => {
 
   const handleEditComplaint = (complaint) => {
     setEditComplaint(complaint);
+    const it = complaint.it_details || {};
     setEditForm({
       title: complaint.title,
       description: complaint.description,
       category: complaint.category,
+      room_number: it.room_number || complaint.room_number || "",
+      internet_speed: it.internet_speed || complaint.internet_speed || "",
+      issue_duration: it.issue_duration || complaint.issue_duration || "",
+      mobile_number: it.mobile_number || complaint.mobile_number || "",
     });
   };
 
@@ -570,7 +584,18 @@ const UserDashboard = () => {
         imageUrl = uploadRes.data.secure_url;
       }
 
-      const updatedData = { ...editForm, image: imageUrl };
+      let updatedData = { ...editForm, image: imageUrl };
+      if (isITCategory(editForm.category)) {
+        updatedData = {
+          ...updatedData,
+          it_details: {
+            room_number: editForm.room_number,
+            internet_speed: editForm.internet_speed,
+            issue_duration: editForm.issue_duration,
+            mobile_number: editForm.mobile_number,
+          },
+        };
+      }
 
       await axios.put(`${baseUrl}/user-api/edit-complaint/${editComplaint.complaint_id}`, updatedData, {
         headers: { Authorization: `Bearer ${token}` },
@@ -726,6 +751,46 @@ const UserDashboard = () => {
                       )}
                     </Card.Text>
 
+                    {(() => {
+                      const isIt = isITCategory(complaint.category);
+                      const it = complaint.it_details || {};
+                      const itRoom = it.room_number || complaint.room_number;
+                      const itSpeed = it.internet_speed || complaint.internet_speed;
+                      const itDuration = it.issue_duration || complaint.issue_duration;
+                      const itMobile = it.mobile_number || complaint.mobile_number;
+                      if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+                        return (
+                          <div className="it-summary mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
+                            {itRoom && (
+                              <div className="d-flex align-items-center mb-1">
+                                <span style={{ marginRight: 8 }}>🏷️</span>
+                                <small><strong>Room:</strong> {itRoom}</small>
+                              </div>
+                            )}
+                            {itSpeed && (
+                              <div className="d-flex align-items-center mb-1">
+                                <span style={{ marginRight: 8 }}>📶</span>
+                                <small><strong>Internet Speed:</strong> {itSpeed}</small>
+                              </div>
+                            )}
+                            {itDuration && (
+                              <div className="d-flex align-items-center mb-1">
+                                <span style={{ marginRight: 8 }}>⏱️</span>
+                                <small><strong>Duration:</strong> {itDuration}</small>
+                              </div>
+                            )}
+                            {itMobile && (
+                              <div className="d-flex align-items-center mb-1">
+                                <span style={{ marginRight: 8 }}>📞</span>
+                                <small><strong>Mobile:</strong> {itMobile}</small>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+
                     {complaint.comments && complaint.comments.length > 0 && (
                       <button className="admin-update-btn" onClick={() => setExpandedCard(complaint)}>Show Admin Updates <ChevronDown size={18} /></button>
                     )}
@@ -832,6 +897,46 @@ const UserDashboard = () => {
 
       {/* Description */}
       <Card.Text className="text-dark mb-3">{expandedCard.description}</Card.Text>
+
+      {(() => {
+        const isIt = isITCategory(expandedCard.category);
+        const it = expandedCard.it_details || {};
+        const itRoom = it.room_number || expandedCard.room_number;
+        const itSpeed = it.internet_speed || expandedCard.internet_speed;
+        const itDuration = it.issue_duration || expandedCard.issue_duration;
+        const itMobile = it.mobile_number || expandedCard.mobile_number;
+        if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+          return (
+            <div className="it-summary-popup mb-3" style={{ color: "#495057" }}>
+              {itRoom && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>🏷️</span>
+                  <strong>Room:</strong>&nbsp; <span>{itRoom}</span>
+                </div>
+              )}
+              {itSpeed && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>📶</span>
+                  <strong>Internet Speed:</strong>&nbsp; <span>{itSpeed}</span>
+                </div>
+              )}
+              {itDuration && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>⏱️</span>
+                  <strong>Duration:</strong>&nbsp; <span>{itDuration}</span>
+                </div>
+              )}
+              {itMobile && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>📞</span>
+                  <strong>Mobile:</strong>&nbsp; <span>{itMobile}</span>
+                </div>
+              )}
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       {/* Admin Updates */}
       <div className="admin-updates mb-3">
@@ -963,6 +1068,54 @@ const UserDashboard = () => {
           ))}
         </select>
       </div>
+
+      {isITCategory(editForm.category) && (
+        <div className="it-edit-fields mb-2">
+          <div className="form-group mb-2">
+            <label className="form-label">Room Number</label>
+            <input
+              type="text"
+              name="room_number"
+              className="form-control"
+              value={editForm.room_number}
+              onChange={handleEditChange}
+            />
+          </div>
+
+          <div className="form-group mb-2">
+            <label className="form-label">Internet Speed</label>
+            <input
+              type="text"
+              name="internet_speed"
+              className="form-control"
+              value={editForm.internet_speed}
+              onChange={handleEditChange}
+            />
+          </div>
+
+          <div className="form-group mb-2">
+            <label className="form-label">Issue Duration</label>
+            <input
+              type="text"
+              name="issue_duration"
+              className="form-control"
+              value={editForm.issue_duration}
+              onChange={handleEditChange}
+            />
+          </div>
+
+          <div className="form-group mb-2">
+            <label className="form-label">Mobile Number</label>
+            <input
+              type="tel"
+              name="mobile_number"
+              className="form-control"
+              value={editForm.mobile_number}
+              onChange={handleEditChange}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Image Upload */}
       <div className="form-group mb-2">

@@ -76,14 +76,44 @@ function isMeaninglessComplaint(text) {
 // -------------------- ADD COMPLAINT --------------------
 userApp.post(
   "/add-complaint",
-  verifyGoogleToken,
   asyncHandler(async (req, res) => {
-    const { complaint_id, title, description, category, user_id, github_issue, image } = req.body;
+    const {
+      complaint_id,
+      title,
+      description,
+      category,
+      user_id,
+      github_issue,
+      image,
+      room_number,
+      internet_speed,
+      mobile_number,
+      issue_duration,
+    } = req.body;
 
     if (!complaint_id || !title || !description || !category || !user_id) {
       return res.status(400).json({
         message: "Complaint ID, title, description, category, and user ID are required",
       });
+    }
+
+    // Determine if this complaint belongs to IT & Networking (case-insensitive)
+    const normalizedCategory = typeof category === "string" ? category.trim().toLowerCase() : "";
+    const isITCategory = [
+      "it and networking",
+      "it & networking",
+      "it networking",
+      "it/networking",
+    ].includes(normalizedCategory);
+
+    // If IT category, require the additional fields
+    if (isITCategory) {
+      if (!room_number || !internet_speed || !mobile_number || !issue_duration) {
+        return res.status(400).json({
+          message:
+            "For IT and Networking complaints, `room_number`, `internet_speed`, `mobile_number` and `issue_duration` are required",
+        });
+      }
     }
 
     const result = sentiment.analyze(description);
@@ -109,6 +139,17 @@ userApp.post(
       user_id,
       github_issue: github_issue || null,
       image: image || null,
+      // Only add IT-specific details when category is IT & Networking
+      ...(isITCategory
+        ? {
+            it_details: {
+              room_number,
+              internet_speed,
+              mobile_number,
+              issue_duration,
+            },
+          }
+        : {}),
       timestamp: new Date().toISOString(),
       likes: 0,
       dislikes: 0,
@@ -164,6 +205,12 @@ userApp.post(
                       <li><strong>Complaint ID:</strong> ${complaint_id}</li>
                       <li><strong>Status:</strong> Pending</li>
                       <li><strong>Submitted on:</strong> ${formattedTimestamp}</li>
+                      ${isITCategory ? `
+                        <li><strong>Room Number:</strong> ${room_number}</li>
+                        <li><strong>Internet Speed:</strong> ${internet_speed}</li>
+                        <li><strong>Mobile Number:</strong> ${mobile_number}</li>
+                        <li><strong>Issue Duration:</strong> ${issue_duration}</li>
+                      ` : ''}
                       ${
                         image
                           ? `<li><strong>Image:</strong><br>

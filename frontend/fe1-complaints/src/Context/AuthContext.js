@@ -19,21 +19,47 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      // mark this request as authenticated so response interceptor can make decisions
+      config._hasAuth = true;
     }
     return config;
   });
 
   // Handle token expiry globally
   const interceptor = axios.interceptors.response.use(
-    (response) => response,
+    // Success handler: catch cases where authenticated requests unexpectedly return no body
+    (response) => {
+      try {
+        const wasAuth = response?.config?._hasAuth;
+        // If an authenticated request returned no data or 204, consider token/session failure
+        if (wasAuth && (response.status === 204 || response.data == null)) {
+          console.warn("⛔ Authenticated request returned empty — forcing logout");
+          logout();
+          window.location.href = "/complaints-website";
+        }
+      } catch (e) {
+        // ignore
+      }
+      return response;
+    },
     (error) => {
       const status = error?.response?.status;
 
-      if (status === 401 || status === 403) {
-        console.log("⛔ Token expired — logging out");
-
+      // Force logout on common auth-related status codes
+      if ([401, 403, 419, 440].includes(status)) {
+        console.log("⛔ Token/session failure detected (status)");
         logout();
         window.location.href = "/complaints-website";
+        return Promise.reject(error);
+      }
+
+      // Network or CORS failures (no response) for authenticated requests
+      const wasAuthReq = error?.config?._hasAuth;
+      if (!error.response && wasAuthReq) {
+        console.log("⛔ Network/CORS error on authenticated request — forcing logout");
+        logout();
+        window.location.href = "/complaints-website";
+        return Promise.reject(error);
       }
 
       return Promise.reject(error);

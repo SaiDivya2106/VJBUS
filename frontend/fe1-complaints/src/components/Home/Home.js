@@ -729,14 +729,35 @@ const handleDeleteComplaint = async (id) => {
   {/* Edit icon (optional) */}
 </div>
 
-<Card.Title
-  className="fw-bold text-dark fs-5"
-  style={{ marginTop: "5px", marginBottom: "5px" }} // reduced gap
->
-  {complaint.title}
-</Card.Title>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <Card.Title
+            className="fw-bold text-dark fs-5"
+            style={{ marginTop: "5px", marginBottom: "5px" }} // reduced gap
+          >
+            {complaint.title}
+          </Card.Title>
 
-<Card.Text className="text-secondary mb-2" style={{ marginTop: 0 }}>
+          {/* Show IT-specific summary when category is IT and Networking */}
+          {(() => {
+            const cat = (complaint.category || "").toString().toLowerCase();
+            const isIt = cat.includes("it") && cat.includes("network");
+            const itRoom = complaint.it_details?.room_number || complaint.room_number;
+            const itSpeed = complaint.it_details?.internet_speed || complaint.internet_speed;
+            const itDuration = complaint.it_details?.issue_duration || complaint.issue_duration;
+
+            if (isIt && (itRoom || itSpeed || itDuration)) {
+              return (
+                <div className="it-summary mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
+                  {itRoom && <div><strong>Room:</strong> <span style={{ marginLeft: 6 }}>{itRoom}</span></div>}
+                  {itSpeed && <div><strong>Internet Speed:</strong> <span style={{ marginLeft: 6 }}>{itSpeed}</span></div>}
+                  {itDuration && <div><strong>Duration:</strong> <span style={{ marginLeft: 6 }}>{itDuration}</span></div>}
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          <Card.Text className="text-secondary mb-2" style={{ marginTop: 0, maxHeight: 140, overflow: "hidden" }}>
   {expandedDescriptions[complaint.complaint_id]
     ? complaint.description
     : `${complaint.description.substring(0, 200)}${
@@ -807,6 +828,7 @@ const handleDeleteComplaint = async (id) => {
                       </button>
                     </div>
                   </div>
+          </div>
                 </Card>
               </Col>
             ))}
@@ -865,6 +887,48 @@ const handleDeleteComplaint = async (id) => {
       <Card.Title className="fw-bold text-dark mt-3 fs-4">
         {expandedCard.title}
       </Card.Title>
+      {/* Show IT details in expanded popup */}
+      {(() => {
+        const cat = (expandedCard.category || "").toString().toLowerCase();
+        const isIt = cat.includes("it") && cat.includes("network");
+        const itRoom = expandedCard.it_details?.room_number || expandedCard.room_number;
+        const itSpeed = expandedCard.it_details?.internet_speed || expandedCard.internet_speed;
+        const itDuration = expandedCard.it_details?.issue_duration || expandedCard.issue_duration;
+        const itMobile = expandedCard.it_details?.mobile_number || expandedCard.mobile_number;
+
+        if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+          return (
+            <div className="it-details-inline mb-3" style={{ color: "#333" }}>
+              {itRoom && (
+                <div className="d-flex align-items-center mb-1">
+                  <span className="me-2" style={{ color: "#6c757d" }}>🏷️</span>
+                  <small style={{ color: "#555" }}><strong>Room:</strong> {itRoom}</small>
+                </div>
+              )}
+              {itSpeed && (
+                <div className="d-flex align-items-center mb-1">
+                  <span className="me-2" style={{ color: "#6c757d" }}>📶</span>
+                  <small style={{ color: "#555" }}><strong>Internet Speed:</strong> {itSpeed}</small>
+                </div>
+              )}
+              {itDuration && (
+                <div className="d-flex align-items-center mb-1">
+                  <span className="me-2" style={{ color: "#6c757d" }}>⏱️</span>
+                  <small style={{ color: "#555" }}><strong>Duration:</strong> {itDuration}</small>
+                </div>
+              )}
+              {itMobile && (
+                <div className="d-flex align-items-center mb-1">
+                  <span className="me-2" style={{ color: "#6c757d" }}>📞</span>
+                  <small style={{ color: "#555" }}><strong>Mobile:</strong> {itMobile}</small>
+                </div>
+              )}
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       <Card.Text className="text-dark mb-3">{expandedCard.description}</Card.Text>
 
       {/* Admin Comments */}

@@ -702,6 +702,48 @@ try {
           {complaint.title}
         </Card.Title>
 
+        {/* IT summary for admin cards */}
+        {(() => {
+          const cat = (complaint.category || "").toString().toLowerCase();
+          const isIt = cat.includes("it") && cat.includes("network");
+          const itRoom = complaint.it_details?.room_number || complaint.room_number;
+          const itSpeed = complaint.it_details?.internet_speed || complaint.internet_speed;
+          const itDuration = complaint.it_details?.issue_duration || complaint.issue_duration;
+          const itMobile = complaint.it_details?.mobile_number || complaint.mobile_number;
+
+          if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+            return (
+              <div className="it-summary-admin mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
+                {itRoom && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>🏷️</span>
+                    <small><strong>Room:</strong> {itRoom}</small>
+                  </div>
+                )}
+                {itSpeed && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>📶</span>
+                    <small><strong>Internet Speed:</strong> {itSpeed}</small>
+                  </div>
+                )}
+                {itDuration && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>⏱️</span>
+                    <small><strong>Duration:</strong> {itDuration}</small>
+                  </div>
+                )}
+                {itMobile && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>📞</span>
+                    <small><strong>Mobile:</strong> {itMobile}</small>
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <Card.Text className="text-secondary mb-2">
           {complaint.description.split(" ").length > 38 ? (
             <>

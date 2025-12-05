@@ -44,7 +44,13 @@ const ComplaintForm = () => {
     title: "",
     category: "",
     description: "",
+    room_number: "",
+    internet_speed: "",
+    mobile_number: "",
+    issue_duration: "",
   });
+
+
 
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,10 +66,26 @@ const ComplaintForm = () => {
   const displayedCategories = showAll ? categoriesList : categoriesList.slice(0, 7);
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
+  const normalizedCategory = typeof formData.category === "string" ? formData.category.trim().toLowerCase() : "";
+  const isITCategory = [
+    "it and networking",
+    "it & networking",
+    "it networking",
+    "it/networking",
+  ].includes(normalizedCategory);
+
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleCategorySelect = (cat) => {
-    setFormData({ ...formData, category: cat });
+    // when category changes, reset IT-specific fields
+    setFormData({
+      ...formData,
+      category: cat,
+      room_number: "",
+      internet_speed: "",
+      mobile_number: "",
+      issue_duration: "",
+    });
     setShowAll(false); // collapse after selecting
   };
 
@@ -109,6 +131,30 @@ const ComplaintForm = () => {
         imageUrl = uploadRes.data.secure_url; // ✅ Cloudinary hosted image
       }
 
+      // determine if category is IT & Networking (match frontend label)
+      const normalizedCategory = typeof formData.category === "string" ? formData.category.trim().toLowerCase() : "";
+      const isITCategory = [
+        "it and networking",
+        "it & networking",
+        "it networking",
+        "it/networking",
+        "it and networking",
+      ].includes(normalizedCategory);
+
+      // client-side validation for IT fields
+      if (isITCategory) {
+        if (
+          !formData.room_number ||
+          !formData.internet_speed ||
+          !formData.mobile_number ||
+          !formData.issue_duration
+        ) {
+          setWarning("Please fill all IT & Networking fields: Room, Internet Speed, Mobile Number and Issue Duration.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const complaintData = {
         complaint_id: Date.now().toString(),
         title: formData.title,
@@ -116,6 +162,15 @@ const ComplaintForm = () => {
         description: formData.description,
         user_id: user?.email,
         image: imageUrl, // ✅ store Cloudinary URL
+        // include IT-specific fields only when the selected category is IT
+        ...(isITCategory
+          ? {
+              room_number: formData.room_number,
+              internet_speed: formData.internet_speed,
+              mobile_number: formData.mobile_number,
+              issue_duration: formData.issue_duration,
+            }
+          : {}),
       };
 
       const token = localStorage.getItem("authToken");
@@ -125,13 +180,13 @@ const ComplaintForm = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.status === 201) {
+        if (response.status === 201) {
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
           navigate("/all-complaints");
         }, 3000);
-        setFormData({ title: "", category: "", description: "" });
+        setFormData({ title: "", category: "", description: "", room_number: "", internet_speed: "", mobile_number: "", issue_duration: "" });
         setImage(null);
         setImagePreview(null);
       } else {
@@ -283,6 +338,59 @@ const ComplaintForm = () => {
             required
           />
         </div>
+
+        {/* IT & Networking additional fields (shown only when category is IT) */}
+        {isITCategory && (
+          <div className="it-fields">
+            <div className="input-group">
+              <label style={labelStyle}>Room Number *</label>
+              <input
+                type="text"
+                name="room_number"
+                value={formData.room_number || ""}
+                onChange={handleChange}
+                placeholder="e.g. B-204 or Lab-A"
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label style={labelStyle}>Internet Speed *</label>
+              <input
+                type="text"
+                name="internet_speed"
+                value={formData.internet_speed || ""}
+                onChange={handleChange}
+                placeholder="e.g. 0.5 Mbps or 10 Mbps"
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label style={labelStyle}>Mobile Number *</label>
+              <input
+                type="tel"
+                name="mobile_number"
+                value={formData.mobile_number || ""}
+                onChange={handleChange}
+                placeholder="e.g. 9876543210"
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label style={labelStyle}>Issue Duration *</label>
+              <input
+                type="text"
+                name="issue_duration"
+                value={formData.issue_duration || ""}
+                onChange={handleChange}
+                placeholder="e.g. 2 hours, since yesterday"
+                required
+              />
+            </div>
+          </div>
+        )}
 
         {/* Image Upload */}
         <div className="input-group image-upload-container">
