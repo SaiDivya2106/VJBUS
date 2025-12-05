@@ -22,6 +22,14 @@ app.use('/projects', projectRoutes);
 // Serve static files for the uploaded content
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.get("/health", (req, res) => {
+    res.status(200).json({ 
+        status: "healthy",
+        service: "openhouse-be", 
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Start the server
 const PORT = 3120;
 app.listen(PORT, '0.0.0.0', () => {

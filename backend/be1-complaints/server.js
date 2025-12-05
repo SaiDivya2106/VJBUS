@@ -37,6 +37,14 @@ const adminApp = require('./APIs/admin-api');
 app.use('/user-api', userApp);
 app.use('/admin-api', adminApp);
 
+app.get("/health", (req, res) => {
+    res.status(200).json({ 
+        status: "healthy",
+        service: "complaints-be", 
+        timestamp: new Date().toISOString()
+    });
+});
+
 // ✅ React SPA fallback (only for non-API GET requests)
 app.get('*', (req, res) => {
   if (!req.originalUrl.startsWith('/user-api') && !req.originalUrl.startsWith('/admin-api')) {

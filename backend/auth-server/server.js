@@ -168,4 +168,13 @@ app.post("/logout", (req, res) => {
 });
 
 
+app.get("/health", (req, res) => {
+    res.status(200).json({ 
+        status: "healthy",
+        service: "auth-server", 
+        timestamp: new Date().toISOString()
+    });
+});
+
+
 app.listen(3115, () => console.log("Auth Server running on port 3115"));
