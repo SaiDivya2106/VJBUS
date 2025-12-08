@@ -93,6 +93,17 @@ const SuperAdminDashboard = () => {
   const uniqueCategories = [...new Set(complaints.map((c) => c.category))];
   const uniqueReasons = [...new Set(complaints.map((c) => c.flagged.reason))];
 
+  // Allowed reasons (keep in sync with flag UI)
+  const allowedFlagReasons = [
+    "False or Misleading Information",
+    "Irrelevant or Non-Complaint Content",
+    "Individual-Specific Issue",
+    "Other",
+  ];
+
+  // Use only allowed reasons for the filter dropdown (show only those present)
+  const filteredReasons = allowedFlagReasons.filter((r) => uniqueReasons.includes(r));
+
   return (
     <div className="superadmin-container">
       <Container>
@@ -151,9 +162,9 @@ const SuperAdminDashboard = () => {
       }
     >
       <option value="">All Reasons</option>
-      {uniqueReasons.map((r) => (
-        <option key={r}>{r}</option>
-      ))}
+      {filteredReasons.length > 0
+        ? filteredReasons.map((r) => <option key={r}>{r}</option>)
+        : allowedFlagReasons.map((r) => <option key={r}>{r}</option>)}
     </Form.Select>
       <span className="arrow-icon">˅</span>
   </div>

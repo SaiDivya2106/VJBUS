@@ -19,7 +19,7 @@
 
 
 /* OUTER WRAPPER — FULL WIDTH BORDER BOX */
-.filters-box {
+/* .filters-box {
   width: 100%;
   background: rgba(18, 26, 48, 0.6);
   border-radius: 26px;
@@ -28,7 +28,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.45);
-}
+} */
 
 /* FILTER TITLE ROW */
 .filter-heading {

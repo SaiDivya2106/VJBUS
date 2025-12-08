@@ -106,6 +106,57 @@ select.form-select {
   font-weight: 600;
 }
 
+/* Remove unwanted dark inner shadows coming from global styles for selects
+   Scoped to this component so other pages are unaffected. */
+.content-section select.form-select,
+.content-section .form-select,
+.content-section .report-select {
+  background-color: #fff !important;
+  color: #222 !important;
+  border: 1px solid #ddd !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  background-image: none !important;
+  background-clip: padding-box !important;
+}
+
+.content-section select.form-select:focus,
+.content-section .form-select:focus,
+.content-section .report-select:focus {
+  box-shadow: 0 0 0 0.15rem rgba(13,110,253,0.08) !important;
+  outline: none !important;
+}
+
+/* Ensure dropdown options are readable and have no inner shadow */
+.content-section select.form-select option,
+.content-section .form-select option,
+.content-section .report-select option {
+  background-color: #fff !important;
+  color: #222 !important;
+}
+
+/* Remove IE/Edge default dropdown arrow background artifacts inside this component */
+.content-section select.form-select::-ms-expand {
+  display: inline-block;
+}
+
+/* Force light theme for status/category selects inside ComplaintsDetails */
+.form-css.status-box select.form-select,
+.status-box select.form-select,
+.content-section .status-box select.form-select,
+.content-section .category-box select.form-select {
+  background-color: #fff !important;
+  color: #222 !important;
+  border: 1px solid #ddd !important;
+}
+
+.form-css.status-box select.form-select option,
+.status-box select.form-select option,
+.content-section .status-box select.form-select option {
+  background-color: #fff !important;
+  color: #222 !important;
+}
+
 /* Status Colors */
 .pending-status {
   border: 2px solid #ff9800;
@@ -119,7 +170,7 @@ select.form-select {
 
 /* === Status Indicator Box === */
 /* === Update Status Box === */
-.update-status-box {
+/* .update-status-box {
    background-color: #f8f5ff;
   color: #000;
   border-radius: 16px;
@@ -132,7 +183,7 @@ select.form-select {
   flex-wrap: wrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   width:360px;
-}
+} */
 
 /* Tweak select for alignment */
 .update-status-box select.form-select {

@@ -11,7 +11,7 @@ import {
   ImageFill,
   ChevronDown,
   ChevronUp,
-  ExclamationTriangleFill, // for error icon
+  ExclamationTriangleFill,
 } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import "./ComplaintForm.css";
@@ -44,22 +44,22 @@ const ComplaintForm = () => {
     title: "",
     category: "",
     description: "",
+    location: "",
+    connectionType: "",
     room_number: "",
     internet_speed: "",
     mobile_number: "",
     issue_duration: "",
   });
 
-
-
+  const [wifiAtHostelWarning, setWifiAtHostelWarning] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [warning, setWarning] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showSizeError, setShowSizeError] = useState(false); // NEW state for size error modal
+  const [showSizeError, setShowSizeError] = useState(false);
 
-  // Image upload state
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -74,27 +74,43 @@ const ComplaintForm = () => {
     "it/networking",
   ].includes(normalizedCategory);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "connectionType" && value === "WiFi") {
+      const isHostel = formData.location === "Boys Hostel" || formData.location === "Girls Hostel";
+      setWifiAtHostelWarning(isHostel);
+    } else if (name === "location") {
+      const isHostel = value === "Boys Hostel" || value === "Girls Hostel";
+      if (isHostel && formData.connectionType === "WiFi") {
+        setWifiAtHostelWarning(true);
+      } else {
+        setWifiAtHostelWarning(false);
+      }
+    }
+  };
 
   const handleCategorySelect = (cat) => {
-    // when category changes, reset IT-specific fields
     setFormData({
       ...formData,
       category: cat,
+      location: "",
+      connectionType: "",
       room_number: "",
       internet_speed: "",
       mobile_number: "",
       issue_duration: "",
     });
-    setShowAll(false); // collapse after selecting
+    setWifiAtHostelWarning(false);
+    setShowAll(false);
   };
 
-  // Handle image selection with size validation
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 15000 * 1024) {
-        setShowSizeError(true); // show popup modal
+        setShowSizeError(true);
         return;
       }
       setImage(file);
@@ -117,41 +133,44 @@ const ComplaintForm = () => {
     try {
       let imageUrl = null;
 
-      // ✅ Upload image to Cloudinary if user selected one
       if (image) {
         const imgData = new FormData();
         imgData.append("file", image);
-        imgData.append("upload_preset", "complaint_uploads"); // your Cloudinary preset
+        imgData.append("upload_preset", "complaint_uploads");
 
         const uploadRes = await axios.post(
           `https://api.cloudinary.com/v1_1/dbsrpikci/image/upload`,
           imgData
         );
 
-        imageUrl = uploadRes.data.secure_url; // ✅ Cloudinary hosted image
+        imageUrl = uploadRes.data.secure_url;
       }
 
-      // determine if category is IT & Networking (match frontend label)
       const normalizedCategory = typeof formData.category === "string" ? formData.category.trim().toLowerCase() : "";
       const isITCategory = [
         "it and networking",
         "it & networking",
         "it networking",
         "it/networking",
-        "it and networking",
       ].includes(normalizedCategory);
 
-      // client-side validation for IT fields
       if (isITCategory) {
-        if (
-          !formData.room_number ||
-          !formData.internet_speed ||
-          !formData.mobile_number ||
-          !formData.issue_duration
-        ) {
-          setWarning("Please fill all IT & Networking fields: Room, Internet Speed, Mobile Number and Issue Duration.");
+        if (!formData.location || !formData.connectionType) {
+          setWarning("Please select Location and Connection Type for IT & Networking complaints.");
           setLoading(false);
           return;
+        }
+
+        const isHostel = formData.location === "Boys Hostel" || formData.location === "Girls Hostel";
+        const isWiFi = formData.connectionType === "WiFi";
+        const isWiFiAtHostel = isHostel && isWiFi;
+
+        if (!isWiFiAtHostel) {
+          if (!formData.room_number || !formData.internet_speed || !formData.mobile_number || !formData.issue_duration) {
+            setWarning("Please fill all IT & Networking fields: Room, Internet Speed, Mobile Number and Issue Duration.");
+            setLoading(false);
+            return;
+          }
         }
       }
 
@@ -161,14 +180,17 @@ const ComplaintForm = () => {
         category: formData.category,
         description: formData.description,
         user_id: user?.email,
-        image: imageUrl, // ✅ store Cloudinary URL
-        // include IT-specific fields only when the selected category is IT
+        image: imageUrl,
         ...(isITCategory
           ? {
-              room_number: formData.room_number,
-              internet_speed: formData.internet_speed,
-              mobile_number: formData.mobile_number,
-              issue_duration: formData.issue_duration,
+              it_details: {
+                location: formData.location,
+                connectionType: formData.connectionType,
+                room_number: formData.room_number || "",
+                internet_speed: formData.internet_speed || "",
+                mobile_number: formData.mobile_number || "",
+                issue_duration: formData.issue_duration || "",
+              },
             }
           : {}),
       };
@@ -180,15 +202,16 @@ const ComplaintForm = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-        if (response.status === 201) {
+      if (response.status === 201) {
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
           navigate("/all-complaints");
         }, 3000);
-        setFormData({ title: "", category: "", description: "", room_number: "", internet_speed: "", mobile_number: "", issue_duration: "" });
+        setFormData({ title: "", category: "", description: "", location: "", connectionType: "", room_number: "", internet_speed: "", mobile_number: "", issue_duration: "" });
         setImage(null);
         setImagePreview(null);
+        setWifiAtHostelWarning(false);
       } else {
         setMessage("Failed to register complaint. Please try again.");
       }
@@ -241,7 +264,6 @@ const ComplaintForm = () => {
       <h2 style={headingStyle}>Register a Complaint</h2>
 
       <form className="form" onSubmit={handleSubmit}>
-        {/* User info */}
         <div style={userInfoStyle}>
           <img
             src={user?.picture || "/default-avatar.png"}
@@ -253,15 +275,11 @@ const ComplaintForm = () => {
           </span>
         </div>
 
-        {/* Title */}
         <div className="input-group">
           <label style={labelStyle}>
-            {/* <span className="icon-circle">
-              <PersonFill size={18} color={lightBlue} />
-            </span> */}
-          <span className="label-icon purple me-2">
-            <i className="bi bi-info-lg"></i>
-          </span>
+            <span className="label-icon purple me-2">
+              <i className="bi bi-info-lg"></i>
+            </span>
             {" "}
             Request Title *
           </label>
@@ -275,60 +293,36 @@ const ComplaintForm = () => {
           />
         </div>
 
-        {/* Category */}
         <div className="input-group">
           <div className="category-label-wrapper">
             <label style={labelStyle}>
-              {/* <span className="icon-circle">
-                <TagFill size={18} color={lightBlue} />
-              </span> */}
-            <span className="label-icon orange me-2">
-              <i className="bi bi-tag"></i>
-            </span>
+              <span className="label-icon orange me-2">
+                <i className="bi bi-tag"></i>
+              </span>
               {" "}
               Category
             </label>
           </div>
           <div className="category-grid">
-            {/* {formData.category ? (
-              <button
-                type="button"
-                className="category-btn active"
-                onClick={() => setFormData({ ...formData, category: "" })}
-              >
-                <span className="icon">
-                  {categoriesList.find((cat) => cat.name === formData.category)?.icon}
-                </span>
-                <span>{formData.category}</span>
-              </button>
-            ) : ( */}
-
-
-
-
             {formData.category ? (
-  <div className="category-btn active selected-category-card">
-    <span className="icon">
-      {categoriesList.find((c) => c.name === formData.category)?.icon}
-    </span>
-    <span className="cat-name">{formData.category}</span>
+              <div className="category-btn active selected-category-card">
+                <span className="icon">
+                  {categoriesList.find((c) => c.name === formData.category)?.icon}
+                </span>
+                <span className="cat-name">{formData.category}</span>
 
-    {/* Close button INSIDE card */}
-    <button
-      type="button"
-      className="close-btn-inside"
-      onClick={() => {
-        setFormData({ ...formData, category: "" });
-        setShowAll(true);
-      }}
-    >
-      ×
-    </button>
-  </div>
-) : (
-
-
-
+                <button
+                  type="button"
+                  className="close-btn-inside"
+                  onClick={() => {
+                    setFormData({ ...formData, category: "" });
+                    setShowAll(true);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
               <>
                 {displayedCategories.map((cat) => (
                   <button
@@ -341,20 +335,8 @@ const ComplaintForm = () => {
                     <span>{cat.name}</span>
                   </button>
                 ))}
-                {/* <button
-                  type="button"
-                  className="category-btn more-btn"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  <span className="icon-circle">
-                    {showAll ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </span>
-                  {showAll ? "Show Less" : "More Options"}
-                </button> */}
 
-
-
-                                <button
+                <button
                   type="button"
                   className="category-btn more-btn"
                   onClick={() => setShowAll(!showAll)}
@@ -364,22 +346,16 @@ const ComplaintForm = () => {
                   </span>
                   {showAll ? "Show Less" : "More Options"}
                 </button>
-
-                
               </>
             )}
           </div>
         </div>
 
-        {/* Description */}
         <div className="input-group">
           <label style={labelStyle}>
-            {/* <span className="icon-circle">
-              <FileTextFill size={18} color={lightBlue} />
-            </span> */}
-          <span className="label-icon dark-purple me-2">
-            <i className="bi bi-card-text"></i>
-          </span>
+            <span className="label-icon dark-purple me-2">
+              <i className="bi bi-card-text"></i>
+            </span>
             {" "}
             Detailed Description *
           </label>
@@ -393,130 +369,160 @@ const ComplaintForm = () => {
           />
         </div>
 
-        {/* IT & Networking additional fields (shown only when category is IT) */}
         {isITCategory && (
           <div className="it-fields">
             <div className="input-group">
-              <label style={labelStyle}>Room Number *</label>
-              <input
-                type="text"
-                name="room_number"
-                value={formData.room_number || ""}
+              <label style={labelStyle}>Location *</label>
+              <select
+                name="location"
+                value={formData.location}
                 onChange={handleChange}
-                placeholder="e.g. B-204 or Lab-A"
+                className="form-select"
                 required
-              />
+              >
+                <option value="">-- Select Location --</option>
+                <option value="Main Campus">Main Campus</option>
+                <option value="Boys Hostel">Boys Hostel</option>
+                <option value="Girls Hostel">Girls Hostel</option>
+              </select>
             </div>
 
-            <div className="input-group">
-              <label style={labelStyle}>Internet Speed *</label>
-              <input
-                type="text"
-                name="internet_speed"
-                value={formData.internet_speed || ""}
-                onChange={handleChange}
-                placeholder="e.g. 0.5 Mbps or 10 Mbps"
-                required
-              />
+            {formData.location && (
+              <div className="input-group">
+                <label style={labelStyle}>Connection Type *</label>
+                <select
+                  name="connectionType"
+                  value={formData.connectionType}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">-- Select Connection --</option>
+                  <option value="WiFi">WiFi</option>
+                  <option value="LAN">LAN</option>
+                </select>
+              </div>
+            )}
+
+            {wifiAtHostelWarning && (
+              <div style={{ padding: "12px", backgroundColor: "#fff3cd", border: "1px solid #ffc107", borderRadius: "4px", marginBottom: "15px", color: "#856404" }}>
+                <strong>⚠️ Warning:</strong> WiFi is not supported at hostels. Please use LAN or contact IT support for assistance.
+              </div>
+            )}
+
+            {!wifiAtHostelWarning && (
+              <>
+                <div className="input-group">
+                  <label style={labelStyle}>Room Number *</label>
+                  <input
+                    type="text"
+                    name="room_number"
+                    value={formData.room_number || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. B-204 or Lab-A"
+                    required
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label style={labelStyle}>Internet Speed *</label>
+                  <input
+                    type="text"
+                    name="internet_speed"
+                    value={formData.internet_speed || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 0.5 Mbps or 10 Mbps"
+                    required
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label style={labelStyle}>Mobile Number *</label>
+                  <input
+                    type="tel"
+                    name="mobile_number"
+                    value={formData.mobile_number || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 9876543210"
+                    required
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label style={labelStyle}>Issue Duration *</label>
+                  <input
+                    type="text"
+                    name="issue_duration"
+                    value={formData.issue_duration || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 2 hours, since yesterday"
+                    required
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {!wifiAtHostelWarning && (
+          <div className="input-group image-upload-container">
+            <div className="upload-label">
+              <label>
+                <span className="label-icon blue me-2">
+                  <i className="bi bi-image"></i>
+                </span>
+                Upload Image (Optional)
+              </label>
             </div>
 
-            <div className="input-group">
-              <label style={labelStyle}>Mobile Number *</label>
-              <input
-                type="tel"
-                name="mobile_number"
-                value={formData.mobile_number || ""}
-                onChange={handleChange}
-                placeholder="e.g. 9876543210"
-                required
-              />
-            </div>
-
-            <div className="input-group">
-              <label style={labelStyle}>Issue Duration *</label>
-              <input
-                type="text"
-                name="issue_duration"
-                value={formData.issue_duration || ""}
-                onChange={handleChange}
-                placeholder="e.g. 2 hours, since yesterday"
-                required
-              />
+            <div className="upload-box-wrapper">
+              <div className="upload-box">
+                {!imagePreview ? (
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="file-input"
+                      id="file-upload"
+                      style={{ display: "none" }}
+                    />
+                    <label htmlFor="file-upload" className="upload-placeholder">
+                      <div className="upload-icon">
+                        ⬆️
+                        <div className="upload-line"></div>
+                      </div>
+                      <span className="upload-text">Upload Image</span>
+                    </label>
+                  </>
+                ) : (
+                  <div className="image-preview">
+                    <img src={imagePreview} alt="Preview" />
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => {
+                        setImage(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+              <p className="file-size-note m-2">Preferred size: ≤ 1.5MB</p>
             </div>
           </div>
         )}
 
-        {/* Image Upload */}
-        <div className="input-group image-upload-container">
-          <div className="upload-label">
-            <label>
-              {/* <span className="icon-circle">
-                <ImageFill size={18} color={lightBlue} />
-              </span> */}
-          <span className="label-icon blue me-2">
-            <i className="bi bi-image"></i>
-          </span>
-              {" "}
-              Upload Image (Optional)
-            </label>
-          </div>
-
-          <div className="upload-box-wrapper">
-            <div className="upload-box">
-              {!imagePreview ? (
-                <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="file-input"
-                    id="file-upload"
-                    style={{ display: "none" }}
-                  />
-                  <label htmlFor="file-upload" className="upload-placeholder">
-                    <div className="upload-icon">
-                      ⬆️
-                      <div className="upload-line"></div>
-                    </div>
-                    <span className="upload-text">Upload Image</span>
-                  </label>
-                </>
-              ) : (
-                <div className="image-preview">
-                  <img src={imagePreview} alt="Preview" />
-                  <button
-                    type="button"
-                    className="remove-btn"
-                    onClick={() => {
-                      setImage(null);
-                      setImagePreview(null);
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
-            <p className="file-size-note m-2">Preferred size: ≤ 1.5MB</p>
-          </div>
-        </div>
-
-        {/* <p className="complaint-note mt-3 d-flex  ">
+        <p className="complaint-note mt-3 d-flex align-items-start no-padding-left">
           <i className="bi bi-exclamation-triangle-fill text-warning"></i>
-          <span className="warningred">
+          <span className="warningred ms-2">
             False or invalid requests are strictly prohibited. Only genuine issues will be considered.
           </span>
-        </p> */}
-<p className="complaint-note mt-3 d-flex align-items-start no-padding-left">
-  <i className="bi bi-exclamation-triangle-fill text-warning"></i>
-  <span className="warningred ms-2">
-    False or invalid requests are strictly prohibited. Only genuine issues will be considered.
-  </span>
-</p>
+        </p>
 
-
-
-        {/* Submit */}
         <button type="submit" className="submit-btn" disabled={loading}>
           <Send style={{ marginRight: "8px", verticalAlign: "middle" }} size={18} color="#fff" />
           {loading ? "Submitting..." : "Register Request"}
@@ -531,7 +537,6 @@ const ComplaintForm = () => {
         {message && <p className="form-message">{message}</p>}
       </form>
 
-      {/* ✅ Success Modal */}
       <Modal show={showSuccess} onHide={() => setShowSuccess(false)} centered>
         <Modal.Body className="text-center p-5">
           <CheckCircleFill className="success-icon" />
@@ -539,7 +544,6 @@ const ComplaintForm = () => {
         </Modal.Body>
       </Modal>
 
-      {/* ❌ File Size Error Modal */}
       <Modal show={showSizeError} onHide={() => setShowSizeError(false)} centered>
         <Modal.Body className="text-center p-5">
           <ExclamationTriangleFill className="text-danger" size={50} />

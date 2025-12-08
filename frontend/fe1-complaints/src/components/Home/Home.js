@@ -743,16 +743,37 @@ const handleDeleteComplaint = async (id) => {
           {(() => {
             const cat = (complaint.category || "").toString().toLowerCase();
             const isIt = cat.includes("it") && cat.includes("network");
-            const itRoom = complaint.it_details?.room_number || complaint.room_number;
-            const itSpeed = complaint.it_details?.internet_speed || complaint.internet_speed;
-            const itDuration = complaint.it_details?.issue_duration || complaint.issue_duration;
+            const it = complaint.it_details || {};
+            const itLocation = it.location;
+            const itConnection = it.connectionType;
+            const itRoom = it.room_number || complaint.room_number;
+            const itSpeed = it.internet_speed || complaint.internet_speed;
+            const itDuration = it.issue_duration || complaint.issue_duration;
 
-            if (isIt && (itRoom || itSpeed || itDuration)) {
+            if (isIt && (itLocation || itConnection || itRoom || itSpeed || itDuration)) {
               return (
                 <div className="it-summary mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
-                  {itRoom && <div><strong>Room:</strong> <span style={{ marginLeft: 6 }}>{itRoom}</span></div>}
-                  {itSpeed && <div><strong>Internet Speed:</strong> <span style={{ marginLeft: 6 }}>{itSpeed}</span></div>}
-                  {itDuration && <div><strong>Duration:</strong> <span style={{ marginLeft: 6 }}>{itDuration}</span></div>}
+                  {/* compact: location and connection side-by-side */}
+                  {(itLocation || itConnection) && (
+                    <div className="d-flex align-items-center mb-1" style={{ gap: 12 }}>
+                      {itLocation && (
+                        <div className="d-flex align-items-center">
+                          <span style={{ marginRight: 6 }}>📍</span>
+                          <small style={{ color: '#495057' }}>{itLocation}</small>
+                        </div>
+                      )}
+                      {itConnection && (
+                        <div className="d-flex align-items-center">
+                          <span style={{ marginRight: 6 }}>🔗</span>
+                          <small style={{ color: '#495057' }}>{itConnection}</small>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {itRoom && <div className="d-flex align-items-center mb-1"><span style={{ marginRight: 8 }}>🏷️</span><small><strong>Room:</strong>&nbsp;{itRoom}</small></div>}
+                  {itSpeed && <div className="d-flex align-items-center mb-1"><span style={{ marginRight: 8 }}>📶</span><small><strong>Speed:</strong>&nbsp;{itSpeed}</small></div>}
+                  {itDuration && <div className="d-flex align-items-center mb-1"><span style={{ marginRight: 8 }}>⏱️</span><small><strong>Duration:</strong>&nbsp;{itDuration}</small></div>}
                 </div>
               );
             }

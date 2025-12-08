@@ -58,7 +58,7 @@ const ReopenComplaintModal = ({
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered>
+    <Modal show={show} onHide={onHide} centered dialogClassName="reopen-reason-modal">
       <Modal.Header closeButton>
         <Modal.Title>
           <span>❓</span> Why Isn't Your Issue Fixed?
@@ -83,14 +83,7 @@ const ReopenComplaintModal = ({
           </small>
         </Form.Group>
       </Modal.Body>
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={onHide}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
+      <Modal.Footer className="reopen-modal-footer">
         <Button
           variant="primary"
           onClick={handleSubmit}

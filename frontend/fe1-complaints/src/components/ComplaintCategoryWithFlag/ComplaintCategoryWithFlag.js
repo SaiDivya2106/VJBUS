@@ -12,12 +12,11 @@ const ComplaintCategoryWithFlag = ({ complaintId, complaint, onFlagged }) => {
   const [isSubmitting, setIsSubmitting] = useState(false); // loading state
   const { user } = useAuth(); // admin user
 
+  // Restrict flag reasons to approved list
   const flagReasons = [
-    "False Information",
-    "Irrelevant / Off-Topic",
-    "Duplicate / Spam",
-    "Malicious Use",
-    "Insufficient Details",
+    "False or Misleading Information",
+    "Irrelevant or Non-Complaint Content",
+    "Individual-Specific Issue",
     "Other",
   ];
 

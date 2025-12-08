@@ -725,14 +725,28 @@ try {
         {(() => {
           const cat = (complaint.category || "").toString().toLowerCase();
           const isIt = cat.includes("it") && cat.includes("network");
+          const itLocation = complaint.it_details?.location;
+          const itConnection = complaint.it_details?.connectionType;
           const itRoom = complaint.it_details?.room_number || complaint.room_number;
           const itSpeed = complaint.it_details?.internet_speed || complaint.internet_speed;
           const itDuration = complaint.it_details?.issue_duration || complaint.issue_duration;
           const itMobile = complaint.it_details?.mobile_number || complaint.mobile_number;
 
-          if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+          if (isIt && (itLocation || itConnection || itRoom || itSpeed || itDuration || itMobile)) {
             return (
               <div className="it-summary-admin mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
+                {itLocation && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>📍</span>
+                    <small><strong>Location:</strong> {itLocation}</small>
+                  </div>
+                )}
+                {itConnection && (
+                  <div className="d-flex align-items-center mb-1">
+                    <span style={{ marginRight: 8 }}>🔗</span>
+                    <small><strong>Connection Type:</strong> {itConnection}</small>
+                  </div>
+                )}
                 {itRoom && (
                   <div className="d-flex align-items-center mb-1">
                     <span style={{ marginRight: 8 }}>🏷️</span>

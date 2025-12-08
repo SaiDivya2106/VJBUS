@@ -223,17 +223,47 @@ adminApp.get(
   });
 
   // ✅ Step 5: Prepare email content
+  // Include IT details HTML if present and category is IT and Networking
+  const isITCategory = (complaint.category || "").toLowerCase().includes('it') && (complaint.category || "").toLowerCase().includes('network');
+  const itDetailsHTML = isITCategory && complaint.it_details ? `
+    <p><strong>IT Details:</strong></p>
+    <ul>
+      ${complaint.it_details.room_number ? `<li><strong>Room Number:</strong> ${complaint.it_details.room_number}</li>` : ''}
+      ${complaint.it_details.internet_speed ? `<li><strong>Internet Speed:</strong> ${complaint.it_details.internet_speed}</li>` : ''}
+      ${complaint.it_details.issue_duration ? `<li><strong>Issue Duration:</strong> ${complaint.it_details.issue_duration}</li>` : ''}
+      ${complaint.it_details.mobile_number ? `<li><strong>Mobile Number:</strong> ${complaint.it_details.mobile_number}</li>` : ''}
+    </ul>
+  ` : '';
+
+  let mailSubject = `Your Complaint "${complaintTitle}" Status Updated`;
+  let mailHtml = `
+    <p>Dear User,</p>
+    <p>The status of your complaint titled <strong>"${complaintTitle}"</strong> has been updated to <strong>${status}</strong>.</p>
+    <p>This update was made by admin: <strong>${adminEmail}</strong>.</p>
+  `;
+
+  if (status === 'Resolved') {
+    mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
+    mailHtml = `
+      <p>Dear User,</p>
+      <p>We're happy to let you know that your complaint titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
+      ${itDetailsHTML}
+      <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
+      <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
+      <p>Best regards,<br>Complaint Management Team</p>
+    `;
+  } else {
+    mailHtml += `
+      <p>Thank you for using our Complaint Management System.</p>
+      <p>Best regards,<br>Complaint Management Team</p>
+    `;
+  }
+
   const mailOptions = {
     from: process.env.ADMIN_EMAIL,
     to: userEmail,
-    subject: `Your Complaint "${complaintTitle}" Status Updated`,
-    html: `
-      <p>Dear User,</p>
-      <p>The status of your complaint titled <strong>"${complaintTitle}"</strong> has been updated to <strong>${status}</strong>.</p>
-      <p>This update was made by admin: <strong>${adminEmail}</strong>.</p>
-      <p>Thank you for using our Complaint Management System.</p>
-      <p>Best regards,<br>Complaint Management Team</p>
-    `
+    subject: mailSubject,
+    html: mailHtml
   };
 
   // ✅ Step 6: Send email asynchronously

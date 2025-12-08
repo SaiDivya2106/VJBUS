@@ -203,6 +203,14 @@ const ComplaintsDetails = () => {
 
   const handleBackClick = () => navigate("/adminpage");
 
+  // IT details fallbacks
+  const itLocation = complaint?.it_details?.location;
+  const itConnection = complaint?.it_details?.connectionType;
+  const itRoom = complaint?.it_details?.room_number || complaint?.room_number;
+  const itSpeed = complaint?.it_details?.internet_speed || complaint?.internet_speed;
+  const itDuration = complaint?.it_details?.issue_duration || complaint?.issue_duration;
+  const itMobile = complaint?.it_details?.mobile_number || complaint?.mobile_number;
+
   if (!complaint) return <div className="container">Loading complaint...</div>;
 
   return (
@@ -284,11 +292,63 @@ const ComplaintsDetails = () => {
 
           <p className="mt-2 description-text">{complaint.description}</p>
 
-{/* ⭐ FIXED - STATUS LEFT, CATEGORY RIGHT WITH LABELS */}
-<div className="d-flex justify-content-between align-items-start mt-4 flex-wrap">
+          {/* IT Details Section - Show only for IT and Networking category */}
+          {complaint.category === "IT and Networking" && complaint.it_details && (
+            <div className="it-details-section mt-4 p-4" style={{ 
+              backgroundColor: "#f8f9ff", 
+              borderLeft: "4px solid #4c63d2", 
+              borderRadius: "8px" 
+            }}>
+              <h5 className="fw-bold mb-3" style={{ color: "#4c63d2" }}>
+                <FiWifi size={20} className="me-2" style={{ display: "inline" }} />
+                IT & Networking Details
+              </h5>
+              <div className="row">
+                {complaint.it_details.location && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">📍 Location:</strong>
+                    <p className="ms-3">{complaint.it_details.location}</p>
+                  </div>
+                )}
+                {complaint.it_details.connectionType && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">🔗 Connection Type:</strong>
+                    <p className="ms-3">{complaint.it_details.connectionType}</p>
+                  </div>
+                )}
+                {complaint.it_details.room_number && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">🏷️ Room Number:</strong>
+                    <p className="ms-3">{complaint.it_details.room_number}</p>
+                  </div>
+                )}
+                {complaint.it_details.internet_speed && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">📶 Internet Speed:</strong>
+                    <p className="ms-3">{complaint.it_details.internet_speed}</p>
+                  </div>
+                )}
+                {complaint.it_details.mobile_number && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">📞 Mobile Number:</strong>
+                    <p className="ms-3">{complaint.it_details.mobile_number}</p>
+                  </div>
+                )}
+                {complaint.it_details.issue_duration && (
+                  <div className="col-md-6 mb-2">
+                    <strong className="text-muted">⏱️ Issue Duration:</strong>
+                    <p className="ms-3">{complaint.it_details.issue_duration}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+        {/* ⭐ FIXED - STATUS LEFT, CATEGORY RIGHT WITH LABELS */}
+        <div className="d-flex justify-content-between align-items-start mt-4 flex-wrap">
 
   {/* LEFT SIDE - STATUS */}
-  <div className="status-box" style={{ minWidth: "240px" }}>
+  <div className="form-css status-box" style={{ minWidth: "240px" }}>
     <label className="form-label fw-bold mb-1">Update Status</label>
     <select
       className={`form-select ${status.toLowerCase()}-status`}

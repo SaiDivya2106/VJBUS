@@ -85,10 +85,7 @@ userApp.post(
       user_id,
       github_issue,
       image,
-      room_number,
-      internet_speed,
-      mobile_number,
-      issue_duration,
+      it_details,
     } = req.body;
 
     if (!complaint_id || !title || !description || !category || !user_id) {
@@ -106,13 +103,26 @@ userApp.post(
       "it/networking",
     ].includes(normalizedCategory);
 
-    // If IT category, require the additional fields
+    // If IT category, validate location and connectionType are required
     if (isITCategory) {
-      if (!room_number || !internet_speed || !mobile_number || !issue_duration) {
+      if (!it_details || !it_details.location || !it_details.connectionType) {
         return res.status(400).json({
-          message:
-            "For IT and Networking complaints, `room_number`, `internet_speed`, `mobile_number` and `issue_duration` are required",
+          message: "Location and Connection Type are required for IT & Networking complaints",
         });
+      }
+
+      // Only require room_number, internet_speed, mobile_number, issue_duration if NOT WiFi at hostel
+      const isHostel = it_details.location === "Boys Hostel" || it_details.location === "Girls Hostel";
+      const isWiFi = it_details.connectionType === "WiFi";
+      const isWiFiAtHostel = isHostel && isWiFi;
+
+      if (!isWiFiAtHostel) {
+        if (!it_details.room_number || !it_details.internet_speed || !it_details.mobile_number || !it_details.issue_duration) {
+          return res.status(400).json({
+            message:
+              "For IT and Networking complaints (non-WiFi at hostel), `room_number`, `internet_speed`, `mobile_number` and `issue_duration` are required",
+          });
+        }
       }
     }
 
@@ -140,14 +150,9 @@ userApp.post(
       github_issue: github_issue || null,
       image: image || null,
       // Only add IT-specific details when category is IT & Networking
-      ...(isITCategory
+      ...(isITCategory && it_details
         ? {
-            it_details: {
-              room_number,
-              internet_speed,
-              mobile_number,
-              issue_duration,
-            },
+            it_details,
           }
         : {}),
       timestamp: new Date().toISOString(),

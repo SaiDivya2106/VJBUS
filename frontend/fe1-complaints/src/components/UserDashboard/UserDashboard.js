@@ -401,7 +401,7 @@ const UserDashboard = () => {
   const [userVotes, setUserVotes] = useState({});
   const [expandedCard, setExpandedCard] = useState(null);
   const [editComplaint, setEditComplaint] = useState(null);
-  const [editForm, setEditForm] = useState({ title: "", description: "", category: "", room_number: "", internet_speed: "", issue_duration: "", mobile_number: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", category: "", location: "", connectionType: "", room_number: "", internet_speed: "", issue_duration: "", mobile_number: "" });
   const [editImage, setEditImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
@@ -545,6 +545,8 @@ const UserDashboard = () => {
       title: complaint.title,
       description: complaint.description,
       category: complaint.category,
+      location: it.location || complaint.location || "",
+      connectionType: it.connectionType || complaint.connectionType || "",
       room_number: it.room_number || complaint.room_number || "",
       internet_speed: it.internet_speed || complaint.internet_speed || "",
       issue_duration: it.issue_duration || complaint.issue_duration || "",
@@ -594,6 +596,8 @@ const UserDashboard = () => {
         updatedData = {
           ...updatedData,
           it_details: {
+            location: editForm.location,
+            connectionType: editForm.connectionType,
             room_number: editForm.room_number,
             internet_speed: editForm.internet_speed,
             issue_duration: editForm.issue_duration,
@@ -771,13 +775,32 @@ const UserDashboard = () => {
                     {(() => {
                       const isIt = isITCategory(complaint.category);
                       const it = complaint.it_details || {};
+                      const itLocation = it.location;
+                      const itConnection = it.connectionType;
                       const itRoom = it.room_number || complaint.room_number;
                       const itSpeed = it.internet_speed || complaint.internet_speed;
                       const itDuration = it.issue_duration || complaint.issue_duration;
                       const itMobile = it.mobile_number || complaint.mobile_number;
-                      if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+                      if (isIt && (itLocation || itConnection || itRoom || itSpeed || itDuration || itMobile)) {
                         return (
                           <div className="it-summary mb-2" style={{ color: "#495057", fontSize: "0.95rem" }}>
+                            {/* compact: location & connection side-by-side */}
+                            {(itLocation || itConnection) && (
+                              <div className="d-flex align-items-center mb-1" style={{ gap: 12 }}>
+                                {itLocation && (
+                                  <div className="d-flex align-items-center">
+                                    <span style={{ marginRight: 6 }}>📍</span>
+                                    <small style={{ color: '#495057' }}>{itLocation}</small>
+                                  </div>
+                                )}
+                                {itConnection && (
+                                  <div className="d-flex align-items-center">
+                                    <span style={{ marginRight: 6 }}>🔗</span>
+                                    <small style={{ color: '#495057' }}>{itConnection}</small>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             {itRoom && (
                               <div className="d-flex align-items-center mb-1">
                                 <span style={{ marginRight: 8 }}>🏷️</span>
@@ -964,13 +987,27 @@ const UserDashboard = () => {
       {(() => {
         const isIt = isITCategory(expandedCard.category);
         const it = expandedCard.it_details || {};
+        const itLocation = it.location;
+        const itConnection = it.connectionType;
         const itRoom = it.room_number || expandedCard.room_number;
         const itSpeed = it.internet_speed || expandedCard.internet_speed;
         const itDuration = it.issue_duration || expandedCard.issue_duration;
         const itMobile = it.mobile_number || expandedCard.mobile_number;
-        if (isIt && (itRoom || itSpeed || itDuration || itMobile)) {
+        if (isIt && (itLocation || itConnection || itRoom || itSpeed || itDuration || itMobile)) {
           return (
             <div className="it-summary-popup mb-3" style={{ color: "#495057" }}>
+              {itLocation && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>📍</span>
+                  <strong>Location:</strong>&nbsp; <span>{itLocation}</span>
+                </div>
+              )}
+              {itConnection && (
+                <div className="d-flex align-items-center mb-1">
+                  <span style={{ marginRight: 10 }}>🔗</span>
+                  <strong>Connection Type:</strong>&nbsp; <span>{itConnection}</span>
+                </div>
+              )}
               {itRoom && (
                 <div className="d-flex align-items-center mb-1">
                   <span style={{ marginRight: 10 }}>🏷️</span>
@@ -1118,48 +1155,89 @@ const UserDashboard = () => {
       {isITCategory(editForm.category) && (
         <div className="it-edit-fields mb-2">
           <div className="form-group mb-2">
-            <label className="form-label">Room Number</label>
-            <input
-              type="text"
-              name="room_number"
+            <label className="form-label">Location</label>
+            <select
+              name="location"
               className="form-control"
-              value={editForm.room_number}
+              value={editForm.location}
               onChange={handleEditChange}
-            />
+            >
+              <option value="">-- Select Location --</option>
+              <option value="Main Campus">Main Campus</option>
+              <option value="Boys Hostel">Boys Hostel</option>
+              <option value="Girls Hostel">Girls Hostel</option>
+            </select>
           </div>
 
-          <div className="form-group mb-2">
-            <label className="form-label">Internet Speed</label>
-            <input
-              type="text"
-              name="internet_speed"
-              className="form-control"
-              value={editForm.internet_speed}
-              onChange={handleEditChange}
-            />
-          </div>
+          {editForm.location && (
+            <div className="form-group mb-2">
+              <label className="form-label">Connection Type</label>
+              <select
+                name="connectionType"
+                className="form-control"
+                value={editForm.connectionType}
+                onChange={handleEditChange}
+              >
+                <option value="">-- Select Connection --</option>
+                <option value="WiFi">WiFi</option>
+                <option value="LAN">LAN</option>
+              </select>
+            </div>
+          )}
 
-          <div className="form-group mb-2">
-            <label className="form-label">Issue Duration</label>
-            <input
-              type="text"
-              name="issue_duration"
-              className="form-control"
-              value={editForm.issue_duration}
-              onChange={handleEditChange}
-            />
-          </div>
+          {editForm.location && editForm.connectionType === "WiFi" && (editForm.location === "Boys Hostel" || editForm.location === "Girls Hostel") ? (
+            <div style={{ padding: "12px", backgroundColor: "#fff3cd", border: "1px solid #ffc107", borderRadius: "4px", marginBottom: "15px", color: "#856404", marginTop: "10px" }}>
+              <strong>⚠️ Warning:</strong> WiFi is not supported at hostels. Please use LAN or contact IT support for assistance.
+            </div>
+          ) : null}
 
-          <div className="form-group mb-2">
-            <label className="form-label">Mobile Number</label>
-            <input
-              type="tel"
-              name="mobile_number"
-              className="form-control"
-              value={editForm.mobile_number}
-              onChange={handleEditChange}
-            />
-          </div>
+          {!(editForm.location && editForm.connectionType === "WiFi" && (editForm.location === "Boys Hostel" || editForm.location === "Girls Hostel")) && (
+            <>
+              <div className="form-group mb-2">
+                <label className="form-label">Room Number</label>
+                <input
+                  type="text"
+                  name="room_number"
+                  className="form-control"
+                  value={editForm.room_number}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group mb-2">
+                <label className="form-label">Internet Speed</label>
+                <input
+                  type="text"
+                  name="internet_speed"
+                  className="form-control"
+                  value={editForm.internet_speed}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group mb-2">
+                <label className="form-label">Issue Duration</label>
+                <input
+                  type="text"
+                  name="issue_duration"
+                  className="form-control"
+                  value={editForm.issue_duration}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group mb-2">
+                <label className="form-label">Mobile Number</label>
+                <input
+                  type="tel"
+                  name="mobile_number"
+                  className="form-control"
+                  value={editForm.mobile_number}
+                  onChange={handleEditChange}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
 

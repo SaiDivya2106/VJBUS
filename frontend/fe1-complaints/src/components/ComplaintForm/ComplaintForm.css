@@ -207,26 +207,33 @@
   color: #ccc;
 }
 
-.input-group input,
-.input-group textarea {
+.it-fields .input-group input,
+.it-fields .input-group textarea,
+.it-fields .input-group select,
+.it-fields .form-select {
   width: 100%;
   padding: 14px;
-  border-radius: 12px; /* ✅ FULLY rounded on all sides */
+  border-radius: 12px;
   border: none;
   outline: none;
-  background: #111; /* ✅ black input fields */
+  background: #111;
   color: white;
   font-size: 15px;
   box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
-.input-group input:focus,
-.input-group textarea:focus {
+
+.it-fields .input-group input:focus,
+.it-fields .input-group textarea:focus,
+.it-fields .input-group select:focus,
+.it-fields .form-select:focus {
   background: #111112;
   border: 1px solid #441b6f;
   box-shadow: 0 0 10px rgba(114, 91, 107, 0.6);
+  outline: none;
 }
+
 
 textarea {
   resize: none;
