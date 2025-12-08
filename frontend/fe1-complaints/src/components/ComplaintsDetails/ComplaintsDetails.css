@@ -18,6 +18,34 @@
   margin-bottom: 1rem;
 }
 
+
+
+
+/* === FINAL RED FLAGGED BADGE (Perfect match to your screenshot) === */
+.flagged-badge-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 12px;
+  border-radius: 18px;
+  background: rgba(255, 80, 80, 0.10);      /* soft red background */
+  border: 1.5px solid rgba(255, 80, 80, 0.45); /* thin red border */
+
+  color: #d32f2f;    /* red text */
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  line-height: 1.3;
+}
+
+.flagged-badge-red i,
+.flagged-badge-red .bi-flag-fill {
+  font-size: 14px;
+  color: #ef5350 !important; /* perfect red icon */
+}
+
+
 /* === Category Badge === */
 .categoryb {
   background-color: #6A1B9A;

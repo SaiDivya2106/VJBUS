@@ -1,7 +1,7 @@
 /* UserDashboard Specific Styling */
 .user-dashboard-container {
   padding: 2rem;
-  background-color: #f5f5f5; /* Slightly darker light gray background */
+  background-color: #f2efef; /* Slightly darker light gray background */
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
 }
@@ -16,6 +16,200 @@
   justify-content: center;
   padding: 40px 20px;
 }
+
+
+
+/* Outer box */
+.flagged-container {
+  background: #ffe5e5;
+  border-left: 4px solid #ff4545;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+/* Title row */
+.flagged-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flag-emoji {
+  font-size: 1.2rem;
+}
+
+.flagged-title-text {
+  color: #d60000;
+  font-size: 1.05rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* All text lines (Reason, Note, Flagged By) */
+.flagged-line {
+  margin: 6px 0;
+  color: #000;
+  font-size: 0.95rem;
+}
+
+/* Note box EXACT from screenshot */
+.flag-note-box {
+  background: #ffd6d6;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 6px 0 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #444;
+  white-space: pre-line;
+}
+.flagged-pill-row {
+  background: #ffe6e6;
+  border: 1px solid #ff4d4d;
+  padding: 2px 9px;
+  border-radius: 50px;
+  color: #cc0000;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 28px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.15);
+  transition: 0.15s ease;
+}
+
+.flagged-pill-row:hover {
+  background: #ffdcdc;
+
+}
+
+
+
+
+
+
+
+/* OUTER CONTAINER */
+.flagged-card {
+  background: #ffecec;
+  border: 2px solid #ff4d4d;
+  border-radius: 12px;
+  padding: 18px 22px;
+  width: 88%;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.22);
+}
+
+/* HEADER */
+.flagged-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #d10000;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.flagged-title h4 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.flag-emoji {
+  font-size: 1.3rem;
+}
+
+/* STANDARD ROWS */
+.flagged-row {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+/* NOTE TITLE */
+.flag-note-heading {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: block;
+  color: #b30000;
+}
+
+/* NOTE BOX — EXACT FROM SCREENSHOT */
+.flag-note-box {
+  background: #ffd9d9;
+
+  padding: 10px 12px;
+  border-radius: 8px;
+  white-space: pre-line;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+
+
+.close-btn-inside-modal {
+  position: sticky;
+  top: 5px;
+  margin-left: auto;
+  z-index: 9999;
+  background: #ffffffdd;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.editheading{
+  color: #000;
+  font-weight: 600;
+}
+
+
+.expanded-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  width: 30px;
+  height: 30px;
+
+  background: rgba(244, 242, 242, 0.7);    /* soft white */
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+
+  border: none;
+  font-size: 1rem;
+  color: #6c6c6c;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  z-index: 999;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);  /* soft shadow */
+  transition: all 0.2s ease;
+}
+
+
+
+
+
+
+
 
 .no-complaints-text {
   font-size: 1rem;

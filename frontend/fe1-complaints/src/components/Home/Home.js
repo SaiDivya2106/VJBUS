@@ -848,7 +848,7 @@ const handleDeleteComplaint = async (id) => {
     >
       {/* Close button */}
       <button
-        className="close-btn"
+        className="expanded-close-btn"
         onClick={() => setExpandedCard(null)} // ✅ only close on this button
       >
         ✕

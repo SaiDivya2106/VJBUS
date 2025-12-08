@@ -646,6 +646,12 @@ try {
           expandedCardId === complaint.complaint_id ? "expanded-card" : ""
         }`}
       >
+        {/* STATUS (if NOT flagged) */}
+{!complaint.flagged?.isFlagged && (
+  <div className="status-overlay-admin">{getStatusBadge(complaint.status)}</div>
+)}
+
+
         
         {/* Image with status overlay */}
         <div className="complaint-image-wrapper position-relative mb-3">
@@ -656,15 +662,15 @@ try {
             className="complaint-image rounded-3"
             style={{ height: "200px", objectFit: "cover", width: "100%" }}
           />
-<div className="status-overlay">
-  {complaint.flagged === true || complaint.flagged?.isFlagged === true ? (
-    <span className="badge bg-danger p-2 text-white" style={{ fontSize: "0.85rem" }}>
-      Flagged
-    </span>
-  ) : (
-    getStatusBadge(complaint.status)
-  )}
-</div>
+{/* <div className="status-overlay">
+{complaint.flagged?.isFlagged && (
+  <span className="flagged-badge position-absolute" 
+        style={{ top: "10px", left: "10px" }}>
+    Flagged
+  </span>
+)}
+
+</div> */}
 
         </div>
 
@@ -697,6 +703,9 @@ try {
             {new Date(complaint.timestamp).toDateString()}
           </Card.Text>
 
+    {complaint.flagged?.isFlagged && (
+      <span className="flagged-badge">Flagged</span>
+    )}
           <Button
             className="custom-pencil-button"
             onClick={() =>
