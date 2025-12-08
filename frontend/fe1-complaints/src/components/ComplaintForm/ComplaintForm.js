@@ -256,9 +256,13 @@ const ComplaintForm = () => {
         {/* Title */}
         <div className="input-group">
           <label style={labelStyle}>
-            <span className="icon-circle">
+            {/* <span className="icon-circle">
               <PersonFill size={18} color={lightBlue} />
-            </span>{" "}
+            </span> */}
+          <span className="label-icon purple me-2">
+            <i className="bi bi-info-lg"></i>
+          </span>
+            {" "}
             Request Title *
           </label>
           <input
@@ -275,14 +279,18 @@ const ComplaintForm = () => {
         <div className="input-group">
           <div className="category-label-wrapper">
             <label style={labelStyle}>
-              <span className="icon-circle">
+              {/* <span className="icon-circle">
                 <TagFill size={18} color={lightBlue} />
-              </span>{" "}
+              </span> */}
+            <span className="label-icon orange me-2">
+              <i className="bi bi-tag"></i>
+            </span>
+              {" "}
               Category
             </label>
           </div>
           <div className="category-grid">
-            {formData.category ? (
+            {/* {formData.category ? (
               <button
                 type="button"
                 className="category-btn active"
@@ -293,7 +301,34 @@ const ComplaintForm = () => {
                 </span>
                 <span>{formData.category}</span>
               </button>
-            ) : (
+            ) : ( */}
+
+
+
+
+            {formData.category ? (
+  <div className="category-btn active selected-category-card">
+    <span className="icon">
+      {categoriesList.find((c) => c.name === formData.category)?.icon}
+    </span>
+    <span className="cat-name">{formData.category}</span>
+
+    {/* Close button INSIDE card */}
+    <button
+      type="button"
+      className="close-btn-inside"
+      onClick={() => {
+        setFormData({ ...formData, category: "" });
+        setShowAll(true);
+      }}
+    >
+      ×
+    </button>
+  </div>
+) : (
+
+
+
               <>
                 {displayedCategories.map((cat) => (
                   <button
@@ -306,7 +341,20 @@ const ComplaintForm = () => {
                     <span>{cat.name}</span>
                   </button>
                 ))}
-                <button
+                {/* <button
+                  type="button"
+                  className="category-btn more-btn"
+                  onClick={() => setShowAll(!showAll)}
+                >
+                  <span className="icon-circle">
+                    {showAll ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </span>
+                  {showAll ? "Show Less" : "More Options"}
+                </button> */}
+
+
+
+                                <button
                   type="button"
                   className="category-btn more-btn"
                   onClick={() => setShowAll(!showAll)}
@@ -316,6 +364,8 @@ const ComplaintForm = () => {
                   </span>
                   {showAll ? "Show Less" : "More Options"}
                 </button>
+
+                
               </>
             )}
           </div>
@@ -324,9 +374,13 @@ const ComplaintForm = () => {
         {/* Description */}
         <div className="input-group">
           <label style={labelStyle}>
-            <span className="icon-circle">
+            {/* <span className="icon-circle">
               <FileTextFill size={18} color={lightBlue} />
-            </span>{" "}
+            </span> */}
+          <span className="label-icon dark-purple me-2">
+            <i className="bi bi-card-text"></i>
+          </span>
+            {" "}
             Detailed Description *
           </label>
           <textarea
@@ -396,9 +450,13 @@ const ComplaintForm = () => {
         <div className="input-group image-upload-container">
           <div className="upload-label">
             <label>
-              <span className="icon-circle">
+              {/* <span className="icon-circle">
                 <ImageFill size={18} color={lightBlue} />
-              </span>{" "}
+              </span> */}
+          <span className="label-icon blue me-2">
+            <i className="bi bi-image"></i>
+          </span>
+              {" "}
               Upload Image (Optional)
             </label>
           </div>
@@ -439,17 +497,24 @@ const ComplaintForm = () => {
                 </div>
               )}
             </div>
-            <p className="file-size-note">Preferred size: ≤ 1.5MB</p>
+            <p className="file-size-note m-2">Preferred size: ≤ 1.5MB</p>
           </div>
         </div>
 
-        {/* Warning */}
-        <p className="complaint-note mt-3 d-flex align-items-center">
-          <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-          <span>
+        {/* <p className="complaint-note mt-3 d-flex  ">
+          <i className="bi bi-exclamation-triangle-fill text-warning"></i>
+          <span className="warningred">
             False or invalid requests are strictly prohibited. Only genuine issues will be considered.
           </span>
-        </p>
+        </p> */}
+<p className="complaint-note mt-3 d-flex align-items-start no-padding-left">
+  <i className="bi bi-exclamation-triangle-fill text-warning"></i>
+  <span className="warningred ms-2">
+    False or invalid requests are strictly prohibited. Only genuine issues will be considered.
+  </span>
+</p>
+
+
 
         {/* Submit */}
         <button type="submit" className="submit-btn" disabled={loading}>
@@ -458,7 +523,7 @@ const ComplaintForm = () => {
         </button>
 
         {warning && (
-          <p className="form-warning mt-3 ml-2">
+          <p className="form-warning mt-3">
             <span className="text-danger">⚠</span>{" "}
             <span className="text-white">{warning}</span>
           </p>

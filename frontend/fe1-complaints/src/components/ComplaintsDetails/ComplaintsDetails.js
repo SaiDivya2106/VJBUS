@@ -238,7 +238,7 @@ const ComplaintsDetails = () => {
               </div>
             </div>
 
-            <div
+            {/* <div
               className="position-absolute"
               style={{ top: "10px", right: "10px", zIndex: 10 }}
             >
@@ -250,7 +250,27 @@ const ComplaintsDetails = () => {
                 onFlagged={() => toast.success("Complaint flagged!")}
                 disabled={isFlagged}
               />
-            </div>
+            </div> */}
+            <div
+  className="position-absolute"
+  style={{ top: "10px", right: "10px", zIndex: 10 }}
+>
+  {complaint?.flagged?.isFlagged ? (
+    <span className="flagged-badge-red">
+      <i className="bi bi-flag-fill"></i>
+      Flagged
+    </span>
+  ) : (
+    <ComplaintCategoryWithFlag
+      complaintId={complaint.complaint_id}
+      baseUrl={baseUrl}
+      complaint={complaint}
+      user={user}
+      onFlagged={() => toast.success("Complaint flagged!")}
+    />
+  )}
+</div>
+
           </div>
 
           <h1 className="h4 fw-bold">{complaint.title}</h1>

@@ -722,17 +722,16 @@ const UserDashboard = () => {
                       </div>
                       <div className="status-overlay position-absolute" style={{ top: "8px", left: "8px", zIndex: 3 }}>
                         {/* STATUS OR FLAG BADGE */}
-{complaint.flagged?.isFlagged ? (
-  <span
-    className="flagged-pill"
-    onClick={() => setExpandedCard(complaint)}
-    style={{ cursor: "pointer" }}
-  >
-    🚩 Flagged
-  </span>
-) : (
-  getStatusBadge(complaint.status)
-)}
+<div
+  className="status-overlay position-absolute"
+  style={{
+    top: "4px",
+    left: "-9px",
+    zIndex: 2
+  }}
+>
+  {!complaint.flagged?.isFlagged && getStatusBadge(complaint.status)}
+</div>
 
                       </div>
                     </div>
@@ -743,6 +742,16 @@ const UserDashboard = () => {
                           <FaCalendarAlt style={{ fontSize: "14px" }} />
                         </span>
                         {formatDate(complaint.timestamp)}
+
+
+    {complaint.flagged?.isFlagged && (
+      <span
+        className="flagged-pill-row"
+        onClick={() => setExpandedCard(complaint)}
+      >
+        🚩 Flagged
+      </span>
+    )}
                       </div>
                       {complaint.user_id === user?.email && complaint.status === "Pending" && (
                         <FaEdit size={24} className="edit-icon-purple" style={{ cursor: "pointer" }} onClick={() => handleEditComplaint(complaint)} />
@@ -857,10 +866,12 @@ const UserDashboard = () => {
 {expandedCard && (
   <div className="overlay">
     <Card className="popup-card rounded-4 card-background-gradient p-4">
-      <button className="close-btn" onClick={() => setExpandedCard(null)}>✕</button>
+      {/* <button className="close-btn" onClick={() => setExpandedCard(null)}>✕</button> */}
+      <button className="expanded-close-btn" onClick={() => setExpandedCard(null)}>✕</button>
+
 
 {/* FLAGGED OR STATUS */}
-{expandedCard.flagged?.isFlagged ? (
+{/* {expandedCard.flagged?.isFlagged ? (
   <div
     className="flagged-alert-box"
     style={{
@@ -889,7 +900,38 @@ const UserDashboard = () => {
   </div>
 ) : (
   <div className="mb-2">{getStatusBadge(expandedCard.status)}</div>
+)} */}
+
+
+
+{expandedCard.flagged?.isFlagged ? (
+  <div className="flagged-container">
+
+    <div className="flagged-title-row">
+      <span className="flag-emoji">🚩</span>
+      <h4 className="flagged-title-text">This request has been flagged</h4>
+    </div>
+
+    <p className="flagged-line">
+      <strong>Reason:</strong> {expandedCard.flagged.reason}
+    </p>
+
+    {expandedCard.flagged.note && (
+      <>
+        <p className="flagged-line"><strong>Note:</strong></p>
+        <div className="flag-note-box">{expandedCard.flagged.note}</div>
+      </>
+    )}
+
+    <p className="flagged-line">
+      <strong>Flagged By:</strong> {expandedCard.flagged.flaggedBy}
+    </p>
+
+  </div>
+) : (
+  <div className="mb-2">{getStatusBadge(expandedCard.status)}</div>
 )}
+
 
 
       {/* Date */}
@@ -989,31 +1031,7 @@ const UserDashboard = () => {
       </div>
 
       {/* Footer: category + votes */}
-      <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
-        <span className="category-tag px-2 py-1 rounded-pill me-auto" style={{ fontSize: "0.8rem" }}>
-          {expandedCard.category}
-        </span>
-        <div className="d-flex align-items-center gap-3 ms-auto">
-          <button
-            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-              userVotes[expandedCard.complaint_id] === "upvote" ? "bg-success text-white" : "text-success"
-            }`}
-            onClick={() => handleVote(expandedCard.complaint_id, "upvote")}
-            style={{ fontSize: "1rem" }}
-          >
-            <ThumbsUp size={20} /> {expandedCard.likes}
-          </button>
-          <button
-            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
-              userVotes[expandedCard.complaint_id] === "downvote" ? "bg-danger text-white" : "text-danger"
-            }`}
-            onClick={() => handleVote(expandedCard.complaint_id, "downvote")}
-            style={{ fontSize: "1rem" }}
-          >
-            <ThumbsDown size={20} /> {expandedCard.dislikes}
-          </button>
-        </div>
-      </div>
+      
     </Card>
   </div>
 )}
@@ -1022,16 +1040,18 @@ const UserDashboard = () => {
         {/* Edit Complaint Modal */}
 {editComplaint && (
   <div className="overlay">
-    <Card
-      className="popup-card rounded-4 card-background-gradient p-3"
+     
+    <Card   style={{ position: "relative" }}
+      className=" popup-card rounded-4 card-background-gradient p-3"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Close button */}
-      <button className="close-btn" onClick={() => setEditComplaint(null)}>✕</button>
+      <button className="close-btn-inside-modal fixed" onClick={() => setEditComplaint(null)}>✕</button>
+
 
       {/* Header with Delete */}
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5 className="mb-0">Edit or delete your Complaint</h5>
+        <h4 className="editheading mb-2 text-bold text-dark">Edit or delete your Complaint</h4>
         <button
           className="btn btn-danger btn-icon btn-sm delete-btn"
           onClick={() => handleDeleteComplaint(editComplaint.complaint_id)}
