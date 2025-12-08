@@ -67,7 +67,7 @@ const ReopenComplaintModal = ({
       <Modal.Body>
         <Form.Group>
           <Form.Label className="fw-semibold">
-            Please explain what's still wrong:
+            Please describe what still needs attention:
           </Form.Label>
           <Form.Control
             as="textarea"

@@ -177,6 +177,148 @@ padding: 10px;
 }
 
 
+
+/* === UNIQUE NEON EDGE BUTTON === */
+/* .issue-not-fixed-neo-btn {
+  width: 70%;
+  padding: 5px 8px;
+  background: #ffffff;
+  color: #d94700;
+  font-size: 1rem;
+  font-weight: 700;
+margin-top: 8px;
+  border: 2px solid transparent;
+  border-radius: 90px;
+
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  transition: 0.3s ease;
+}
+
+.issue-not-fixed-neo-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  padding: 2px;
+  background: linear-gradient(135deg, #ff7a00, #ff4800, #ff8f46);
+  -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+
+.issue-not-fixed-neo-btn:hover {
+  background: #ff6b2c;
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(255, 100, 40, 0.45);
+}
+
+
+.issue-not-fixed-neo-btn i {
+  font-size: 1.2rem;
+}
+
+
+.issue-not-fixed-neo-btn {
+  width: 50%;
+  padding: 5px 5px;
+  background: #ffffff;
+  color: #d94700;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 8px;
+  border-radius: 40px;
+
+  border: 2px solid #ff9b4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+
+.issue-not-fixed-neo-btn .issue-icon {
+  font-size: 1rem;
+  color: #d94700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.issue-not-fixed-neo-btn .issue-icon {
+  font-size: 1.1rem;
+  color: #ff7a21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+
+
+/* MAIN ATTRACTIVE BUTTON */
+.issue-not-fixed-attractive-btn {
+  width: 50%;
+  padding: 3px 2px;
+  margin-top: 10px;
+
+  background: linear-gradient(90deg, #fffaf5, #ffe5d1);
+  border: 2px solid #ff9c57;
+
+  color: #ff6a19;
+  font-weight: 700;
+  font-size: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  border-radius: 60px;
+  cursor: pointer;
+
+  transition: 0.25s ease;
+  box-shadow: 0 2px 8px rgba(255, 140, 70, 0.2);
+}
+
+/* HOVER EFFECT */
+.issue-not-fixed-attractive-btn:hover {
+  background: linear-gradient(90deg, #ffe5d1, #ffd1b3);
+  border-color: #ff7a2d;
+  color: #ff4e00;
+
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 120, 50, 0.35);
+}
+
+/* ICON */
+.issue-not-fixed-attractive-btn .issue-icon {
+  font-size: 1.2rem;
+  color: #ff6a19;
+  transition: 0.25s ease;
+}
+
+/* ICON HOVER MATCHES TEXT */
+.issue-not-fixed-attractive-btn:hover .issue-icon {
+  color: #ff4e00;
+}
+
+
+
 .expanded-close-btn {
   position: absolute;
   top: 16px;

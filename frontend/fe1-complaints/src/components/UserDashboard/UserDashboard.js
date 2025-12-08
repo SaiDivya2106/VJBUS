@@ -836,7 +836,7 @@ const UserDashboard = () => {
                     )}
 
                     {/* "Issue Not Fixed?" button for Resolved complaints */}
-                    {complaint.status === "Resolved" && (
+                    {/* {complaint.status === "Resolved" && (
                       <button 
                         className="btn btn-sm btn-outline-primary mt-2 w-100" 
                         onClick={() => {
@@ -846,7 +846,23 @@ const UserDashboard = () => {
                       >
                         ❓ Issue Not Fixed?
                       </button>
-                    )}
+                    )} */}
+
+
+{complaint.status === "Resolved" && (
+  <button
+    className="issue-not-fixed-attractive-btn"
+    onClick={() => {
+      setSelectedComplaintForReopen(complaint);
+      setShowReopenModal(true);
+    }}
+  >
+    <i className="bi bi-exclamation-circle issue-icon"></i>
+    Issue Not Fixed?
+  </button>
+)}
+
+
 
                     {/* <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
                       <span className="category-tag px-2 py-1 rounded-pill me-auto" style={{ fontSize: "0.8rem" }}>{complaint.category}</span>

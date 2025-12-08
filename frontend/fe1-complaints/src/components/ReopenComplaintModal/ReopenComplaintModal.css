@@ -1,41 +1,140 @@
+
+
+
+/* ----- MODAL CONTAINER ----- */
+.reopen-reason-modal .modal-content {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.25);
+  border: none;
+  overflow: hidden;
+}
+
+/* ----- HEADER ----- */
+.reopen-reason-modal .modal-header {
+  background: linear-gradient(135deg, #38e6cf, #2196f3);
+  padding: 18px 24px;
+  border-bottom: none;
+  color: white;
+}
+
+.reopen-reason-modal .modal-title {
+  font-weight: 700;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reopen-reason-modal .modal-title span {
+  font-size: 1.5rem;
+}
+
+
+/* ----- BODY ----- */
+.reopen-reason-modal .modal-body {
+  padding: 24px 26px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
 .reopen-textarea {
-  border: 1.5px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  resize: vertical;
-  transition: border-color 0.3s;
+  border-radius: 14px !important;
+  border: 2px solid #7de3e3 !important;
+  background: #effdff !important;
+  padding: 14px !important;
+  transition: 0.25s ease;
 }
 
 .reopen-textarea:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+  border-color: #28c7d9 !important;
+  box-shadow: 0 0 0 3px rgba(72, 221, 236, 0.25);
 }
 
-/* Ensure footer buttons align neatly and are responsive */
-.reopen-reason-modal .modal-footer,
+/* ----- FOOTER BUTTON ----- */
 .reopen-modal-footer {
-  display: flex !important;
-  gap: 12px;
-  justify-content: center !important;
+  padding: 18px 26px;
+  background: rgba(255, 255, 255, 0.65);
+  border-top: none;
+  display: flex;
+  justify-content: center;
+}
+
+.reopen-modal-footer .btn-primary {
+  background: linear-gradient(135deg, #00c2ff, #006aff);
+  border: none;
+  padding: 10px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 32px;
+  transition: 0.25s ease;
+}
+
+.reopen-modal-footer .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #009dfa, #0050e5);
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 14px rgba(0, 152, 255, 0.35);
+}
+
+.reopen-modal-footer .btn-primary:disabled {
+  background: #db8eff;
+}
+
+
+
+
+
+
+/* Enhanced enabled button (just keeping for reference) */
+
+
+/* DISABLED STATE */
+.reopen-modal-footer .btn-primary:disabled {
+  /* background: linear-gradient(135deg, #a4b9f5, #a3b4f7) !important; */
+    background: linear-gradient(135deg, #a0dbee, #a3c9f7) !important;
+  color: #6d7bb4 !important;
+  cursor: not-allowed !important;
+  opacity: 1;
+  box-shadow: none;
+  transform: none;
+}
+
+
+/* Close (X) button - circular style */
+.reopen-reason-modal .btn-close {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #d4d2d2;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: center;
+  transition: 0.25s ease-in-out;
+
+  /* Remove default Bootstrap icon background */
+  background-image: none !important;
+  position: relative;
 }
 
-.reopen-reason-modal .modal-footer .btn,
-.reopen-modal-footer .btn {
-  min-width: 120px;
+/* Replace default icon */
+.reopen-reason-modal .btn-close::after {
+  content: "✕";
+  font-size: 18px;
+  font-weight: 500;
+  color: #181717;
 }
 
-/* On very small screens stack buttons vertically */
-@media (max-width: 420px) {
-  .reopen-reason-modal .modal-footer,
-  .reopen-modal-footer {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
+/* Hover effect */
+.reopen-reason-modal .btn-close:hover {
+  background: #f4f4f4;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
 
-  .reopen-reason-modal .modal-footer .btn,
-  .reopen-modal-footer .btn {
-    width: 100% !important;
-  }
+/* Active press effect */
+.reopen-reason-modal .btn-close:active {
+  transform: scale(0.52);
+  background: #e9e9e9;
 }

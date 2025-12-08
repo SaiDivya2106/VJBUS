@@ -369,10 +369,11 @@ const ComplaintForm = () => {
           />
         </div>
 
-        {isITCategory && (
+        {/* {isITCategory && (
           <div className="it-fields">
-            <div className="input-group">
+            <div className="input-group it-input">
               <label style={labelStyle}>Location *</label>
+              
               <select
                 name="location"
                 value={formData.location}
@@ -388,7 +389,7 @@ const ComplaintForm = () => {
             </div>
 
             {formData.location && (
-              <div className="input-group">
+              <div className="input-group it-input">
                 <label style={labelStyle}>Connection Type *</label>
                 <select
                   name="connectionType"
@@ -462,7 +463,120 @@ const ComplaintForm = () => {
               </>
             )}
           </div>
-        )}
+        )} */}
+
+
+
+        {isITCategory && (
+  <div className="it-fields">
+
+    {/* LOCATION */}
+    <div className="input-group">
+      <label style={labelStyle}>Location *</label>
+
+      <select
+        name="location"
+        value={formData.location}
+        onChange={handleChange}
+        className="styled-select"
+        required
+      >
+        <option value="">-- Select Location --</option>
+        <option value="Main Campus">Main Campus</option>
+        <option value="Boys Hostel">Boys Hostel</option>
+        <option value="Girls Hostel">Girls Hostel</option>
+      </select>
+    </div>
+
+    {/* CONNECTION TYPE */}
+    {formData.location && (
+      <div className="input-group">
+        <label style={labelStyle}>Connection Type *</label>
+
+        <select
+          name="connectionType"
+          value={formData.connectionType}
+          onChange={handleChange}
+          className="styled-select"
+          required
+        >
+          <option value="">-- Select Connection --</option>
+          <option value="WiFi">WiFi</option>
+          <option value="LAN">LAN</option>
+        </select>
+      </div>
+    )}
+
+    {/* WARNING */}
+    {wifiAtHostelWarning && (
+      <div style={{
+        padding: "12px",
+        backgroundColor: "#fff3cd",
+        border: "1px solid #ffc107",
+        borderRadius: "4px",
+        marginBottom: "15px",
+        color: "#856404"
+      }}>
+        <strong>⚠️ Warning:</strong> WiFi is not supported at hostels. Please use LAN or contact IT support.
+      </div>
+    )}
+
+    {/* IT FIELDS (when no hostel wifi error) */}
+    {!wifiAtHostelWarning && (
+      <>
+        <div className="input-group">
+          <label style={labelStyle}>Room Number *</label>
+          <input
+            type="text"
+            name="room_number"
+            value={formData.room_number || ""}
+            onChange={handleChange}
+            placeholder="e.g. B-204 or Lab-A"
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label style={labelStyle}>Internet Speed *</label>
+          <input
+            type="text"
+            name="internet_speed"
+            value={formData.internet_speed || ""}
+            onChange={handleChange}
+            placeholder="e.g. 0.5 Mbps or 10 Mbps"
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label style={labelStyle}>Mobile Number *</label>
+          <input
+            type="tel"
+            name="mobile_number"
+            value={formData.mobile_number || ""}
+            onChange={handleChange}
+            placeholder="e.g. 9876543210"
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label style={labelStyle}>Issue Duration *</label>
+          <input
+            type="text"
+            name="issue_duration"
+            value={formData.issue_duration || ""}
+            onChange={handleChange}
+            placeholder="e.g. 2 hours, since yesterday"
+            required
+          />
+        </div>
+      </>
+    )}
+
+  </div>
+)}
+
 
         {!wifiAtHostelWarning && (
           <div className="input-group image-upload-container">
