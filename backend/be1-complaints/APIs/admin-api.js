@@ -2,7 +2,7 @@ const exp = require('express');
 const asyncHandler = require('express-async-handler');
 const jwt = require("jsonwebtoken"); 
 const nodemailer=require("nodemailer");
-const verifyGoogleToken = require("../Middleware/verifyGoogleToken");
+const verifyAppJWT = require("../Middleware/verifyAppJWT");
 
 const adminApp = exp.Router();
 adminApp.use(exp.json()); // Middleware to parse JSON
@@ -49,7 +49,7 @@ adminApp.use((req, res, next) => {
 
 
 
-adminApp.post("/check-admin", verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.post("/check-admin", verifyAppJWT, asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -76,7 +76,7 @@ adminApp.post("/check-admin", verifyGoogleToken, asyncHandler(async (req, res) =
 
 
 // GET API to view all complaints (sorted by priority)
-adminApp.get('/view-complaints',verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.get('/view-complaints',verifyAppJWT, asyncHandler(async (req, res) => {
     const complaints = await complaintsCollectionObj
         .find()
         .sort({ priority_score: -1, timestamp: -1 })
@@ -90,7 +90,7 @@ adminApp.get('/view-complaints',verifyGoogleToken, asyncHandler(async (req, res)
 }));
 
 //GET Complaint Details by complaint ID
-adminApp.get('/view-complaint/:complaintId',verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.get('/view-complaint/:complaintId',verifyAppJWT, asyncHandler(async (req, res) => {
     const complaintId = req.params.complaintId; // Get complaint ID from request params
 
     try {
@@ -175,7 +175,7 @@ adminApp.get(
 );
 
 
-  adminApp.put('/update-status/:complaint_id', verifyGoogleToken, asyncHandler(async (req, res) => {
+  adminApp.put('/update-status/:complaint_id', verifyAppJWT, asyncHandler(async (req, res) => {
   const complaintId = req.params.complaint_id;
   const { status, adminEmail } = req.body;
 
@@ -285,7 +285,7 @@ adminApp.get(
 
 adminApp.delete(
   '/delete-complaint/:complaint_id',
-  verifyGoogleToken,
+  verifyAppJWT,
   asyncHandler(async (req, res) => {
     const complaintId = req.params.complaint_id;
     const { adminEmail } = req.body; // ✅ Take admin email from frontend
@@ -379,7 +379,7 @@ adminApp.delete(
 
 
 
-adminApp.get('/filter-complaints', verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.get('/filter-complaints', verifyAppJWT, asyncHandler(async (req, res) => {
   const { status, category, dateRange } = req.query;
 
   let query = {};
@@ -461,7 +461,7 @@ function getDateRange(dateRange) {
 
 adminApp.post(
   '/complaints/:id/comment',
-  verifyGoogleToken,
+  verifyAppJWT,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { text, adminEmail } = req.body;
@@ -581,7 +581,7 @@ adminApp.post(
 
 
 // ✅ Flag a complaint (without async IIFE)
-adminApp.post('/flag-complaint/:id',verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.post('/flag-complaint/:id',verifyAppJWT, asyncHandler(async (req, res) => {
   const { id } = req.params;
   console.log("params",req.params)
   const { reason, note, flaggedBy } = req.body;
@@ -803,7 +803,7 @@ adminApp.post('/superadmin/complaints/:id/action', asyncHandler(async (req, res)
 // ✅ CHANGE CATEGORY ENDPOINT (escalate/reassign complaint to another category)
 adminApp.put(
   '/change-category/:complaint_id',
-  verifyGoogleToken,
+  verifyAppJWT,
   asyncHandler(async (req, res) => {
     const { complaint_id } = req.params;
     const { newCategory, adminEmail } = req.body;
@@ -935,7 +935,7 @@ adminApp.put(
 // ✅ GET REOPENED COMPLAINTS FOR NOTIFICATION
 adminApp.get(
   '/get-reopened-complaints',
-  verifyGoogleToken,
+  verifyAppJWT,
   asyncHandler(async (req, res) => {
     const { categories } = req.query;
 
