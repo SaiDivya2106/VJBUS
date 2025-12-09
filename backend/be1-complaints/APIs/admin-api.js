@@ -235,27 +235,30 @@ adminApp.get(
     </ul>
   ` : '';
 
-  let mailSubject = `Your Complaint "${complaintTitle}" Status Updated`;
+  let mailSubject = `Your Request "${complaintTitle}" Status Updated`;
   let mailHtml = `
     <p>Dear User,</p>
-    <p>The status of your complaint titled <strong>"${complaintTitle}"</strong> has been updated to <strong>${status}</strong>.</p>
+    <p>The status of your request titled <strong>"${complaintTitle}"</strong> has been updated to <strong>${status}</strong>.</p>
     <p>This update was made by admin: <strong>${adminEmail}</strong>.</p>
   `;
 
   if (status === 'Resolved') {
-    mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
+    mailSubject = `Your Request "${complaintTitle}" Has Been Resolved`;
     mailHtml = `
       <p>Dear User,</p>
-      <p>We're happy to let you know that your complaint titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
+      <p>We're happy to let you know that your request titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
       ${itDetailsHTML}
       <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
       <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
-      <p>Best regards,<br>Complaint Management Team</p>
+      <p>Best regards,<br>Thrive Team</p>
     `;
   } else {
     mailHtml += `
-      <p>Thank you for using our Complaint Management System.</p>
-      <p>Best regards,<br>Complaint Management Team</p>
+      <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
+      <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
+      <p>Best regards,<br>Thrive Team</p>
+      <p>Thank you for using our Thrive System.</p>
+      <p>Best regards,<br>Thrive Team</p>
     `;
   }
 
@@ -322,8 +325,8 @@ adminApp.delete(
     const mailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: userEmail,
-      subject: `Your Complaint "${complaintTitle}" Has Been Removed`,
-      text: `Dear User,\n\nYour complaint titled "${complaintTitle}" has been reviewed and removed by the admin (${adminEmail}).\n\nThank you for using our Complaint Management System.\n\n- Team Thrive`,
+      subject: `Your Request "${complaintTitle}" Has Been Removed`,
+      text: `Dear User,\n\nYour request titled "${complaintTitle}" has been reviewed and removed by the admin (${adminEmail}).\n\nThank you for using our Thrive System.\n\n- Team Thrive`,
     };
 
     // Step 6: Send email
@@ -523,16 +526,16 @@ adminApp.post(
         const mailOptions = {
           from: process.env.ADMIN_EMAIL,
           to: complaint.user_id,
-          subject: `Update on Your Complaint (${complaint.title})`,
+          subject: `Update on Your Request (${complaint.title})`,
           html: `
             <p>Dear User,</p>
-            <p>An admin (<strong>${adminEmail}</strong>) has added an update to your complaint titled "<strong>${complaint.title}</strong>".</p>
+            <p>An admin (<strong>${adminEmail}</strong>) has added an update to your request titled "<strong>${complaint.title}</strong>".</p>
             <p><strong>Admin Comment:</strong></p>
             <blockquote style="border-left: 4px solid #6a1b9a; padding-left: 10px; color: #333;">
               ${text}
             </blockquote>
             <p><strong>Date:</strong> ${formattedDate}</p>
-            <p>You can view your complaint and its updates by visiting:</p>
+            <p>You can view your request and its updates by visiting:</p>
             <p><a href="https://thrive.vjstartup.com" target="_blank" style="
               display: inline-block;
               padding: 8px 16px;
@@ -541,8 +544,8 @@ adminApp.post(
               text-decoration: none;
               border-radius: 16px;
               font-weight: 500;
-            ">🔍 View Complaint</a></p>
-            <p>Best Regards,<br>Complaint Management System</p>
+            ">🔍 View request</a></p>
+            <p>Best Regards,<br>Thrive</p>
           `,
         };
 
@@ -652,18 +655,18 @@ console.log("Complaint found:", comp);
     const mailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: superAdminEmails,
-      subject: `⚠️ Complaint Flagged: "${complaint.title}"`,
+      subject: `⚠️ Request Flagged: "${complaint.title}"`,
       html: `
         <p>Dear Super Admin,</p>
-        <p>A complaint has been <b>flagged</b> by admin <b>${admin.name || admin.email}</b>.</p>
-        <p><b>Complaint Title:</b> ${complaint.title}</p>
-        <p><b>Complaint Description:</b> ${complaint.description}</p>
+        <p>A Request has been <b>flagged</b> by admin <b>${admin.name || admin.email}</b>.</p>
+        <p><b>Request Title:</b> ${complaint.title}</p>
+        <p><b>Request Description:</b> ${complaint.description}</p>
         <p><b>Flag Reason:</b> ${reason}</p>
         <p><b>Note:</b> ${note || "No extra details"}</p>
         <p><b>Flagged At:</b> ${new Date().toLocaleString()}</p>
-        <p>User who raised this complaint: ${userEmail}</p>
-        <p>Please review this complaint in the admin dashboard.</p>
-        <p>- Complaint Management System</p>
+        <p>User who raised this request: ${userEmail}</p>
+        <p>Please review this request in the admin dashboard.</p>
+        <p>- Thrive</p>
       `
     };
 
@@ -760,14 +763,14 @@ adminApp.post('/superadmin/complaints/:id/action', asyncHandler(async (req, res)
         const mailOptions = {
           from: process.env.ADMIN_EMAIL,
           to: complaint.user_id, // complaint raiser email
-          subject: `⚠️ Warning Regarding Your Complaint: "${complaint.title}"`,
+          subject: `⚠️ Warning Regarding Your Request: "${complaint.title}"`,
           html: `
             <p>Dear User,</p>
-            <p>Your complaint titled "<b>${complaint.title}</b>" was flagged and reviewed by the Super Admin.</p>
+            <p>Your request titled "<b>${complaint.title}</b>" was flagged and reviewed by the Super Admin.</p>
             <p><b>Action Taken:</b> Warning</p>
             <p><b>Reason/Note:</b> ${note || "No additional details provided"}</p>
-            <p>Please raise complaints responsibly.</p>
-            <p>- Complaint Management Team</p>
+            <p>Please raise requests responsibly.</p>
+            <p>- Thrive</p>
           `
         };
 
@@ -859,18 +862,18 @@ adminApp.put(
     const studentMailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: studentEmail,
-      subject: `Complaint Reassigned to ${newCategory}`,
+      subject: `Request Reassigned to ${newCategory}`,
       html: `
         <p>Dear Student,</p>
-        <p>Your complaint has been moved to <strong>${newCategory}</strong> by the administration.</p>
-        <p><strong>Complaint Title:</strong> ${complaintTitle}</p>
-        <p><strong>Complaint ID:</strong> ${complaint_id}</p>
+        <p>Your request has been moved to <strong>${newCategory}</strong> by the administration.</p>
+        <p><strong>Request Title:</strong> ${complaintTitle}</p>
+        <p><strong>Request ID:</strong> ${complaint_id}</p>
         <p><strong>Previous Department:</strong> ${oldCategory}</p>
         <p><strong>New Department:</strong> ${newCategory}</p>
         ${itDetailsHTML}
         <p>The appropriate team will now review and assist with your request.</p>
         <p>Thank you for your patience.</p>
-        <p>Best regards,<br>Complaint Management Team</p>
+        <p>Best regards,<br>Thrive Team</p>
       `
     };
 
@@ -891,14 +894,14 @@ adminApp.put(
     const adminMailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: adminEmails,
-      subject: `New Complaint Assigned to Your Department: ${complaintTitle}`,
+      subject: `New Request Assigned to Your Department: ${complaintTitle}`,
       html: `
         <p>Dear Admin Team,</p>
-        <p>A new complaint has been assigned to your department after category change.</p>
-        <p><strong>Complaint Details:</strong></p>
+        <p>A new request has been assigned to your department after category change.</p>
+        <p><strong>Request Details:</strong></p>
         <ul>
           <li><strong>Title:</strong> ${complaintTitle}</li>
-          <li><strong>Complaint ID:</strong> ${complaint_id}</li>
+          <li><strong>Request ID:</strong> ${complaint_id}</li>
           <li><strong>Category:</strong> ${newCategory}</li>
           <li><strong>Previous Category:</strong> ${oldCategory}</li>
           <li><strong>Status:</strong> ${complaint.status}</li>
@@ -908,7 +911,7 @@ adminApp.put(
         </ul>
         ${adminITDetailsHTML}
         <p>Please review and take necessary action.</p>
-        <p>Best regards,<br>Complaint Management System</p>
+        <p>Best regards,<br>Thrive</p>
       `
     };
 
