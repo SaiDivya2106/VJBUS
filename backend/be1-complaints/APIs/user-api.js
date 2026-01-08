@@ -155,7 +155,9 @@ userApp.post(
             it_details,
           }
         : {}),
-      timestamp: new Date().toISOString(),
+      // timestamp: new Date().toISOString(),
+      timestamp: new Date(),
+
       likes: 0,
       dislikes: 0,
       status: "Pending",
@@ -608,7 +610,14 @@ userApp.post(
         id: new Date().getTime(),
         text: trimmedText,
         role: "student", // Student comment
-        timestamp: new Date().toISOString(),
+        // timestamp: new Date().toISOString(),
+
+
+
+
+
+        timestamp: new Date(),
+
       };
 
       // Update complaint: add comment, change status to Reopened, update lastCommentAt

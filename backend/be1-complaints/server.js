@@ -26,11 +26,27 @@ mc.connect('mongodb://127.0.0.1:27017')
     app.set('flaggedusersCollectionObj', flaggedusersCollectionObj);
     app.set('superAdminCollectionObj',superAdminCollectionObj);
     console.log('DB connection success');
+
+
+
+    const reminderCron = require("./cron/reminderCron");
+
+// Start cron scheduler
+reminderCron(
+  complaintsCollectionObj,
+  adminsCollectionObj
+);
+
+
+
+
   })
   .catch(err => {
     console.log("DB connection error: ", err);
   });
 
+
+  
 const userApp = require('./APIs/user-api');
 const adminApp = require('./APIs/admin-api');
 

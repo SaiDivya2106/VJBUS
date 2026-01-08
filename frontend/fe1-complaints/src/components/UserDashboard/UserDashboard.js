@@ -906,7 +906,7 @@ const UserDashboard = () => {
   <div className="overlay">
     <Card className="popup-card rounded-4 card-background-gradient p-4">
       {/* <button className="close-btn" onClick={() => setExpandedCard(null)}>✕</button> */}
-      <button className="expanded-close-btn" onClick={() => setExpandedCard(null)}>✕</button>
+      <button className="close-btn-inside-modalh" onClick={() => setExpandedCard(null)}>✕</button>
 
 
 {/* FLAGGED OR STATUS */}
@@ -1099,7 +1099,7 @@ const UserDashboard = () => {
       onClick={(e) => e.stopPropagation()}
     >
       {/* Close button */}
-      <button className="close-btn-inside-modal fixed" onClick={() => setEditComplaint(null)}>✕</button>
+      <button className="close-btn-inside-modalm fixed" onClick={() => setEditComplaint(null)}>✕</button>
 
 
       {/* Header with Delete */}

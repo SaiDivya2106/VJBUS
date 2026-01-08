@@ -15,6 +15,8 @@ import {
 } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import "./ComplaintForm.css";
+import { suggestCategory } from "../../utils/categorySuggester";
+
 
 const categoriesList = [
   { name: "Infrastructure", icon: "🏗" },
@@ -66,6 +68,12 @@ const ComplaintForm = () => {
   const displayedCategories = showAll ? categoriesList : categoriesList.slice(0, 7);
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
+
+const [suggestedCategories, setSuggestedCategories] = useState([]);
+
+
+
+
   const normalizedCategory = typeof formData.category === "string" ? formData.category.trim().toLowerCase() : "";
   const isITCategory = [
     "it and networking",
@@ -74,22 +82,50 @@ const ComplaintForm = () => {
     "it/networking",
   ].includes(normalizedCategory);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
 
-    if (name === "connectionType" && value === "WiFi") {
-      const isHostel = formData.location === "Boys Hostel" || formData.location === "Girls Hostel";
-      setWifiAtHostelWarning(isHostel);
-    } else if (name === "location") {
-      const isHostel = value === "Boys Hostel" || value === "Girls Hostel";
-      if (isHostel && formData.connectionType === "WiFi") {
-        setWifiAtHostelWarning(true);
-      } else {
-        setWifiAtHostelWarning(false);
-      }
-    }
-  };
+  //   if (name === "connectionType" && value === "WiFi") {
+  //     const isHostel = formData.location === "Boys Hostel" || formData.location === "Girls Hostel";
+  //     setWifiAtHostelWarning(isHostel);
+  //   } else if (name === "location") {
+  //     const isHostel = value === "Boys Hostel" || value === "Girls Hostel";
+  //     if (isHostel && formData.connectionType === "WiFi") {
+  //       setWifiAtHostelWarning(true);
+  //     } else {
+  //       setWifiAtHostelWarning(false);
+  //     }
+  //   }
+  // };
+
+
+
+  const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  const updatedData = { ...formData, [name]: value };
+  setFormData(updatedData);
+
+  // Auto suggest category when typing title or description
+  if (name === "title" || name === "description") {
+    const suggestions = suggestCategory(
+      updatedData.title,
+      updatedData.description
+    );
+
+    setSuggestedCategories(suggestions);
+  }
+
+  // Existing logic (keep this)
+  if (name === "connectionType" && value === "WiFi") {
+    const isHostel =
+      formData.location === "Boys Hostel" ||
+      formData.location === "Girls Hostel";
+    setWifiAtHostelWarning(isHostel);
+  }
+};
+
 
   const handleCategorySelect = (cat) => {
     setFormData({
@@ -292,6 +328,41 @@ const ComplaintForm = () => {
             required
           />
         </div>
+
+
+
+
+
+{suggestedCategories.length > 0 && !formData.category && (
+  <div className="suggested-wrapper">
+    <div className="suggested-header">
+      💡 Suggested categories
+    </div>
+
+    <div className="suggested-pills">
+      {suggestedCategories.map((cat) => (
+        <button
+          key={cat}
+          type="button"
+          className="suggested-pill"
+          onClick={() => handleCategorySelect(cat)}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+
+    <div className="suggested-hint">
+      (optional – you can change this)
+    </div>
+  </div>
+)}
+
+
+
+
+
+
 
         <div className="input-group">
           <div className="category-label-wrapper">

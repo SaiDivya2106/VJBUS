@@ -1129,3 +1129,66 @@ margin-top: 5px;
     height: 48px;
   }
 }
+
+
+/* ================================
+   POPUP CARD SCROLL + FIXED CLOSE
+================================ */
+
+/* Popup overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9998;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Popup card */
+.popup-card {
+  position: relative;
+  max-height: 85vh;              /* limits height */
+  overflow-y: auto;              /* enables scrolling */
+  width: 100%;
+  max-width: 720px;
+  z-index: 9999;
+}
+
+
+/* FIXED CLOSE BUTTON */
+/* .expanded-close-btn {
+  position: fixed;            
+  top: 12px;
+  right: 12px;
+
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border: none;
+
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+
+  z-index: 10001;
+} */
+
+
+/* Optional: smoother scrolling */
+.popup-card::-webkit-scrollbar {
+  width: 6px;
+}
+.popup-card::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 10px;
+}
