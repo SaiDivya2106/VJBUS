@@ -201,15 +201,15 @@ userApp.post(
                 const mailOptions = {
                   from: process.env.ADMIN_EMAIL,
                   to: admin.email,
-                  subject: `New Complaint: ${title} in ${category}`,
+                  subject: `New Request: ${title} in ${category}`,
                   html: `
                     <p>Dear Admin,</p>
-                    <p>A new complaint has been submitted in your assigned category: <strong>${category}</strong>.</p>
-                    <p><strong>Complaint Details:</strong></p>
+                    <p>A new request has been submitted in your assigned category: <strong>${category}</strong>.</p>
+                    <p><strong>Request Details:</strong></p>
                     <ul>
                       <li><strong>Title:</strong> ${title}</li>
                       <li><strong>Description:</strong> ${description}</li>
-                      <li><strong>Complaint ID:</strong> ${complaint_id}</li>
+                      <li><strong>Request ID:</strong> ${complaint_id}</li>
                       <li><strong>Status:</strong> Pending</li>
                       <li><strong>Submitted on:</strong> ${formattedTimestamp}</li>
                       ${isITCategory ? `
@@ -239,9 +239,9 @@ userApp.post(
                           : ""
                       }
                     </ul>
-                    <p><a href="https://thrive.vjstartup.com">View and manage the complaint</a></p>
+                    <p><a href="https://thrive.vjstartup.com">View and manage the request</a></p>
                     <p>Please take action as soon as possible.</p>
-                    <p>Regards,<br>Complaint Management System</p>
+                    <p>Regards,<br>Thrive</p>
                   `,
                 };
                 return transporter.sendMail(mailOptions);
@@ -666,21 +666,22 @@ userApp.post(
             const mailOptions = {
               from: process.env.ADMIN_EMAIL,
               to: adminEmails,
-              subject: `Complaint #${complaint_id} Reopened - Action Required`,
+              subject: `Request #${complaint.title} Reopened - Action Required`,
               html: `
                 <p>Dear Admin Team,</p>
-                <p>A resolved complaint has been reopened by the student.</p>
+                <p>A resolved request has been reopened by the student.</p>
                 <p><strong>Complaint Details:</strong></p>
                 <ul>
                   <li><strong>Title:</strong> ${complaint.title}</li>
-                  <li><strong>Complaint ID:</strong> ${complaint_id}</li>
+                  <li><strong>Request ID:</strong> ${complaint_id}</li>
+                  <li><strong>Request ID:</strong> ${complaint.description}</li>
                   <li><strong>Category:</strong> ${complaint.category}</li>
                   <li><strong>Status:</strong> Reopened</li>
                   <li><strong>Student Comment:</strong> ${trimmedText}</li>
                   <li><strong>Reopened on:</strong> ${new Date().toLocaleString()}</li>
                 </ul>
-                <p>Please review the updated complaint and take necessary action.</p>
-                <p>Best regards,<br>Complaint Management System</p>
+                <p>Please review the updated request and take necessary action.</p>
+                <p>Best regards,<br>Thrive</p>
               `,
             };
 

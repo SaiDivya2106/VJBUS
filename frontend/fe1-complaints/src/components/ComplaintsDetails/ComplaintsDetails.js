@@ -223,7 +223,7 @@ const ComplaintsDetails = () => {
         </button>
 
         <div className="complaint-header-wrapper d-flex justify-content-between align-items-center mt-4 mb-3 px-2">
-          <h1 className="page-title fs-2 fw-bold mb-0">Complaint Details</h1>
+          <h1 className="page-title fs-2 fw-bold mb-0">Request Details</h1>
           <button className="btn btn-danger delete-icon-btn" onClick={handleDeleteComplaint}>
             <i className="bi bi-trash3-fill"></i>
           </button>
