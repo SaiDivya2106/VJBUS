@@ -107,7 +107,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="superadmin-container">
       <Container>
-        <h2 className="text-center mb-4 fw-bold text-light page-title">
+        <h2 className=" text-center mb-4 fw-bold  page-title">
           ⚠ Super Admin - Flagged Requests
         </h2>
 
@@ -218,35 +218,60 @@ const SuperAdminDashboard = () => {
                       {/* Details */}
                       <div className="details-section">
                         <div className="detail-row">
-                          <span className="detail-label">User:</span>
-                          <span className="detail-box">
+                          <span className="detail-label text-dark">User:</span>
+                          <span className="">
                             <FaUserCircle size={16} className="me-2" />
                             {complaint.user_id}
                           </span>
                         </div>
 
                         <div className="detail-row">
-                          <span className="detail-label">Flagged By:</span>
-                          <span className="detail-box">
+                          <span className="detail-label text-dark">Flagged By:</span>
+                          <span className="">
                             {complaint.flagged.flaggedBy}
                           </span>
                         </div>
 
                         <div className="detail-row">
-                          <span className="detail-label">Reason:</span>
+                          <span className="detail-label text-dark">Reason:</span>
                           <span className="reason-badge">
                             {complaint.flagged.reason}
                           </span>
                         </div>
 
-                        {complaint.flagged.note && (
+                        {/* {complaint.flagged.note && (
                           <div className="detail-row">
-                            <span className="detail-label">Note:</span>
-                            <span className="detail-box note-box">
+                            <span className="detail-label text-dark">Note:</span>
+                            <span className="">
                               {complaint.flagged.note}
                             </span>
                           </div>
-                        )}
+                        )} */}
+
+
+ {complaint.flagged.note && (
+  <div className="detail-row">
+    <span className="detail-label text-dark">Note:</span>
+
+    <span className="note-preview">
+      {complaint.flagged.note.length > 120
+        ? complaint.flagged.note.slice(0, 120) + "..."
+        : complaint.flagged.note}
+
+      {complaint.flagged.note.length > 120 && (
+        <Button
+          variant="link"
+          className="read-more"
+          onClick={() => setFullViewComplaint(complaint)}
+        >
+          View More
+        </Button>
+      )}
+    </span>
+  </div>
+)}
+
+
                       </div>
 
                       <hr className="separator" />

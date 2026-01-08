@@ -650,8 +650,8 @@ const handleDeleteComplaint = async (id) => {
     }}
     style={{
       cursor: complaint.image ? "pointer" : "default",
-      width: complaint.image ? "100%" : "250px", // smaller for default image
-      height: complaint.image ? "auto" : "250px",
+      width: complaint.image ? "100%" : "220px", // smaller for default image
+      height: complaint.image ? "auto" : "220px",
       display: "block",
       margin: complaint.image ? "0 auto" : "20px auto 0 auto", // moves default image up
       opacity: complaint.image ? 1 : 0.95,
@@ -869,7 +869,7 @@ const handleDeleteComplaint = async (id) => {
     >
       {/* Close button */}
       <button
-        className="expanded-close-btn"
+        className="close-btn-inside-modalh"
         onClick={() => setExpandedCard(null)} // ✅ only close on this button
       >
         ✕

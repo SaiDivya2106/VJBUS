@@ -330,7 +330,7 @@ import { useAuth } from "../../Context/AuthContext";
 import { FileX } from "lucide-react";
 import "./AdminPage.css";
 import NotificationBell from "../NotificationBell/NotificationBell";
-
+import NoImageIcon from "../images/no-img-icon.png";
 const AdminPage = () => {
   const navigate = useNavigate();
   const { isAdmin, adminCategory, user } = useAuth();
@@ -343,7 +343,19 @@ const AdminPage = () => {
   const [error, setError] = useState(false);
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
-  const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+  // const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+  const DEFAULT_IMAGE = NoImageIcon;
+
+
+
+
+
+  
+    const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState(null);
+
+
+
 
 
   // Normalize admin categories into array
@@ -654,7 +666,7 @@ try {
 
         
         {/* Image with status overlay */}
-        <div className="complaint-image-wrapper position-relative mb-3">
+        {/* <div className="complaint-image-wrapper position-relative mb-3">
           <Card.Img
             variant="top"
             src={complaint.image || DEFAULT_IMAGE}
@@ -662,6 +674,10 @@ try {
             className="complaint-image rounded-3"
             style={{ height: "200px", objectFit: "cover", width: "100%" }}
           />
+                  </div> */}
+
+
+
 {/* <div className="status-overlay">
 {complaint.flagged?.isFlagged && (
   <span className="flagged-badge position-absolute" 
@@ -672,10 +688,74 @@ try {
 
 </div> */}
 
-        </div>
+
+<div
+  className="d-flex align-items-center justify-content-center"
+  style={{
+    height: "180px",          // SAME height as image cards
+    // backgroundColor: "#f8f9fa",
+    borderRadius: "12px",
+    overflow: "hidden",
+  }}
+>
+  {complaint.image ? (
+    <Card.Img
+      src={complaint.image}
+      alt="Complaint"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        setModalImageSrc(complaint.image);
+        setShowImageModal(true);
+      }}
+    />
+  ) : (
+    <div
+      className="d-flex flex-column align-items-center justify-content-center"
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <img
+        src={DEFAULT_IMAGE}
+        alt="No Image"
+        style={{
+        cursor: complaint.image ? "pointer" : "default",
+      width: complaint.image ? "100%" : "190px", // smaller for default image
+      height: complaint.image ? "auto" : "190px",
+      display: "block",
+      margin: complaint.image ? "0 auto" : "20px auto 0 auto", // moves default image up
+      opacity: complaint.image ? 1 : 0.95,
+        }}
+      />
+
+    <p
+    style={{
+      position: "absolute",
+      bottom: "35px", // locks text below icon regardless of icon size
+      width: "100%",
+      textAlign: "center",
+      fontSize: "1rem",
+      color: "#6c757d",
+      fontWeight: "bold",
+      margin: 0,
+    }}
+  >
+    No Image
+  </p>
+    </div>
+  )}
+</div>
+
+
 
         {/* Date and Edit on the same line */}
-        <div className="d-flex justify-content-between align-items-center mb-2">
+        <div className="d-flex justify-content-between align-items-center mb-2 mt-3">
           <Card.Text
             className="mb-0"
             style={{

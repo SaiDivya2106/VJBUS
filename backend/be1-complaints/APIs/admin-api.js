@@ -238,26 +238,79 @@ adminApp.get(
   let mailSubject = `Your Complaint "${complaintTitle}" Status Updated`;
   let mailHtml = `
     <p>Dear User,</p>
-    <p>The status of your complaint titled <strong>"${complaintTitle}"</strong> has been updated to <strong>${status}</strong>.</p>
+<p>
+  The status of your complaint titled 
+  <strong style="color:#1e88e5;">"${complaintTitle}"</strong> 
+  has been updated to 
+  <strong style="color:#2e7d32;">${status}</strong>.
+</p>
+
     <p>This update was made by admin: <strong>${adminEmail}</strong>.</p>
   `;
 
+  // if (status === 'Resolved') {
+  //   mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
+  //   mailHtml = `
+  //     <p>Dear User,</p>
+  //     <p>We're happy to let you know that your complaint titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
+  //     ${itDetailsHTML}
+  //     <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
+  //     <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
+  //     <p>Best regards,<br>Complaint Management Team</p>
+  //   `;
+  // } else {
+  //   mailHtml += `
+  //     <p>Thank you for using our Complaint Management System.</p>
+  //     <p>Best regards,<br>Complaint Management Team</p>
+  //   `;
+  // }
+
+
   if (status === 'Resolved') {
-    mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
-    mailHtml = `
+  mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
+  mailHtml = `
+    <div style="font-family:Arial, sans-serif; color:#333;">
       <p>Dear User,</p>
-      <p>We're happy to let you know that your complaint titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
+
+      <p>
+        We're happy to let you know that your complaint titled 
+        <strong style="color:#1e88e5;">"${complaintTitle}"</strong> 
+        has been marked as 
+        <strong style="color:#fb8c00;">Resolved</strong> 
+        by our team.
+      </p>
+
       ${itDetailsHTML}
-      <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
-      <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
-      <p>Best regards,<br>Complaint Management Team</p>
-    `;
-  } else {
-    mailHtml += `
-      <p>Thank you for using our Complaint Management System.</p>
-      <p>Best regards,<br>Complaint Management Team</p>
-    `;
-  }
+
+      <p>
+        If you feel the issue is not fully resolved, you may reopen the complaint
+        from your complaints page and add a short comment explaining the issue.
+        Your feedback will be shared with the admin team anonymously.
+      </p>
+
+      <p>
+        You can view and manage your complaints here:<br>
+        <a 
+          href="https://thrive.vjstartup.com/my-complaints"
+          style="color:#1e88e5;text-decoration:none;font-weight:bold;"
+        >
+          https://thrive.vjstartup.com/my-complaints
+        </a>
+      </p>
+
+      <p>
+        Best regards,<br>
+        <strong>Complaint Management Team</strong>
+      </p>
+    </div>
+  `;
+} else {
+  mailHtml += `
+    <p>Thank you for using our Complaint Management System.</p>
+    <p>Best regards,<br>Complaint Management Team</p>
+  `;
+}
+
 
   const mailOptions = {
     from: process.env.ADMIN_EMAIL,
