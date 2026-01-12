@@ -174,30 +174,37 @@ export const AuthProvider = ({ children }) => {
     });
 
   // --- Check admin ---
-  const checkAdminStatus = async (email) => {
-    console.log("baseURl",baseUrl)
-    try {
-      const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      setIsAdmin(data.isAdmin);
-      setAdminCategory(
-        data.isAdmin
-          ? Array.isArray(data.adminCategories)
-            ? data.adminCategories
-            : [data.adminCategory].filter(Boolean)
-          : []
-      );
-    } catch (err) {
-      console.error("Error checking admin:", err);
+ const checkAdminStatus = async (email) => {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // ✅ REQUIRED
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Admin check failed: ${res.status}`);
     }
-  };
+
+    const data = await res.json();
+    setIsAdmin(data.isAdmin);
+    setAdminCategory(
+      data.isAdmin
+        ? Array.isArray(data.adminCategories)
+          ? data.adminCategories
+          : [data.adminCategory].filter(Boolean)
+        : []
+    );
+  } catch (err) {
+    console.error("Error checking admin:", err);
+  }
+};
+
 
   // --- Render Google login button ---
   const showLoginButton = () => {

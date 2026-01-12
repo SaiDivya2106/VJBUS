@@ -4,8 +4,9 @@ require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
 
-// Enable CORS for all routes
 app.use(cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Deploy React build to this server
 app.use(exp.static(path.join(__dirname, '../../frontend/fe1-complaints/build')));

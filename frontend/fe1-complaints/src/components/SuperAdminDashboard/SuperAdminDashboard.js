@@ -111,69 +111,73 @@ const SuperAdminDashboard = () => {
           ⚠ Super Admin - Flagged Requests
         </h2>
 
-        {/* Filters */}
-        <Row className="align-items-center g-4 filter-row">
-          <Col md={6}>
-            <div className="filter-container">
-              <div className="filter-box">
-                {/* Category */}
-{/* Category */}
-<div className="filter-group">
-  <div className="filter-title">
-    <span className="filter-icon blue">
-      <i className="bi bi-funnel"></i>
-    </span>
-    Filter by Category
-  </div>
+{/* Filters */}
+<Row className="align-items-center g-4 filter-row">
+  <Col >
+    <div className="filter-container">
+      <div className="filter-box">
 
-  <div className="select-wrapper">
-  <Form.Select
-    className="filter-select1"
-    value={filters.category}
-    onChange={(e) =>
-      setFilters({ ...filters, category: e.target.value })
-    }
-  >
-    <option value="">All Categories</option>
-    {uniqueCategories.map((cat) => (
-      <option key={cat}>{cat}</option>
-    ))}
-  </Form.Select>
-  <span className="arrow-icon">˅</span>
-</div>
+        {/* Category */}
+        <div className="filter-group ">
+          <div className="filter-title">
+            <span className="filter-icon blue">
+              <i className="bi bi-funnel"></i>
+            </span>
+            Filter by Category
+          </div>
 
-</div>
+          <Form.Select
+            className="form-select filter-select-bootstrap"
+            value={filters.category}
+            onChange={(e) =>
+              setFilters({ ...filters, category: e.target.value })
+            }
+          >
+            <option value="">All Categories</option>
+            {uniqueCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </Form.Select>
+        </div>
 
-{/* Reason */}
-<div className="filter-group">
-  <div className="filter-title">
-    <span className="filter-icon purple">
-      <i className="bi bi-funnel"></i>
-    </span>
-    Filter by Reason
-  </div>
+        {/* Reason */}
+        <div className="filter-group">
+          <div className="filter-title">
+            <span className="filter-icon purple">
+              <i className="bi bi-funnel"></i>
+            </span>
+            Filter by Reason
+          </div>
 
-  <div className="select-wrapper">
-    <Form.Select
-      className="filter-select1 purple-border"
-      value={filters.reason}
-      onChange={(e) =>
-        setFilters({ ...filters, reason: e.target.value })
-      }
-    >
-      <option value="">All Reasons</option>
-      {filteredReasons.length > 0
-        ? filteredReasons.map((r) => <option key={r}>{r}</option>)
-        : allowedFlagReasons.map((r) => <option key={r}>{r}</option>)}
-    </Form.Select>
-      <span className="arrow-icon">˅</span>
-  </div>
-</div>
+          <Form.Select
+            className="form-select filter-select-bootstrap purple-border"
+            value={filters.reason}
+            onChange={(e) =>
+              setFilters({ ...filters, reason: e.target.value })
+            }
+          >
+            <option value="">All Reasons</option>
+            {filteredReasons.length > 0
+              ? filteredReasons.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))
+              : allowedFlagReasons.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+          </Form.Select>
+        </div>
 
-              </div>
-            </div>
-          </Col>
-        </Row>
+      </div>
+    </div>
+  </Col>
+</Row>
+
 
         {/* Loading */}
         {loading ? (
@@ -184,7 +188,8 @@ const SuperAdminDashboard = () => {
         ) : filteredComplaints.length === 0 ? (
           emptyState
         ) : (
-          <Row xs={1} sm={2} md={3} className="g-4">
+          <div className="filter-container">
+            <Row xs={1} sm={2} md={3} className="g-4 complaints-grid">
             {filteredComplaints.map((complaint) => {
               const words = complaint.description.split(" ");
               const shortDesc = words.slice(0, 25).join(" ");
@@ -310,18 +315,19 @@ const SuperAdminDashboard = () => {
                 </Col>
               );
             })}
-          </Row>
+            </Row>
+          </div>
         )}
 
         {/* ACTION MODAL */}
         {/* ACTION MODAL */}
 {selectedComplaint && (
-  <Modal
-    show={!!selectedComplaint}
-    onHide={() => setSelectedComplaint(null)}
-    centered
-    className="confirm-action-modal"
-  >
+<Modal
+  show={!!selectedComplaint}
+  onHide={() => setSelectedComplaint(null)}
+  centered
+  className="white-modal"
+>
     <Modal.Header closeButton>
       <Modal.Title className="modal-header-title">
         Confirm Action
@@ -357,33 +363,33 @@ const SuperAdminDashboard = () => {
 
       {/* Note Input */}
       <div className="modal-section-title">Note (Optional)</div>
-      <Form.Control
-        as="textarea"
-        rows={3}
-        className="note-textarea"
-        placeholder="Add an internal note..."
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-      />
+     <Form.Control
+  as="textarea"
+  rows={3}
+  className="form-control note-textarea-bootstrap"
+  placeholder="Add an internal note..."
+  value={note}
+  onChange={(e) => setNote(e.target.value)}
+/>
+
     </Modal.Body>
 
-    <Modal.Footer className="confirm-footer">
+   <Modal.Footer className="justify-content-end gap-2">
   <Button
-    className="modal-footer-btn cancel-btn"
+    variant="outline-secondary"
     onClick={() => setSelectedComplaint(null)}
   >
     Cancel
   </Button>
 
   <Button
-    className={`modal-footer-btn ${
-      actionType === "valid" ? "confirm-btn-valid" : "confirm-btn-warn"
-    }`}
+    variant={actionType === "valid" ? "success" : "warning"}
     onClick={() => handleAction(selectedComplaint.complaint_id)}
   >
     Confirm
   </Button>
 </Modal.Footer>
+
 
   </Modal>
 )}
