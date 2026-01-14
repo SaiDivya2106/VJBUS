@@ -64,6 +64,10 @@ const Home = () => {
   const [showImageModal, setShowImageModal] = useState(false);
 const [modalImageSrc, setModalImageSrc] = useState(null);
 
+// Reply UI state: tracks open reply box and reply texts per comment
+const [openReply, setOpenReply] = useState(null);
+const [replyTexts, setReplyTexts] = useState({});
+
 
 
 
@@ -75,6 +79,38 @@ const [popupMessage, setPopupMessage] = useState("");
 const showPopup = (message) => {
   setPopupMessage(message);
   setTimeout(() => setPopupMessage(""), 2000); // disappears in 2 sec
+};
+
+// Reply helpers
+const handleReplyChange = (commentId, value) => {
+  setReplyTexts((prev) => ({ ...prev, [commentId]: value }));
+};
+
+const handleReplySubmit = async (comment) => {
+  const text = (replyTexts[comment.id] || "").trim();
+  if (!text) return showPopup("Reply cannot be empty");
+
+  try {
+    const token = localStorage.getItem("authToken");
+    const url = `${baseUrl}/user-api/complaints/${expandedCard.complaint_id}/comment/${comment.id}/reply`;
+    const res = await axios.post(
+      url,
+      { text, userEmail: user.email },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res?.data?.complaint) {
+      setExpandedCard(res.data.complaint);
+      setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+      setOpenReply(null);
+      showPopup("Reply added successfully");
+    } else {
+      showPopup("Reply added, but failed to refresh comments");
+    }
+  } catch (err) {
+    console.error("Error adding reply:", err);
+    showPopup("Failed to add reply");
+  }
 };
 
 
@@ -156,11 +192,26 @@ const DEFAULT_IMAGE = NoImageIcon;
 };
 
 
-  const formatDate = (timestamp) => {
-    if (!timestamp) return "Unknown Date";
-    const date = new Date(timestamp);
-    return date.toDateString();
-  };
+const formatDate = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
 
 
 
@@ -980,6 +1031,123 @@ const handleDeleteComplaint = async (id) => {
             <strong style={{ color: borderColor }}>{displayName}</strong>
           </div>
           <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
+
+          {/* Replies (threaded under this comment) */}
+          {comment.replies && comment.replies.length > 0 && (
+            <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+              {comment.replies.map((r) => {
+                const rIsStudent = r.role === "student";
+                const rDisplay = rIsStudent ? "Student" : (r.email || "User");
+                return (
+                  <div
+  key={r.id}
+  style={{
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "10px",
+    marginBottom: "10px",
+  }}
+>
+  {/* 🔴 Arrow OUTSIDE the reply box */}
+  <span
+    style={{
+      color: "#ff6b6b",
+      fontSize: "1.3rem",
+      marginTop: "14px",
+    }}
+  >
+    ↳
+  </span>
+
+  {/* 🟦 Student reply card */}
+  <div
+    className="reply-entry"
+    style={{
+     backgroundColor: "#f6f8fa",
+      borderLeft: "3px solid #e2e2e2",
+      padding: "10px 12px",
+      borderRadius: "10px",
+      flex: 1,
+    }}
+  >
+    {/* Header */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "4px",
+      }}
+    >
+      {/* Student icon */}
+      <FaUser
+        size={14}
+        style={{
+          color: "#ff6b6b",
+          marginRight: "6px",
+        }}
+      />
+
+      {/* Student label */}
+      <strong
+        style={{
+          color: "#ff6b6b",
+          fontSize: "0.9rem",
+        }}
+      >
+        Student
+      </strong>
+
+      {/* Date */}
+      <span
+        style={{
+          marginLeft: "auto",
+          fontSize: "0.75rem",
+          color: "#6c757d",
+        }}
+      >
+        {formatDate(r.timestamp || r.date)}
+      </span>
+    </div>
+
+    {/* Message */}
+    <div
+      style={{
+        marginLeft: "1.4rem",
+        fontSize: "1rem",
+        color: "#212529",
+      }}
+    >
+      {r.text}
+    </div>
+  </div>
+</div>
+                );                        })}
+            </div>
+          )}
+
+          {/* Reply UI for complaint owner when target comment is admin */}
+          {comment.role === "admin" && user?.email === expandedCard.user_id && (
+            <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>
+              {openReply === comment.id ? (
+                <div className="d-flex gap-2">
+                  <textarea
+                    className="form-control"
+                    rows="2"
+                    value={replyTexts[comment.id] || ""}
+                    onChange={(e) => handleReplyChange(comment.id, e.target.value)}
+                    placeholder="Write a reply..."
+                  ></textarea>
+                  <div className="d-flex flex-column gap-1 ms-2">
+                    <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment)}>Send</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => { setOpenReply(null); setReplyTexts((prev) => ({ ...prev, [comment.id]: "" })); }}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <button className="btn btn-link btn-sm" onClick={() => setOpenReply(comment.id)}>Reply</button>
+              )}
+            </div>
+          )}
+
         </div>
       );
     })

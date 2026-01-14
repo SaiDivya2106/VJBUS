@@ -15,6 +15,15 @@ import { IoMdCall } from "react-icons/io";
 import { useAuth } from "../../Context/AuthContext";
 import ComplaintCategoryWithFlag from "../ComplaintCategoryWithFlag/ComplaintCategoryWithFlag";
 
+
+
+
+import { FaUser } from "react-icons/fa";
+
+
+
+
+
 const ComplaintsDetails = () => {
   const { complaint_id } = useParams();
   const navigate = useNavigate();
@@ -27,18 +36,41 @@ const ComplaintsDetails = () => {
   // determine if complaint is flagged (used to disable updates)
   const isFlagged = complaint?.flagged === true || complaint?.flagged?.isFlagged === true;
 
-  const formatDate = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
+  // const formatDate = (isoString) => {
+  //   const date = new Date(isoString);
+  //   return date.toLocaleString("en-US", {
+  //     weekday: "long",
+  //     year: "numeric",
+  //     month: "long",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     hour12: true,
+  //   });
+  // };
+
+
+  const formatDate = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
+
 
   useEffect(() => {
     const fetchComplaint = async () => {
@@ -425,15 +457,76 @@ const ComplaintsDetails = () => {
                       {/* Comment card */}
                       <div className="timeline-content">
                         <div className="comment-card" style={{ borderLeftColor: roleColor, backgroundColor: roleBgColor }}>
-                          <div className="comment-header">
+                          {/* <div className="comment-header">
                             <span className="comment-role" style={{ color: roleColor, fontWeight: "700" }}>
                               {displayName}
                             </span>
                             <span className="comment-date">
                               {formatDate(c.timestamp || c.date)}
                             </span>
-                          </div>
+                          </div> */}
+
+
+
+<div className="comment-header">
+  <div className="comment-author">
+    <FaUser
+      size={16}
+      className="me-2"
+      style={{ color: c.role === "student" ? "#ff6b6b" : "#7b1fa2" }}
+    />
+    <span
+      style={{
+        color: c.role === "student" ? "#ff6b6b" : "#7b1fa2",
+        fontWeight: 700,
+      }}
+    >
+      {c.role === "student" ? "Student" : c.email}
+    </span>
+  </div>
+
+  <span className="comment-date">
+    {formatDate(c.timestamp || c.date)}
+  </span>
+</div>
+
+
+
+
+
                           <div className="comment-body">{c.text}</div>
+
+                          {/* Replies (threaded under this comment) */}
+                          {c.replies && c.replies.length > 0 && (
+                            <div style={{ marginLeft: "1.6rem", marginTop: "0.6rem" }}>
+                              {c.replies.map((r) => (
+                                <div key={r.id} style={{ marginBottom: "0.5rem" }}>
+                                  <div className="reply-card" style={{ backgroundColor: "#fff", borderLeft: "3px solid #e9ecef", padding: "8px", borderRadius: "6px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
+                                      {/* <strong style={{ color: "#6c757d", fontSize: "0.9rem" }}>{r.role === "student" ? "Student" : (r.email || "User")}</strong> */}
+
+
+
+                                      <div className={`comment-author ${r.role === "student" ? "student" : "admin"}`}>
+<FaUser
+  size={14}
+  className=""
+  style={{ color: r.role === "student" ? "#ff6b6b" : "#7b1fa2" }}
+/>
+
+  <span className="author-name">
+    {r.role === "student" ? "Student" : r.email}
+  </span>
+</div>
+
+                                      <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "#6c757d" }}>{formatDate(r.timestamp || r.date)}</span>
+                                    </div>
+                                    <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

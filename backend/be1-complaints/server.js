@@ -3,10 +3,13 @@ const app = exp();
 require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
+app.use(cors({
+  origin: "http://localhost:3000", // 👈 exact origin
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
-app.use(cors());
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 // Deploy React build to this server
 app.use(exp.static(path.join(__dirname, '../../frontend/fe1-complaints/build')));

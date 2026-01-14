@@ -14,6 +14,16 @@ import NoImageIcon from "../images/no-img-icon.png";
 import { useRef } from "react";
 import ReopenComplaintModal from "../ReopenComplaintModal/ReopenComplaintModal";
 
+
+
+
+
+import { Reply } from "lucide-react";
+
+
+
+
+
 const CATEGORIES = [
   "Infrastructure",
   "Canteen",
@@ -54,6 +64,11 @@ const UserDashboard = () => {
   const [editWarning, setEditWarning] = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState(null);
+
+  // Reply UI state for threaded replies
+  const [openReply, setOpenReply] = useState(null);
+  const [replyTexts, setReplyTexts] = useState({});
+
   const [showReopenModal, setShowReopenModal] = useState(false);
   const [selectedComplaintForReopen, setSelectedComplaintForReopen] = useState(null);
   const warningRef = useRef(null);
@@ -102,10 +117,110 @@ const UserDashboard = () => {
     });
 }, [user]);
 
+
+
+
+
+
+// const formatDateTime = (timestamp) => {
+//   if (!timestamp) return "";
+
+//   const date = new Date(timestamp);
+
+//   const datePart = date.toLocaleDateString("en-US", {
+//     month: "short",
+//     day: "2-digit",
+//     year: "numeric",
+//   });
+
+//   const timePart = date.toLocaleTimeString([], {
+//     hour: "numeric",
+//     minute: "2-digit",
+//     hour12: true,
+//   });
+
+//   return `${datePart} ${timePart}`;
+// };
+
+
+const formatDateTime = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
+
+
+
+
+
+
+
+
+
+
   const formatDate = (timestamp) => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
     return date.toDateString();
+  };
+
+  // Reply helpers for threaded replies
+  const handleReplyChange = (commentId, value) => {
+    setReplyTexts((prev) => ({ ...prev, [commentId]: value }));
+  };
+
+  const handleReplySubmit = async (comment) => {
+    const text = (replyTexts[comment.id] || "").trim();
+    // if (!text) return toast.error("Reply cannot be empty");
+
+
+
+    if (text.trim().length < 5) {
+  return toast.error("Reply must be at least 5 characters or Please enter a meaningful reply");
+}
+
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const url = `${baseUrl}/user-api/complaints/${expandedCard.complaint_id}/comment/${comment.id}/reply`;
+      const res = await axios.post(url, { text }, { headers: { Authorization: `Bearer ${token}` } });
+
+      if (res?.data?.complaint) {
+        setExpandedCard(res.data.complaint);
+        setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+        setOpenReply(null);
+        toast.success("Reply added successfully");
+      } else {
+        toast.info("Reply added, but failed to refresh comments");
+      }
+    } 
+    // catch (err) {
+    //   console.error("Error adding reply:", err);
+    //   toast.error("Failed to add reply");
+    // }
+
+    catch (err) {
+  console.error("Error adding reply:", err);
+  toast.error(
+    err.response?.data?.message || "Failed to add reply"
+  );
+}
+
   };
 
   const isITCategory = (category) => {
@@ -720,6 +835,86 @@ const UserDashboard = () => {
                   <strong style={{ color: borderColor }}>{displayName}</strong>
                 </div>
                 <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
+
+                {/* Replies */}
+                {comment.replies && comment.replies.length > 0 && (
+                  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+                    {comment.replies.map((r) => (
+                      <div key={r.id} style={{ marginBottom: "0.5rem" }}>
+                        <div className="reply-card" style={{ backgroundColor: "#fff", borderLeft: "3px solid #e9ecef", padding: "8px", borderRadius: "6px" }}>
+                          {/* <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
+                            <strong style={{ color: "#6c757d", fontSize: "0.9rem" }}>{r.role === "student" ? "Student" : (r.email || "User")}</strong>
+                            <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "#6c757d" }}>{formatDate(r.timestamp || r.date)}</span>
+                          </div> */}
+
+
+
+                          <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
+  
+  {/* Student icon */}
+  {r.role === "student" && (
+    <FaUser
+      className="me-2"
+      size={14}
+      style={{ color: "#ff6b6b" }}
+    />
+  )}
+
+  <strong
+    style={{
+      color: r.role === "student" ? "#ff6b6b" : "#6c757d",
+      fontSize: "0.9rem"
+    }}
+  >
+    {r.role === "student" ? "Student" : (r.email || "User")}
+  </strong>
+
+<span
+  style={{
+    marginLeft: "auto",
+    fontSize: "0.75rem",
+    color: "#6c757d"   // always grey
+  }}
+>
+  {formatDateTime(r.timestamp || r.date)}
+</span>
+
+</div>
+
+
+
+
+
+                          <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Reply UI for complaint owner when target comment is admin */}
+                {comment.role === "admin" && userEmail === expandedCard.user_id && (
+                  <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>
+                    {openReply === comment.id ? (
+                      <div className="d-flex gap-2">
+                        <textarea
+                          className="form-control"
+                          rows="2"
+                          value={replyTexts[comment.id] || ""}
+                          onChange={(e) => handleReplyChange(comment.id, e.target.value)}
+                          placeholder="Write a reply..."
+                        ></textarea>
+                        <div className="d-flex flex-column gap-1 ms-2">
+                          <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment)}>Send</button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => { setOpenReply(null); setReplyTexts((prev) => ({ ...prev, [comment.id]: "" })); }}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button className="btn btn-link btn-sm" onClick={() => setOpenReply(comment.id)}>Reply</button>
+                    )}
+                  </div>
+                )}
+
               </div>
             );
           })
