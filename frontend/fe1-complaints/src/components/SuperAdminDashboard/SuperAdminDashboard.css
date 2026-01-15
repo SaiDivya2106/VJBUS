@@ -2491,6 +2491,70 @@ textarea.note-textarea {
   border-radius: 999px; /* fully pill / circular */
 }
 
+/* Filter wrapper */
+.filter-container {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Grid layout for filters */
+.filter-box-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+/* Stack on mobile */
+@media (max-width: 768px) {
+  .filter-box-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Each filter block */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Title row */
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Icon styling */
+.filter-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-icon.blue {
+  background: #e8f0ff;
+  color: #4c63d2;
+}
+
+.filter-icon.purple {
+  background: #f2e8ff;
+  color: #7b1fa2;
+}
+
+/* Select styling */
+.filter-select-bootstrap {
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 500;
+}
 
 
 

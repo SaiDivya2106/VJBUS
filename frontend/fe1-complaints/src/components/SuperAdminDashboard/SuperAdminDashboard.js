@@ -112,13 +112,15 @@ const SuperAdminDashboard = () => {
         </h2>
 
 {/* Filters */}
-<Row className="align-items-center g-4 filter-row">
-  <Col >
+{/* Filters */}
+{/* Filters */}
+<Row className="filter-row justify-content-center">
+  <Col xs={12} lg={10}>
     <div className="filter-container">
-      <div className="filter-box">
+      <div className="filter-box-grid">
 
         {/* Category */}
-        <div className="filter-group ">
+        <div className="filter-group">
           <div className="filter-title">
             <span className="filter-icon blue">
               <i className="bi bi-funnel"></i>
@@ -177,6 +179,7 @@ const SuperAdminDashboard = () => {
     </div>
   </Col>
 </Row>
+
 
 
         {/* Loading */}
