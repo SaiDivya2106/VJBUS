@@ -68,6 +68,8 @@ const [modalImageSrc, setModalImageSrc] = useState(null);
 const [openReply, setOpenReply] = useState(null);
 const [replyTexts, setReplyTexts] = useState({});
 
+// Track expanded replies per comment
+const [expandedReplies, setExpandedReplies] = useState({});
 
 
 
@@ -363,6 +365,17 @@ const submitEditComplaint = async () => {
       console.error("Error editing complaint:", err);
     }
   }
+};
+
+
+
+
+
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
 };
 
 
@@ -1034,94 +1047,75 @@ const handleDeleteComplaint = async (id) => {
 
           {/* Replies (threaded under this comment) */}
           {comment.replies && comment.replies.length > 0 && (
-            <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
-              {comment.replies.map((r) => {
-                const rIsStudent = r.role === "student";
-                const rDisplay = rIsStudent ? "Student" : (r.email || "User");
-                return (
-                  <div
-  key={r.id}
-  style={{
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "10px",
-    marginBottom: "10px",
-  }}
->
-  {/* 🔴 Arrow OUTSIDE the reply box */}
-  <span
-    style={{
-      color: "#ff6b6b",
-      fontSize: "1.3rem",
-      marginTop: "14px",
-    }}
-  >
-    ↳
-  </span>
-
-  {/* 🟦 Student reply card */}
-  <div
-    className="reply-entry"
-    style={{
-     backgroundColor: "#f6f8fa",
-      borderLeft: "3px solid #e2e2e2",
-      padding: "10px 12px",
-      borderRadius: "10px",
-      flex: 1,
-    }}
-  >
-    {/* Header */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "4px",
-      }}
-    >
-      {/* Student icon */}
-      <FaUser
-        size={14}
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[comment.id]
+      ? comment.replies
+      : comment.replies.slice(0, 3)
+    ).map((r) => (
+      <div
+        key={r.id}
         style={{
-          color: "#ff6b6b",
-          marginRight: "6px",
-        }}
-      />
-
-      {/* Student label */}
-      <strong
-        style={{
-          color: "#ff6b6b",
-          fontSize: "0.9rem",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginBottom: "10px",
         }}
       >
-        Student
-      </strong>
+        <span
+          style={{
+            color: "#ff6b6b",
+            fontSize: "1.3rem",
+            marginTop: "14px",
+          }}
+        >
+          ↳
+        </span>
 
-      {/* Date */}
-      <span
-        style={{
-          marginLeft: "auto",
-          fontSize: "0.75rem",
-          color: "#6c757d",
-        }}
-      >
-        {formatDate(r.timestamp || r.date)}
-      </span>
-    </div>
+        <div
+          style={{
+            backgroundColor: "#f6f8fa",
+            borderLeft: "3px solid #e2e2e2",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            flex: 1,
+          }}
+        >
+          <strong
+            style={{
+              color: "#ff6b6b",
+              fontSize: "0.9rem",
+            }}
+          >
+            Student
+          </strong>
 
-    {/* Message */}
-    <div
-      style={{
-        marginLeft: "1.4rem",
+          <div style={{ fontSize: "0.95rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
+
+    {/* 🔽 View More / View Less Replies */}
+    {comment.replies.length > 5 && (
+      <div style={{ marginLeft: "2.5rem" }}>
+        <button
+          className="btn btn-link p-0"
+          style={{
         fontSize: "1rem",
-        color: "#212529",
+        fontWeight: 500,
       }}
-    >
-      {r.text}
-    </div>
+          onClick={() => toggleReplies(comment.id)}
+        >
+          {expandedReplies[comment.id]
+            ? "View less replies"
+            : `View more replies (${comment.replies.length - 3})`}
+        </button>
+      </div>
+    )}
   </div>
-</div>
-                );                        })}
+)}
+          {/* Reply UI for admins */}
+          {comment.role === "student" && (
+            <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>     
             </div>
           )}
 

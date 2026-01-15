@@ -49,7 +49,7 @@
 
 /* Content box (Title / Description) */
 .white-modal .modal-description-box {
-  background: #f9fafb;
+
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 12px 14px;
@@ -235,15 +235,11 @@
     gap: 10px !important;
   }
 
-  .super-btn {
-    min-width: 0 !important;
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-top: 6px !important;
-  }
+
 
   .detail-label {
     min-width: 90px;
+     color: white;
   }
 
   .category-chip {
@@ -287,38 +283,45 @@
 }
 
 /* Light-themed modals: action confirm and detail view */
-.confirm-action-modal .modal-content,
+/* .confirm-action-modal .modal-content,
 .superadmin-detail-modal .modal-content,
 .detail-modal .modal-content {
   background: #ffffff !important;
-  color: #111 !important;
+  color: #d9d6d6 !important;
   border: 1px solid rgba(0,0,0,0.06) !important;
   box-shadow: 0 8px 30px rgba(17,24,39,0.06) !important;
-}
+} */
 
 .confirm-action-modal .modal-header-title,
 .superadmin-detail-modal .detail-title,
 .detail-modal .modal-header-title {
-  color: #111 !important;
+  color: #e9e6e6 !important;
 }
 
-.confirm-action-modal .confirm-modal-body,
+/* .confirm-action-modal .confirm-modal-body,
 .superadmin-detail-modal .modal-body,
 .detail-modal .modal-body {
   color: #222 !important;
-}
+} */
 
 .modal-description-box {
-  background: #f7f8fb !important;
-  color: #111 !important;
+
+  color: #dddada !important;
   border: 1px solid rgba(0,0,0,0.04) !important;
 }
 
-.note-textarea {
+/* .note-textarea {
   background: #ffffff !important;
-  color: #111 !important;
+  color: #d31919 !important;
   border: 1px solid rgba(0,0,0,0.08) !important;
-}
+} */
+
+
+
+
+
+
+
 
 
 
@@ -467,12 +470,78 @@
   background: #18263d !important;
 }
 
+/* Make cards wide like other pages */
 .filter-container {
-  width: 100%;
-  max-width: 1100px; /* constrain width for better centering */
-  margin: 0 auto 40px auto; /* center container */
-  padding: 0 12px;
+  max-width: 1400px;   /* or 100% */
+  margin: 0 auto;
+  padding: 0 20px;
 }
+
+
+
+/* ================================
+   USER / FLAGGED BY – NEXT LINE STYLE
+================================ */
+
+/* Make label on top and value below */
+.detail-row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  margin-bottom: 10px;
+}
+
+/* Label style */
+.detail-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b12020;
+  margin-bottom: 4px;
+}
+
+/* Value goes to next line with space */
+.detail-row > span:not(.detail-label):not(.reason-badge):not(.note-preview) {
+  padding-left: 22px;          /* 👈 THIS CREATES THE SPACE */
+  font-size: 0.9rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  word-break: break-word;
+}
+
+/* User icon color */
+.user-icon {
+  color: #4432e4;   
+             /* blue – change if you want */
+}
+
+
+
+
+/* ===============================
+   REDUCE ACTION BUTTON WIDTH
+================================ */
+
+/* Button container stays centered */
+.btn-row {
+  align-items: center !important;
+}
+
+/* Reduce button width */
+.super-btn {
+  width: auto !important;        /* stop full width */
+  min-width: 200px !important;   /* control size */
+  max-width: 220px !important;   /* prevent stretch */
+
+  padding: 10px 20px !important;
+  margin: 0 auto !important;     /* keep centered */
+}
+
+
+
+
+
 @media (max-width: 768px) {
   .filter-box {
     grid-template-columns: 1fr;
@@ -696,13 +765,53 @@
   color: #1a1b1a;
   font-size: 1.3rem;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 4px !important; 
 }
+
+
+.description {
+  margin-bottom: 1px !important;  /* tighter spacing */
+  line-height: 1.4;
+}
+
+
+
+
+
+
+.details-section {
+  margin-bottom: 4px !important;
+}
+
+.detail-row {
+  margin-bottom: 4px !important;
+}
+
+/* Reason badge spacing */
+.reason-badge {
+  margin-top: 2px;
+}
+.flag-body {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.btn-row {
+  margin-top: auto;     /* pushes buttons to center-bottom */
+  margin-bottom: auto;
+}
+.separator {
+  margin: 6px 0 !important;
+}
+
+
+
+
+
 
 .description {
   font-size: 0.95rem;
   color: rgb(105, 104, 104) !important;
-  margin-bottom: 18px;
+
 }
 
 .read-more {
@@ -716,18 +825,50 @@
   margin-bottom: 10px;
 }
 
+/* FORCE LABEL ON TOP, VALUE BELOW (ALL SCREENS) */
 .detail-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  flex-direction: column;   /* KEY CHANGE */
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
 }
+
 .detail-label {
   min-width: 110px;
   font-weight: 600;
   font-size: 0.9rem;
   color: #080809;
 }
+.detail-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111;
+}
+/* BUTTON CONTAINER – SAME ON ALL SCREENS */
+.btn-row {
+  display: flex;
+  flex-direction: column;   /* STACK BUTTONS */
+  gap: 10px;
+  margin-top: 16px;
+}
+/* FULL-WIDTH BUTTONS */
+.super-btn {
+  width: 100% !important;
+  min-width: 100% !important;
+
+  padding: 12px 20px !important;
+  border-radius: 999px !important;
+
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+}
+
 
 /* Responsive: stack detail rows on small screens so labels sit above values */
 @media (max-width: 768px) {
@@ -1032,6 +1173,17 @@
   margin-bottom: 20px;
   line-height: 1.5;
 }
+
+
+
+/* Reduce title text size inside the box */
+.white-modal .modal-description-box h5 {
+  font-size: 1.2rem;   /* smaller than before */
+  font-weight: 500;     /* slightly lighter */
+  line-height: 1.4;
+  margin: 0;
+}
+
 
 .note-label {
   font-weight: 600;
@@ -1407,7 +1559,6 @@ textarea.note-textarea {
 .btn-row {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 /* Mobile */
@@ -1428,12 +1579,58 @@ textarea.note-textarea {
 .detail-modal .modal-content {
   max-height: 85vh;
   overflow-y: auto;
+  margin-top: 40px;
 }
 
 
 
+/* ===============================
+   FINAL BUTTON FIX – ALL SCREENS
+================================ */
+
+/* Button container */
+.btn-row {
+  display: flex !important;
+  flex-direction: column !important;   /* stack */
+  align-items: center !important;      /* center horizontally */
+  gap: 14px !important;
+  margin: 14px 0 !important;
+}
+
+/* Buttons */
+.super-btn {
+  width: 85% !important;               /* SAME width as image */
+  max-width: 320px !important;         /* prevents too wide on desktop */
+
+  padding: 12px 20px !important;
+  border-radius: 999px !important;
+
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  margin: 0 auto !important;            /* HARD CENTER */
+}
+.flag-body {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.btn-row {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+}
 
 
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 24px;
+}
 
 
 
@@ -1466,7 +1663,7 @@ textarea.note-textarea {
 }
 
 .detail-title {
-  color: #66aaff;
+
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 20px;
@@ -1551,10 +1748,10 @@ textarea.note-textarea {
 
 /* LABEL */
 .detail-label {
-  font-size: 0.85rem;
+  font-size: 0.93rem;
   font-weight: 600;
-  color: #111;
   margin-top: 2px;
+  color:#ceced3;
 }
 
 /* CONTENT (user, flagged by, note text) */
@@ -1879,24 +2076,6 @@ textarea.note-textarea {
    RESPONSIVE – SUPER ADMIN DASHBOARD
 ====================================== */
 
-/* ---------- LARGE TABLETS (≤ 1200px) ---------- */
-@media (max-width: 1200px) {
-  .filter-box {
-    width: 100% !important;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-  .flag-card{
-    width: 100% !important;
-  }
-
-  .filter-group {
-    min-width: 100% !important;
-    flex: 1 1 100%;
-  }
-
-
-}
 
 /* ---------- TABLETS (≤ 992px) ---------- */
 @media (max-width: 992px) {
@@ -2031,10 +2210,286 @@ textarea.note-textarea {
 
 
 
+/* Ensure modal content is NOT affected by overlay */
+.white-modal {
+  isolation: isolate;
+  z-index: 1055;
+}
+
+/* Make body fully opaque */
+.confirm-modal-body {
+  background: #ffffff; /* was #fafafa */
+  color: #111827;
+}
+
+/* Force readable text */
+.confirm-modal-body * {
+  opacity: 1 !important;
+  filter: none !important;
+}
 
 
 
 
+
+
+
+
+
+
+
+
+
+/* Ensure content is fully visible inside dark modal */
+.superadmin-detail-modal .modal-body,
+.superadmin-detail-modal .detail-row,
+.superadmin-detail-modal .detail-value,
+.superadmin-detail-modal .detail-label {
+  opacity: 1 !important;
+  color: inherit !important;
+}
+/* Increase modal width */
+.superadmin-detail-modal .modal-dialog {
+  max-width: 900px;
+  width: 95%;
+}
+/* Make every field stretch till end */
+.detail-value {
+  width: 100%;
+  display: block;
+}
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.superadmin-detail-modal {
+  z-index: 1065 !important;
+}
+.modal-backdrop {
+  z-index: 1055 !important;
+}
+
+
+/* Top-right close (X) button */
+.modal-close-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-x:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+.superadmin-detail-modal .modal-body {
+  position: relative;
+}
+
+
+
+
+
+
+
+
+
+/* ================= FULL DARK CONFIRM / WARN MODAL ================= */
+
+.white-modal .modal-content {
+  background: linear-gradient(180deg, #0b1220 0%, #020617 100%);
+  color: #e5e7eb;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Header */
+.white-modal .modal-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.white-modal .modal-header-title {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Close icon */
+.white-modal .btn-close {
+  filter: invert(1);
+  opacity: 0.9;
+}
+
+/* BODY — THIS IS THE MAIN FIX */
+.white-modal .modal-body {
+  background: transparent;
+  color: #d1d5db;
+}
+
+/* Confirmation text */
+.white-modal .confirm-text {
+  color: #cbd5f5;
+}
+
+/* Section headings */
+.white-modal .modal-section-title {
+  color: #ffffff;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* Read-only text boxes (Title / Description) */
+.white-modal .modal-description-box {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #f8fafc;
+}
+
+/* Title text */
+.white-modal .modal-description-box h5 {
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Textarea (Note) */
+.white-modal textarea,
+.white-modal .form-control {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-radius: 14px;
+}
+
+.white-modal textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Footer */
+.white-modal .modal-footer {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Cancel button */
+.white-modal .btn-outline-secondary {
+  color: #e5e7eb;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.white-modal .btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Confirm buttons */
+.white-modal .btn-success {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  border: none;
+}
+
+.white-modal .btn-warning {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  border: none;
+}
+
+/* Highlight text */
+.highlight-valid {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.highlight-warn {
+  color: #fbbf24;
+  font-weight: 700;
+}
+/* ================= DARK FIELD BOXES (MATCH COMPLAINT DETAILS) ================= */
+
+/* Wrapper boxes (Title / Description display boxes) */
+.white-modal .modal-description-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 16px 18px;
+  color: #f9fafb;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* Title text inside box */
+.white-modal .modal-description-box h5 {
+  color: #ffffff;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Paragraph text inside */
+.white-modal .modal-description-box p,
+.white-modal .modal-description-box div {
+  color: #e5e7eb;
+}
+
+/* ================= NOTE TEXTAREA ================= */
+
+.white-modal textarea,
+.white-modal .form-control {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* Placeholder */
+.white-modal textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Focus state */
+.white-modal textarea:focus,
+.white-modal .form-control:focus {
+  outline: none;
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+
+.white-modal .modal-description-box{
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+
+
+
+
+/* Make Super Admin modal buttons rounded */
+.btnsuperadmin,
+.white-modal .modal-footer .btn {
+  border-radius: 999px; /* fully pill / circular */
+}
 
 
 

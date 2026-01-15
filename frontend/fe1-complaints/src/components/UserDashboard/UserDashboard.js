@@ -64,6 +64,8 @@ const UserDashboard = () => {
   const [editWarning, setEditWarning] = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState(null);
+// Track expanded replies per comment (UserDashboard)
+const [expandedReplies, setExpandedReplies] = useState({});
 
   // Reply UI state for threaded replies
   const [openReply, setOpenReply] = useState(null);
@@ -119,6 +121,12 @@ const UserDashboard = () => {
 
 
 
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
+};
 
 
 
@@ -837,58 +845,69 @@ const formatDateTime = (timestamp) => {
                 <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
 
                 {/* Replies */}
-                {comment.replies && comment.replies.length > 0 && (
-                  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
-                    {comment.replies.map((r) => (
-                      <div key={r.id} style={{ marginBottom: "0.5rem" }}>
-                        <div className="reply-card" style={{ backgroundColor: "#fff", borderLeft: "3px solid #e9ecef", padding: "8px", borderRadius: "6px" }}>
-                          {/* <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
-                            <strong style={{ color: "#6c757d", fontSize: "0.9rem" }}>{r.role === "student" ? "Student" : (r.email || "User")}</strong>
-                            <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "#6c757d" }}>{formatDate(r.timestamp || r.date)}</span>
-                          </div> */}
+{comment.replies && comment.replies.length > 0 && (
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[comment.id]
+      ? comment.replies
+      : comment.replies.slice(0, 2)
+    ).map((r) => (
+      <div key={r.id} style={{ marginBottom: "0.5rem" }}>
+        <div
+          className="reply-card"
+          style={{
+            backgroundColor: "#fff",
+            borderLeft: "3px solid #e9ecef",
+            padding: "8px",
+            borderRadius: "6px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
+            {r.role === "student" && (
+              <FaUser size={14} className="me-2" style={{ color: "#ff6b6b" }} />
+            )}
 
+            <strong
+              style={{
+                color: r.role === "student" ? "#ff6b6b" : "#6c757d",
+                fontSize: "0.9rem",
+              }}
+            >
+              {r.role === "student" ? "Student" : r.email || "User"}
+            </strong>
 
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: "0.75rem",
+                color: "#6c757d",
+              }}
+            >
+              {formatDateTime(r.timestamp || r.date)}
+            </span>
+          </div>
 
-                          <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
-  
-  {/* Student icon */}
-  {r.role === "student" && (
-    <FaUser
-      className="me-2"
-      size={14}
-      style={{ color: "#ff6b6b" }}
-    />
-  )}
+          <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
 
-  <strong
-    style={{
-      color: r.role === "student" ? "#ff6b6b" : "#6c757d",
-      fontSize: "0.9rem"
-    }}
-  >
-    {r.role === "student" ? "Student" : (r.email || "User")}
-  </strong>
-
-<span
-  style={{
-    marginLeft: "auto",
-    fontSize: "0.75rem",
-    color: "#6c757d"   // always grey
-  }}
->
-  {formatDateTime(r.timestamp || r.date)}
-</span>
-
-</div>
-
-
-
-
-
-                          <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
-                        </div>
-                      </div>
-                    ))}
+    {/* 🔽 View More / View Less Replies */}
+    {comment.replies.length > 2 && (
+      <div style={{ marginLeft: "2.5rem" }}>
+        <button
+          className="btn btn-link p-0"
+          style={{
+        fontSize: "1rem",
+        fontWeight: 500,
+      }}
+          onClick={() => toggleReplies(comment.id)}
+        >
+          {expandedReplies[comment.id]
+            ? "View less replies"
+            : `View more replies (${comment.replies.length - 2})`}
+        </button>
+      </div>
+    )}
                   </div>
                 )}
 

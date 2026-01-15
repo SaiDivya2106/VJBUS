@@ -189,15 +189,19 @@ const SuperAdminDashboard = () => {
           emptyState
         ) : (
           <div className="filter-container">
-            <Row xs={1} sm={2} md={3} className="g-4 complaints-grid">
-            {filteredComplaints.map((complaint) => {
-              const words = complaint.description.split(" ");
-              const shortDesc = words.slice(0, 25).join(" ");
+            <Row className="gx-4 gy-4">
+    {filteredComplaints.map((complaint) => {
+      const words = complaint.description.split(" ");
+      const shortDesc = words.slice(0, 25).join(" ");
 
-              return (
-                <Col key={complaint.complaint_id}>
-                  <Card className="flag-card">
-                    {/* Category */}
+      return (
+        <Col
+          key={complaint.complaint_id}
+          sm={12}
+          md={6}
+          lg={4}
+        >
+          <Card className="flag-card h-100">
                     <div className="category-chip">{complaint.category}</div>
 
                     <Card.Body className="flag-body">
@@ -225,7 +229,7 @@ const SuperAdminDashboard = () => {
                         <div className="detail-row">
                           <span className="detail-label text-dark">User:</span>
                           <span className="">
-                            <FaUserCircle size={16} className="me-2" />
+                            <FaUserCircle size={16} className="user-icon me-1" />
                             {complaint.user_id}
                           </span>
                         </div>
@@ -377,6 +381,7 @@ const SuperAdminDashboard = () => {
    <Modal.Footer className="justify-content-end gap-2">
   <Button
     variant="outline-secondary"
+    className="btnsuperadmin"
     onClick={() => setSelectedComplaint(null)}
   >
     Cancel
@@ -403,6 +408,15 @@ const SuperAdminDashboard = () => {
   className="superadmin-detail-modal detail-modal no-scrollbar"
 >
   <Modal.Body>
+
+
+      <button
+    className="modal-close-x"
+    onClick={() => setFullViewComplaint(null)}
+    aria-label="Close"
+  >
+    ×
+  </button>
 
     <h2 className="detail-title">Complaint Details</h2>
 
@@ -431,7 +445,7 @@ const SuperAdminDashboard = () => {
       <div className="detail-value">{fullViewComplaint?.flagged?.flaggedBy}</div>
     </div>
 
-    <div className="detail-row">
+    <div className="detail-row text-white">
       <div className="detail-label">Reason:</div>
       <div className="detail-value reason-box">
         {fullViewComplaint?.flagged?.reason}

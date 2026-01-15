@@ -35,6 +35,10 @@ const ComplaintsDetails = () => {
 
   // determine if complaint is flagged (used to disable updates)
   const isFlagged = complaint?.flagged === true || complaint?.flagged?.isFlagged === true;
+// Track expanded replies per comment (Complaint Details page)
+const [expandedReplies, setExpandedReplies] = useState({});
+
+
 
   // const formatDate = (isoString) => {
   //   const date = new Date(isoString);
@@ -48,6 +52,12 @@ const ComplaintsDetails = () => {
   //     hour12: true,
   //   });
   // };
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
+};
 
 
   const formatDate = (timestamp) => {
@@ -497,36 +507,93 @@ const ComplaintsDetails = () => {
                           <div className="comment-body">{c.text}</div>
 
                           {/* Replies (threaded under this comment) */}
-                          {c.replies && c.replies.length > 0 && (
-                            <div style={{ marginLeft: "1.6rem", marginTop: "0.6rem" }}>
-                              {c.replies.map((r) => (
-                                <div key={r.id} style={{ marginBottom: "0.5rem" }}>
-                                  <div className="reply-card" style={{ backgroundColor: "#fff", borderLeft: "3px solid #e9ecef", padding: "8px", borderRadius: "6px" }}>
-                                    <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
-                                      {/* <strong style={{ color: "#6c757d", fontSize: "0.9rem" }}>{r.role === "student" ? "Student" : (r.email || "User")}</strong> */}
+                                   {c.replies && c.replies.length > 0 && (
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[c.id]
+      ? c.replies
+      : c.replies.slice(0, 2)
+    ).map((r) => (
+      <div
+        key={r.id}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <span
+          style={{
+            color: "#ff6b6b",
+            fontSize: "1.3rem",
+            marginTop: "14px",
+          }}
+        >
+          ↳
+        </span>
+
+        <div
+          style={{
+            backgroundColor: "#f6f8fa",
+            borderLeft: "3px solid #e2e2e2",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            flex: 1,
+          }}
+        >
+          <strong
+            style={{
+              color: "#ff6b6b",
+              fontSize: "0.9rem",
+            }}
+          >
+            Student
+          </strong>
+
+          <div style={{ fontSize: "0.95rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
+
+    {/* 🔽 View More / View Less Replies */}
+{c.replies.length > 2 && (
+  <div
+    onClick={() => toggleReplies(c.id)}
+    style={{
+      marginLeft: "2.6rem",
+      marginTop: "6px",
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      cursor: "pointer",
+      color: "#527dfd",   // 💜 purple
+      fontSize: "1rem",
+      userSelect: "none",
+      background: "transparent", // 🔑 important
+    }}
+  >
+    {/* ✅ Plain arrow — NO background */}
+<span
+  style={{
+    color: "#6188ff",
+    fontSize: "1.2rem",
+    marginTop: "2px",
+  }}
+>
+  ⤶
+</span>
 
 
 
-                                      <div className={`comment-author ${r.role === "student" ? "student" : "admin"}`}>
-<FaUser
-  size={14}
-  className=""
-  style={{ color: r.role === "student" ? "#ff6b6b" : "#7b1fa2" }}
-/>
-
-  <span className="author-name">
-    {r.role === "student" ? "Student" : r.email}
-  </span>
-</div>
-
-                                      <span style={{ marginLeft: "auto", fontSize: "0.75rem", color: "#6c757d" }}>{formatDate(r.timestamp || r.date)}</span>
-                                    </div>
-                                    <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+    <span>
+      {expandedReplies[c.id]
+        ? "View less replies"
+        : `View more replies (${c.replies.length - 2})`}
+    </span>
+  </div>
+)}
+  </div>
+)}  
                         </div>
                       </div>
                     </div>
