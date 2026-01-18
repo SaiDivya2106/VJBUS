@@ -104,6 +104,8 @@ const handleReplySubmit = async (comment) => {
     if (res?.data?.complaint) {
       setExpandedCard(res.data.complaint);
       setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+      // Auto-expand the replies section to show the new reply immediately
+      setExpandedReplies((prev) => ({ ...prev, [comment.id]: true }));
       setOpenReply(null);
       showPopup("Reply added successfully");
     } else {

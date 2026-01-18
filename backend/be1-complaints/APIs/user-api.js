@@ -789,7 +789,7 @@ userApp.post(
               subject: `Reply to your comment on request (${complaint.title})`,
               html: `
                 <p>Dear Admin,</p>
-                <p>The student (<strong>${userEmailFromToken}</strong>) has replied to your comment on the request titled "<strong>${complaint.title}</strong>".</p>
+                <p>The student has replied to your comment on the request ong>)titled "<strong>${complaint.title}</strong>".</p>
                 <p><strong>Reply:</strong></p>
                 <blockquote style="border-left: 4px solid #6a1b9a; padding-left: 10px; color: #333;">
                   ${trimmedText}
