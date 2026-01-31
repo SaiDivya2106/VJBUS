@@ -31,10 +31,22 @@ userApp.use(exp.json());
 let complaintsCollectionObj;
 let adminsCollectionObj;
 
-// Middleware to get the collection object from the app
+// Middleware to get the collection object from the app and fail-fast if missing
 userApp.use((req, res, next) => {
   complaintsCollectionObj = req.app.get("complaintsCollectionObj");
   adminsCollectionObj = req.app.get("adminsCollectionObj");
+
+  if (!complaintsCollectionObj || !adminsCollectionObj) {
+    // Log useful debug info and return a 503 so handlers don't throw
+    console.error('DB collections not available on app object', {
+      complaintsCollectionObj: !!complaintsCollectionObj,
+      adminsCollectionObj: !!adminsCollectionObj,
+      path: req.originalUrl,
+      method: req.method,
+    });
+    return res.status(503).json({ error: 'Service unavailable: database not connected' });
+  }
+
   next();
 });
 
