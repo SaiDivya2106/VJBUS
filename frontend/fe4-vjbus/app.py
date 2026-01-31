@@ -6,11 +6,12 @@ load_dotenv()
 
 app = Flask(__name__)
 API_KEY = os.getenv("API_KEY")
-CLIENT_ID=os.getenv("CLIENT_ID")
-ROUTES=os.getenv('ALL_ROUTES')
+CLIENT_ID = os.getenv("CLIENT_ID")
+ROUTES = os.getenv("ALL_ROUTES")
+DB_PATH = os.getenv("BACKEND_DB_PATH", "../../backend/be4-vjbus/database.db")
+
 def get_db_connection():
-    # conn = sqlite3.connect("../database.db")
-    conn = sqlite3.connect("../../backend/be4-vjbus/database.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -92,4 +93,6 @@ def marker():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3104, debug=True)
+    port = int(os.getenv("PORT", 3104))
+    debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug)
