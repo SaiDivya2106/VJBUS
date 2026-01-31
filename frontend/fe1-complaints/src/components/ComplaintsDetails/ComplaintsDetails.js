@@ -15,6 +15,15 @@ import { IoMdCall } from "react-icons/io";
 import { useAuth } from "../../Context/AuthContext";
 import ComplaintCategoryWithFlag from "../ComplaintCategoryWithFlag/ComplaintCategoryWithFlag";
 
+
+
+
+import { FaUser } from "react-icons/fa";
+
+
+
+
+
 const ComplaintsDetails = () => {
   const { complaint_id } = useParams();
   const navigate = useNavigate();
@@ -26,19 +35,52 @@ const ComplaintsDetails = () => {
 
   // determine if complaint is flagged (used to disable updates)
   const isFlagged = complaint?.flagged === true || complaint?.flagged?.isFlagged === true;
+// Track expanded replies per comment (Complaint Details page)
+const [expandedReplies, setExpandedReplies] = useState({});
 
-  const formatDate = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
+
+
+  // const formatDate = (isoString) => {
+  //   const date = new Date(isoString);
+  //   return date.toLocaleString("en-US", {
+  //     weekday: "long",
+  //     year: "numeric",
+  //     month: "long",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     hour12: true,
+  //   });
+  // };
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
+};
+
+
+  const formatDate = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
+
 
   useEffect(() => {
     const fetchComplaint = async () => {
@@ -425,15 +467,133 @@ const ComplaintsDetails = () => {
                       {/* Comment card */}
                       <div className="timeline-content">
                         <div className="comment-card" style={{ borderLeftColor: roleColor, backgroundColor: roleBgColor }}>
-                          <div className="comment-header">
+                          {/* <div className="comment-header">
                             <span className="comment-role" style={{ color: roleColor, fontWeight: "700" }}>
                               {displayName}
                             </span>
                             <span className="comment-date">
                               {formatDate(c.timestamp || c.date)}
                             </span>
-                          </div>
+                          </div> */}
+
+
+
+<div className="comment-header">
+  <div className="comment-author">
+    <FaUser
+      size={16}
+      className="me-2"
+      style={{ color: c.role === "student" ? "#ff6b6b" : "#7b1fa2" }}
+    />
+    <span
+      style={{
+        color: c.role === "student" ? "#ff6b6b" : "#7b1fa2",
+        fontWeight: 700,
+      }}
+    >
+      {c.role === "student" ? "Student" : c.email}
+    </span>
+  </div>
+
+  <span className="comment-date">
+    {formatDate(c.timestamp || c.date)}
+  </span>
+</div>
+
+
+
+
+
                           <div className="comment-body">{c.text}</div>
+
+                          {/* Replies (threaded under this comment) */}
+                                   {c.replies && c.replies.length > 0 && (
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[c.id]
+      ? c.replies
+      : c.replies.slice(0, 2)
+    ).map((r) => (
+      <div
+        key={r.id}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <span
+          style={{
+            color: "#ff6b6b",
+            fontSize: "1.3rem",
+            marginTop: "14px",
+          }}
+        >
+          ↳
+        </span>
+
+        <div
+          style={{
+            backgroundColor: "#f6f8fa",
+            borderLeft: "3px solid #e2e2e2",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            flex: 1,
+          }}
+        >
+          <strong
+            style={{
+              color: "#ff6b6b",
+              fontSize: "0.9rem",
+            }}
+          >
+            Student
+          </strong>
+
+          <div style={{ fontSize: "0.95rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
+
+    {/* 🔽 View More / View Less Replies */}
+{c.replies.length > 2 && (
+  <div
+    onClick={() => toggleReplies(c.id)}
+    style={{
+      marginLeft: "2.6rem",
+      marginTop: "6px",
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      cursor: "pointer",
+      color: "#527dfd",   // 💜 purple
+      fontSize: "1rem",
+      userSelect: "none",
+      background: "transparent", // 🔑 important
+    }}
+  >
+    {/* ✅ Plain arrow — NO background */}
+<span
+  style={{
+    color: "#6188ff",
+    fontSize: "1.2rem",
+    marginTop: "2px",
+  }}
+>
+  ⤶
+</span>
+
+
+
+    <span>
+      {expandedReplies[c.id]
+        ? "View less replies"
+        : `View more replies (${c.replies.length - 2})`}
+    </span>
+  </div>
+)}
+  </div>
+)}  
                         </div>
                       </div>
                     </div>

@@ -17,21 +17,17 @@ export const AuthProvider = ({ children }) => {
  useEffect(() => {
   // Attach token globally and keep interceptor ids so we can eject them on cleanup
   const reqInterceptorId = axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem("authToken");
     // allow callers to explicitly skip auth (e.g., public uploads)
     if (config && config._skipAuth) return config;
 
-    // don't attach Authorization header to third-party upload endpoints (Cloudinary)
+    // don't attach cookies to third-party upload endpoints (Cloudinary)
     const url = config && config.url ? config.url.toString() : "";
     const skipHosts = ["api.cloudinary.com", "res.cloudinary.com"];
     if (skipHosts.some((h) => url.includes(h))) return config;
 
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-      // mark this request as authenticated so response interceptor can make decisions
-      config._hasAuth = true;
-    }
+    // Auth now relies on HttpOnly cookie from auth-server
+    config.withCredentials = true;
+    config._hasAuth = true;
     return config;
   });
 
@@ -178,32 +174,37 @@ export const AuthProvider = ({ children }) => {
     });
 
   // --- Check admin ---
-  const checkAdminStatus = async (email) => {
-    console.log("baseURl",baseUrl)
-    try {
-      const token = localStorage.getItem("authToken");
-      const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      setIsAdmin(data.isAdmin);
-      setAdminCategory(
-        data.isAdmin
-          ? Array.isArray(data.adminCategories)
-            ? data.adminCategories
-            : [data.adminCategory].filter(Boolean)
-          : []
-      );
-    } catch (err) {
-      console.error("Error checking admin:", err);
+ const checkAdminStatus = async (email) => {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // ✅ REQUIRED
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Admin check failed: ${res.status}`);
     }
-  };
+
+    const data = await res.json();
+    setIsAdmin(data.isAdmin);
+    setAdminCategory(
+      data.isAdmin
+        ? Array.isArray(data.adminCategories)
+          ? data.adminCategories
+          : [data.adminCategory].filter(Boolean)
+        : []
+    );
+  } catch (err) {
+    console.error("Error checking admin:", err);
+  }
+};
+
 
   // --- Render Google login button ---
   const showLoginButton = () => {

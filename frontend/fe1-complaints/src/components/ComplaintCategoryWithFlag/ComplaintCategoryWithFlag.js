@@ -198,7 +198,7 @@ const ComplaintCategoryWithFlag = ({ complaintId, complaint, onFlagged }) => {
       placeholder="Provide context for your report..."
       value={optionalNote}
       onChange={(e) => setOptionalNote(e.target.value)}
-      className="report-textarea text-white"
+      className="report-textarea"
     />
   </div>
 

@@ -150,14 +150,31 @@
   margin-bottom: 10px;
 }
 
-
-
-.close-btn-inside-modal {
+.close-btn-inside-modalm {
   position: sticky;
   top: 5px;
   margin-left: auto;
   z-index: 9999;
-  background: #ffffffdd;
+  background: #f6f4f4dd;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.close-btn-inside-modalh {
+  position: sticky;
+  top: 5px;
+  margin-left: auto;
+  z-index: 9999;
+  background: #c7c5c5dd;
   border: none;
   border-radius: 50%;
   width: 32px;
@@ -273,15 +290,15 @@ margin-top: 8px;
 /* MAIN ATTRACTIVE BUTTON */
 .issue-not-fixed-attractive-btn {
   width: 50%;
-  padding: 3px 2px;
+  padding: 2px 2px;
   margin-top: 10px;
 
   background: linear-gradient(90deg, #fffaf5, #ffe5d1);
   border: 2px solid #ff9c57;
 
   color: #ff6a19;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.8rem;
 
   display: flex;
   align-items: center;
@@ -1145,5 +1162,190 @@ margin-top: 8px;
 }
 
 
+/* =========================
+   ADMIN COMMENTS – MODERN UI
+========================= */
 
+.admin-updates {
+  margin-top: 20px;
+}
+
+/* Main admin comment card */
+.update-entry {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+/* Admin header row */
+.update-entry strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Admin message text */
+.update-entry > div:last-child {
+  font-size: 0.95rem;
+  color: #2b2b2b;
+  line-height: 1.5;
+}
+
+/* =========================
+   REPLIES (THREAD STYLE)
+========================= */
+
+/* Replies container */
+.update-entry > div[style*="marginLeft: 2.4rem"] {
+  margin-left: 44px !important;
+  margin-top: 12px;
+  position: relative;
+}
+
+/* Vertical thread line */
+.update-entry > div[style*="marginLeft: 2.4rem"]::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e6e6ef;
+  border-radius: 4px;
+}
+
+/* Individual reply bubble */
+.reply-card {
+  background: #f5f7ff !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  box-shadow: none !important;
+  position: relative;
+}
+
+/* Reply arrow (Instagram-style) */
+/* .reply-card::before {
+  content: "↳";
+  position: absolute;
+  left: -18px;
+  top: 8px;
+  color: #8a8aff;
+  font-size: 14px;
+  font-weight: bold;
+} */
+
+/* Reply header */
+.reply-card strong {
+  font-size: 0.82rem;
+  color: #6b6fda;
+}
+
+/* Reply text */
+.reply-card div {
+  font-size: 0.92rem;
+  color: #2f2f2f;
+  margin-left: 6px;
+}
+
+/* =========================
+   REPLY BUTTON (ICON STYLE)
+========================= */
+
+.update-entry .btn-link {
+  padding: 0;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #7b5cff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.update-entry .btn-link::before {
+  content: "↩";
+  font-size: 14px;
+}
+
+.update-entry .btn-link:hover {
+  color: #5b3df5;
+  text-decoration: none;
+}
+
+/* =========================
+   REPLY INPUT AREA
+========================= */
+
+.update-entry textarea.form-control {
+  border-radius: 18px;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  resize: none;
+  border: 1px solid #d6d9ff;
+  box-shadow: none;
+}
+
+.update-entry textarea.form-control:focus {
+  border-color: #7b5cff;
+  box-shadow: 0 0 0 2px rgba(123, 92, 255, 0.15);
+}
+
+/* Send button */
+.update-entry .btn-primary.btn-sm {
+  border-radius: 18px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  background: linear-gradient(135deg, #7b5cff, #5f4bff);
+  border: none;
+}
+
+/* Cancel button */
+.update-entry .btn-secondary.btn-sm {
+  border-radius: 18px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  background: #f0f0f5;
+  color: #555;
+  border: none;
+}
+
+/* =========================
+   MOBILE FRIENDLY
+========================= */
+
+@media (max-width: 576px) {
+  .update-entry {
+    padding: 12px !important;
+  }
+
+  .update-entry > div[style*="marginLeft: 2.4rem"] {
+    margin-left: 28px !important;
+  }
+
+  .reply-card::before {
+    left: -14px;
+  }
+}
+/* .reply-card::after {
+  content: "↳";
+  position: absolute;
+  left: -18px;
+  top: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ff6b6b !important;
+} */
+
+
+
+.reply-card::before {
+  content: "↳";
+  position: absolute;
+  left: -18px;
+  top: 8px;
+   color: #ff6b6b !important;
+  font-size: 14px;
+  font-weight: bold;
+}
 

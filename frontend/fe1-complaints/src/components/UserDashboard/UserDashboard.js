@@ -1,358 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import { Card, Button, Row, Col } from "react-bootstrap";
-// import { HiOutlineThumbUp, HiOutlineThumbDown } from "react-icons/hi";
-// import { Clock, CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
-// import { FaPlus, FaCalendarAlt, FaExclamationCircle,FaUser } from "react-icons/fa";
-// import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../../Context/AuthContext";
-// import axios from "axios";
-// import { MdOutlineTextsms } from "react-icons/md";
-// import "./UserDashboard.css";
-
-
-// import { Modal } from "react-bootstrap";
-
-
-// const UserDashboard = () => {
-//   const [showImageModal, setShowImageModal] = useState(false);
-//   const [modalImageSrc, setModalImageSrc] = useState(null);
-
-//   const { user } = useAuth();
-//   const userEmail = user?.email;
-//   const navigate = useNavigate();
-//   const [complaints, setComplaints] = useState([]);
-//   const [expandedCards, setExpandedCards] = useState({});
-
-//   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
-//   const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
-
-
-// useEffect(() => {
-//   if (userEmail) {
-//     // Get token from localStorage
-//     const token = localStorage.getItem("authToken");
-
-//     axios
-//       .get(`${baseUrl}/user-api/view-complaints/${userEmail}`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`, // Add token to headers
-//         },
-//       })
-//       .then((response) => {
-//         setComplaints(response.data.complaints);
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching complaints:", error);
-//       });
-//   }
-// }, [userEmail]);
-
-
-
-// const openImageModal = (src) => {
-//   setModalImageSrc(src);
-//   setShowImageModal(true);
-// };
-
-//   const toggleExpand = (id) => {
-//     setExpandedCards((prev) => ({
-//       ...prev,
-//       [id]: !prev[id],
-//     }));
-//   };
-
-//   const formatDateTime = (isoString) => {
-//     if (!isoString) return "Date not available";
-//     const date = new Date(isoString);
-//     return isNaN(date.getTime())
-//       ? "Invalid date"
-//       : date.toLocaleDateString("en-GB", {
-//           day: "2-digit",
-//           month: "short",
-//           year: "numeric",
-//         });
-//   };
-
-//   return (
-//     <div className="user-dashboard-container">
-//       <div className="dashboard-container">
-//         <div className="page-heading text-center">
-//           <h1>VNRVJIET Support-Request Portal</h1>
-//           <p>Welcome to the platform where your voice matters!</p>
-//         </div>
-
-//         <div className="user-info mb-4">
-//           <div className="user-avatar">
-//             <img src={user?.picture} alt="Profile" className="rounded-circle" />
-//           </div>
-//           <div className="user-details">
-//             <h2>Welcome, {user?.name || "User"}</h2>
-//             <p><strong>Email:</strong> {userEmail}</p>
-//           </div>
-//         </div>
-
-//         <div className="my-complaints-heading mb-3">
-//           <h3>My Support-Requests</h3>
-//         </div>
-
-//         {complaints.length === 0 ? (
-//           <div className="no-complaints-message text-center">
-//             <p>You haven't raised any Requests yet. Have a concern? Speak up and let your voice be heard!</p>
-//             <Button className="raise-complaint-btn mt-3 px-4 py-2 fw-bold" onClick={() => navigate("/complaint-form")}>
-//               Raise a Support-Request
-//             </Button>
-//           </div>
-//         ) : (
-//           <Row className="gx-4 gy-4">
-//             {complaints.map((complaint) => (
-//               <Col key={complaint._id} xs={12} sm={6} lg={4}>
-//                 <Card className=" rounded-4 complaint-card">
-//                   <Card.Body className="d-flex flex-column">
-// {/* Complaint image with status overlay (same as Home) */}
-// <div className="complaint-image-wrapper mt-2 mb-3">
-//   <Card.Img
-//   variant="top"
-//   src={complaint.image || DEFAULT_IMAGE}
-//   alt="complaint"
-//   className="complaint-image rounded-3"
-//   style={{ maxHeight: "200px", objectFit: "cover", width: "100%", cursor: "pointer" }}
-//   onClick={() => openImageModal(complaint.image || DEFAULT_IMAGE)}
-// />
-
-//   <div className="status-overlay">
-//     <span className={`status-pill ${complaint.status.toLowerCase()}`}>
-//       {complaint.status}
-//     </span>
-//   </div>
-// </div>
-
-
-// {/* Date line below status */}
-// <div className="d-flex align-items-center text-muted small mb-3 mt-2">
-//   <span
-//     style={{
-//       backgroundColor: "#e0f0ff",
-//       color: "#1e90ff",
-//       padding: "6px",
-//       borderRadius: "10px",
-//       display: "inline-flex",
-//       alignItems: "center",
-//       justifyContent: "center",
-//       width: "28px",
-//       height: "28px",
-//       marginRight: "8px",
-//     }}
-//   >
-//     <FaCalendarAlt style={{ fontSize: "14px" }} />
-//   </span>
-//     <span style={{ color: "#1e90ff", fontWeight: "700" }}>
-//     {formatDateTime(complaint.createdAt || complaint.date || complaint.timestamp || complaint.created_on)}
-//   </span>
-// </div>
-
-
-//                     <h5 className="fw-bold mb-2">{complaint.title}</h5>
-
-//                     <Card.Text className="text-secondary mb-2">
-//                       {complaint.description.split(" ").length > 20 ? (
-//                         <>
-//                           {expandedCards[complaint.complaint_id]
-//                             ? complaint.description
-//                             : complaint.description.split(" ").slice(0, 20).join(" ") + "..."}
-//                           <span
-//                             className="ms-2 text-primary"
-//                             style={{ cursor: "pointer" }}
-//                             onClick={() => toggleExpand(complaint.complaint_id)}
-//                           >
-//                             {expandedCards[complaint.complaint_id] ? "View less" : "View more"}
-//                           </span>
-//                         </>
-//                       ) : (
-//                         complaint.description
-//                       )}
-//                     </Card.Text>
-
-//                     {complaint.comments?.length > 0 && (
-//                       <button
-//                         className={`admin-toggle-btn mt-2 ${
-//                           expandedCards[complaint.complaint_id] ? "hide-updates-btn" : "show-updates-btn"
-//                         }`}
-//                         onClick={() => toggleExpand(complaint.complaint_id)}
-//                       >
-//                         Admin Updates
-//                         {expandedCards[complaint.complaint_id] ? (
-//                           <ChevronUp size={16} className="ms-1" />
-//                         ) : (
-//                           <ChevronDown size={16} className="ms-1" />
-//                         )}
-//                       </button>
-//                     )}
-
-//                     {expandedCards[complaint.complaint_id] && (
-//                       <div className="admin-updates mt-3">
-//                         <h6 className="d-flex align-items-center">
-//                           <MdOutlineTextsms className="me-2 text-secondary" size={18} /> Admin Updates
-//                         </h6>
-//                         <div className="updates-container">
-//                           {complaint.comments.map((update, index) => (
-// <div key={index} className="update-entry">
-//   <div className="d-flex justify-content-between align-items-start flex-wrap">
-    
-//     {/* EMAIL + ICON */}
-//     <div className="d-flex align-items-center mb-1">
-//       <FaUser className="me-2 text-purple" size={18} />
-//       <div>
-//         <strong style={{ fontSize: "14px" }}>{update.email}</strong>
-//       </div>
-//     </div>
-
-//     {/* TIME */}
-//     <div className="update-time d-flex align-items-center ms-auto">
-//       <Clock size={14} className="me-1 text-muted" />
-//       <small>{formatDateTime(update.date)}</small>
-//     </div>
-//   </div>
-
-//   {/* TEXT (own line) */}
-//   <div className="mt-1 ps-4">
-//     <p className="update-text mb-1">{update.text}</p>
-//   </div>
-// </div>
-
-//                           ))}
-//                         </div>
-//                       </div>
-//                     )}
-
-//                     <div className="mt-auto d-flex justify-content-between align-items-center pt-3">
-//                       <div className="d-flex align-items-center gap-3">
-//                         <span className="text-success d-flex align-items-center">
-//                           <HiOutlineThumbUp className="me-1" size={20} />
-//                           {complaint.likes}
-//                         </span>
-//                         <span className="text-danger d-flex align-items-center">
-//                           <HiOutlineThumbDown className="me-1" size={20} />
-//                           {complaint.dislikes}
-//                         </span>
-//                       </div>
-//                       <span className="category-tag1">{complaint.category}</span>
-//                     </div>
-//                   </Card.Body>
-//                 </Card>
-//               </Col>
-//             ))}
-//           </Row>
-//         )}
-
-// <Modal
-//   show={showImageModal}
-//   onHide={() => setShowImageModal(false)}
-//   centered
-//   size="lg"
-//   contentClassName="bg-dark border-0"
-//   style={{ zIndex: 9999 }}  // ✅ ensures it's on top of everything
-//   backdropClassName="custom-image-backdrop"
-// >
-//   <Modal.Body
-//     className="p-0 d-flex justify-content-center align-items-center"
-//     style={{ backgroundColor: "rgba(0,0,0,0.95)" }}
-//   >
-//     <img
-//       src={modalImageSrc}
-//       alt="Full preview"
-//       style={{
-//         width: "100%",
-//         height: "auto",
-//         maxHeight: "65vh",
-//         objectFit: "contain",
-//       }}
-//     />
-//     <button
-//       onClick={() => setShowImageModal(false)}
-//       style={{
-//         position: "absolute",
-//         top: "15px",
-//         right: "20px",
-//         background: "rgba(255,255,255,0.2)",
-//         color: "white",
-//         border: "none",
-//         borderRadius: "50%",
-//         width: "35px",
-//         height: "35px",
-//         fontSize: "1.5rem",
-//         cursor: "pointer",
-//         zIndex: 10000, // ✅ even above the modal image
-//       }}
-//     >
-//       ×
-//     </button>
-//   </Modal.Body>
-// </Modal>
-
-// {/* 🔍 Shared Image Preview Modal */}
-// <Modal
-//   show={showImageModal}
-//   onHide={() => setShowImageModal(false)}
-//   centered
-//   size="lg"
-//   contentClassName="bg-dark border-0"
-//   style={{ zIndex: 9999 }}
-//   backdropClassName="custom-image-backdrop"
-// >
-//   <Modal.Body
-//     className="p-0 d-flex justify-content-center align-items-center"
-//     style={{ backgroundColor: "rgba(0,0,0,0.9)" }}
-//   >
-//     <img
-//       src={modalImageSrc}
-//       alt="Full preview"
-//       style={{
-//         width: "auto",
-//         maxWidth: "80%",
-//         height: "auto",
-//         maxHeight: "65vh",
-//         borderRadius: "10px",
-//         objectFit: "contain",
-//         boxShadow: "0 0 15px rgba(0,0,0,0.5)",
-//       }}
-//     />
-//     <button
-//       onClick={() => setShowImageModal(false)}
-//       style={{
-//         position: "absolute",
-//         top: "15px",
-//         right: "20px",
-//         background: "rgba(255,255,255,0.2)",
-//         color: "white",
-//         border: "none",
-//         borderRadius: "50%",
-//         width: "35px",
-//         height: "35px",
-//         fontSize: "1.5rem",
-//         cursor: "pointer",
-//         zIndex: 10000,
-//       }}
-//     >
-//       ×
-//     </button>
-//   </Modal.Body>
-// </Modal>
-
-
-//         <div className="text-center mt-4">
-//               <button className="add-complaint-btn" onClick={() => navigate("/complaint-form")}>
-//           <FaPlus className="plus-icon" /> Add Support-Request
-//         </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default UserDashboard;
-
-
-
 import React, { useState, useEffect } from "react";
 import { Card, Container, Row, Col, Modal } from "react-bootstrap";
 import { FaPlus, FaCalendarAlt, FaUser, FaEdit } from "react-icons/fa";
@@ -368,6 +13,16 @@ import "./UserDashboard.css";
 import NoImageIcon from "../images/no-img-icon.png";
 import { useRef } from "react";
 import ReopenComplaintModal from "../ReopenComplaintModal/ReopenComplaintModal";
+
+
+
+
+
+import { Reply } from "lucide-react";
+
+
+
+
 
 const CATEGORIES = [
   "Infrastructure",
@@ -409,6 +64,13 @@ const UserDashboard = () => {
   const [editWarning, setEditWarning] = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState(null);
+// Track expanded replies per comment (UserDashboard)
+const [expandedReplies, setExpandedReplies] = useState({});
+
+  // Reply UI state for threaded replies
+  const [openReply, setOpenReply] = useState(null);
+  const [replyTexts, setReplyTexts] = useState({});
+
   const [showReopenModal, setShowReopenModal] = useState(false);
   const [selectedComplaintForReopen, setSelectedComplaintForReopen] = useState(null);
   const warningRef = useRef(null);
@@ -457,10 +119,118 @@ const UserDashboard = () => {
     });
 }, [user]);
 
+
+
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
+};
+
+
+
+// const formatDateTime = (timestamp) => {
+//   if (!timestamp) return "";
+
+//   const date = new Date(timestamp);
+
+//   const datePart = date.toLocaleDateString("en-US", {
+//     month: "short",
+//     day: "2-digit",
+//     year: "numeric",
+//   });
+
+//   const timePart = date.toLocaleTimeString([], {
+//     hour: "numeric",
+//     minute: "2-digit",
+//     hour12: true,
+//   });
+
+//   return `${datePart} ${timePart}`;
+// };
+
+
+const formatDateTime = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
+
+
+
+
+
+
+
+
+
+
   const formatDate = (timestamp) => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
     return date.toDateString();
+  };
+
+  // Reply helpers for threaded replies
+  const handleReplyChange = (commentId, value) => {
+    setReplyTexts((prev) => ({ ...prev, [commentId]: value }));
+  };
+
+  const handleReplySubmit = async (comment) => {
+    const text = (replyTexts[comment.id] || "").trim();
+    // if (!text) return toast.error("Reply cannot be empty");
+
+
+
+    if (text.trim().length < 5) {
+  return toast.error("Reply must be at least 5 characters or Please enter a meaningful reply");
+}
+
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const url = `${baseUrl}/user-api/complaints/${expandedCard.complaint_id}/comment/${comment.id}/reply`;
+      const res = await axios.post(url, { text }, { headers: { Authorization: `Bearer ${token}` } });
+
+      if (res?.data?.complaint) {
+        setExpandedCard(res.data.complaint);
+        setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+        // Auto-expand the replies section to show the new reply immediately
+        setExpandedReplies((prev) => ({ ...prev, [comment.id]: true }));
+        setOpenReply(null);
+        toast.success("Reply added successfully");
+      } else {
+        toast.info("Reply added, but failed to refresh comments");
+      }
+    } 
+    // catch (err) {
+    //   console.error("Error adding reply:", err);
+    //   toast.error("Failed to add reply");
+    // }
+
+    catch (err) {
+  console.error("Error adding reply:", err);
+  toast.error(
+    err.response?.data?.message || "Failed to add reply"
+  );
+}
+
   };
 
   const isITCategory = (category) => {
@@ -906,7 +676,7 @@ const UserDashboard = () => {
   <div className="overlay">
     <Card className="popup-card rounded-4 card-background-gradient p-4">
       {/* <button className="close-btn" onClick={() => setExpandedCard(null)}>✕</button> */}
-      <button className="expanded-close-btn" onClick={() => setExpandedCard(null)}>✕</button>
+      <button className="close-btn-inside-modalh" onClick={() => setExpandedCard(null)}>✕</button>
 
 
 {/* FLAGGED OR STATUS */}
@@ -1075,6 +845,97 @@ const UserDashboard = () => {
                   <strong style={{ color: borderColor }}>{displayName}</strong>
                 </div>
                 <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
+
+                {/* Replies */}
+{comment.replies && comment.replies.length > 0 && (
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[comment.id]
+      ? comment.replies
+      : comment.replies.slice(0, 2)
+    ).map((r) => (
+      <div key={r.id} style={{ marginBottom: "0.5rem" }}>
+        <div
+          className="reply-card"
+          style={{
+            backgroundColor: "#fff",
+            borderLeft: "3px solid #e9ecef",
+            padding: "8px",
+            borderRadius: "6px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
+            {r.role === "student" && (
+              <FaUser size={14} className="me-2" style={{ color: "#ff6b6b" }} />
+            )}
+
+            <strong
+              style={{
+                color: r.role === "student" ? "#ff6b6b" : "#6c757d",
+                fontSize: "0.9rem",
+              }}
+            >
+              {r.role === "student" ? "Student" : r.email || "User"}
+            </strong>
+
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: "0.75rem",
+                color: "#6c757d",
+              }}
+            >
+              {formatDateTime(r.timestamp || r.date)}
+            </span>
+          </div>
+
+          <div style={{ marginLeft: "0.8rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
+
+    {/* 🔽 View More / View Less Replies */}
+    {comment.replies.length > 2 && (
+      <div style={{ marginLeft: "2.5rem" }}>
+        <button
+          className="btn btn-link p-0"
+          style={{
+        fontSize: "1rem",
+        fontWeight: 500,
+      }}
+          onClick={() => toggleReplies(comment.id)}
+        >
+          {expandedReplies[comment.id]
+            ? "View less replies"
+            : `View more replies (${comment.replies.length - 2})`}
+        </button>
+      </div>
+    )}
+                  </div>
+                )}
+
+                {/* Reply UI for complaint owner when target comment is admin */}
+                {comment.role === "admin" && userEmail === expandedCard.user_id && (
+                  <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>
+                    {openReply === comment.id ? (
+                      <div className="d-flex gap-2">
+                        <textarea
+                          className="form-control"
+                          rows="2"
+                          value={replyTexts[comment.id] || ""}
+                          onChange={(e) => handleReplyChange(comment.id, e.target.value)}
+                          placeholder="Write a reply..."
+                        ></textarea>
+                        <div className="d-flex flex-column gap-1 ms-2">
+                          <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment)}>Send</button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => { setOpenReply(null); setReplyTexts((prev) => ({ ...prev, [comment.id]: "" })); }}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button className="btn btn-link btn-sm" onClick={() => setOpenReply(comment.id)}>Reply</button>
+                    )}
+                  </div>
+                )}
+
               </div>
             );
           })
@@ -1099,7 +960,7 @@ const UserDashboard = () => {
       onClick={(e) => e.stopPropagation()}
     >
       {/* Close button */}
-      <button className="close-btn-inside-modal fixed" onClick={() => setEditComplaint(null)}>✕</button>
+      <button className="close-btn-inside-modalm fixed" onClick={() => setEditComplaint(null)}>✕</button>
 
 
       {/* Header with Delete */}

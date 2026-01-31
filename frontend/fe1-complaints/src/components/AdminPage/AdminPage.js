@@ -330,6 +330,8 @@ import { useAuth } from "../../Context/AuthContext";
 import { FileX } from "lucide-react";
 import "./AdminPage.css";
 import NotificationBell from "../NotificationBell/NotificationBell";
+import NoImageIcon from "../images/no-img-icon.png";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -338,12 +340,71 @@ const AdminPage = () => {
   const [complaints, setComplaints] = useState([]);
   const [sortOption, setSortOption] = useState("default");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [expandedCardId, setExpandedCardId] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
-  const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+  // const DEFAULT_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/719/637/non_2x/no-camera-or-no-photo-allowed-sign-the-flat-icon-crossed-out-good-for-icon-sticker-message-flat-design-with-grey-color-vector.jpg";
+  const DEFAULT_IMAGE = NoImageIcon;
+
+const [userVotes, setUserVotes] = useState({});
+
+
+const [expandedCard, setExpandedCard] = useState(null);
+
+
+  
+    const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState(null);
+
+
+const handleVote = (complaintId, voteType) => {
+  setExpandedCard((prev) => {
+    if (!prev || prev.complaint_id !== complaintId) return prev;
+
+    let likes = prev.likes;
+    let dislikes = prev.dislikes;
+
+    const previousVote = userVotes[complaintId];
+
+    // 🔁 SAME vote clicked again → REMOVE vote
+    if (previousVote === voteType) {
+      if (voteType === "upvote") likes -= 1;
+      if (voteType === "downvote") dislikes -= 1;
+
+      setUserVotes((prevVotes) => {
+        const updated = { ...prevVotes };
+        delete updated[complaintId]; // remove vote
+        return updated;
+      });
+
+      return { ...prev, likes, dislikes };
+    }
+
+    // 🔄 SWITCH vote (up → down OR down → up)
+    if (previousVote === "upvote" && voteType === "downvote") {
+      likes -= 1;
+      dislikes += 1;
+    } else if (previousVote === "downvote" && voteType === "upvote") {
+      dislikes -= 1;
+      likes += 1;
+    } else {
+      // 🆕 FIRST TIME vote
+      if (voteType === "upvote") likes += 1;
+      if (voteType === "downvote") dislikes += 1;
+    }
+
+    setUserVotes((prevVotes) => ({
+      ...prevVotes,
+      [complaintId]: voteType,
+    }));
+
+    return { ...prev, likes, dislikes };
+  });
+};
+
+
 
 
   // Normalize admin categories into array
@@ -504,9 +565,9 @@ try {
   const formatDate = (timestamp) =>
     timestamp ? new Date(timestamp).toDateString() : "Unknown Date";
 
-  const toggleExpand = (id) => {
-    setExpandedCardId((prevId) => (prevId === id ? null : id));
-  };
+const toggleExpand = (complaint) => {
+  setExpandedCard(complaint);
+};
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -638,12 +699,16 @@ try {
           )}
         </div>
       ) : (
-       <Row className="g-4 pb-3">
+      //  <Row className="g-4 pb-3">
+      <Row className="gx-4 gy-4">
+
   {complaints.map((complaint) => (
-    <Col key={complaint.complaint_id} xs={12} sm={6} lg={4}>
+    // <Col key={complaint.complaint_id} xs={12} sm={6} lg={4}>
+    <Col sm={12} md={6} lg={4}>
+
       <Card
         className={`card-hover-effect p-3 glass-effect rounded-4 custom-card-container w-100 d-flex flex-column ${
-          expandedCardId === complaint.complaint_id ? "expanded-card" : ""
+          expandedCard === complaint.complaint_id ? "expanded-card" : ""
         }`}
       >
         {/* STATUS (if NOT flagged) */}
@@ -654,7 +719,7 @@ try {
 
         
         {/* Image with status overlay */}
-        <div className="complaint-image-wrapper position-relative mb-3">
+        {/* <div className="complaint-image-wrapper position-relative mb-3">
           <Card.Img
             variant="top"
             src={complaint.image || DEFAULT_IMAGE}
@@ -662,6 +727,10 @@ try {
             className="complaint-image rounded-3"
             style={{ height: "200px", objectFit: "cover", width: "100%" }}
           />
+                  </div> */}
+
+
+
 {/* <div className="status-overlay">
 {complaint.flagged?.isFlagged && (
   <span className="flagged-badge position-absolute" 
@@ -672,10 +741,67 @@ try {
 
 </div> */}
 
-        </div>
+<div
+  className="d-flex align-items-center justify-content-center"
+  style={{
+    height: "180px",
+    borderRadius: "12px",
+    overflow: "hidden",
+  }}
+>
+  {complaint.image ? (
+    <Card.Img
+      src={complaint.image}
+      alt="Complaint"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        setModalImageSrc(complaint.image);
+        setShowImageModal(true);
+      }}
+    />
+  ) : (
+    <div
+      className="d-flex flex-column align-items-center justify-content-center"
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <img
+        src={DEFAULT_IMAGE}
+        alt="No Image"
+        style={{
+          width: "190px",
+          height: "290px",
+          opacity: 0.9,
+          marginTop: "20px",
+        }}
+      />
+
+      <p
+        style={{
+          marginTop: "10px",
+          fontSize: "1rem",
+          color: "#626466",
+          fontWeight: "700",
+          marginTop: "-45px",
+        }}
+      >
+        No Image
+      </p>
+    </div>
+  )}
+</div>
+
+
 
         {/* Date and Edit on the same line */}
-        <div className="d-flex justify-content-between align-items-center mb-2">
+        <div className="d-flex justify-content-between align-items-center mb-2 mt-3">
           <Card.Text
             className="mb-0"
             style={{
@@ -776,30 +902,29 @@ try {
           }
           return null;
         })()}
+<Card.Text
+  className="text-secondary mb-2"
+  style={{ marginTop: 0, maxHeight: 140, overflow: "hidden" }}
+>
+  {complaint.description.length > 200
+    ? `${complaint.description.substring(0, 200)}...`
+    : complaint.description}
 
-        <Card.Text className="text-secondary mb-2">
-          {complaint.description.split(" ").length > 38 ? (
-            <>
-              {expandedCardId === complaint.complaint_id
-                ? complaint.description
-                : complaint.description
-                    .split(" ")
-                    .slice(0, 38)
-                    .join(" ") + "..."}
-              <span
-                className="ms-2 text-secondary fw-semibold"
-                role="button"
-                onClick={() => toggleExpand(complaint.complaint_id)}
-              >
-                {expandedCardId === complaint.complaint_id
-                  ? "View less"
-                  : "View more"}
-              </span>
-            </>
-          ) : (
-            complaint.description
-          )}
-        </Card.Text>
+  {complaint.description.length > 200 && (
+    <span
+      className="view-more-link ms-2"
+      onClick={() => setExpandedCard(complaint)}
+      style={{
+        color: "#007bff",
+        cursor: "pointer",
+        fontWeight: 500,
+      }}
+    >
+      View More
+    </span>
+  )}
+</Card.Text>
+
 
         {/* Likes, Dislikes, Category */}
         <div className="mt-auto d-flex justify-content-between align-items-center pt-3">
@@ -820,10 +945,91 @@ try {
   ))}
 </Row>
 
-
       )}
+
+
+
+        {/* 🔥 VIEW MORE POPUP */}
+{/* 🔥 VIEW MORE POPUP */}
+{expandedCard && (
+  <div className="overlay" onClick={() => setExpandedCard(null)}>
+    <Card
+      className="popup-card p-4 rounded-4"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Close */}
+      <button
+        className="close-btn-inside-modalh"
+        onClick={() => setExpandedCard(null)}
+      >
+        ✕
+      </button>
+
+      {/* Status */}
+      <div className="mb-2">
+        {getStatusBadge(expandedCard.status)}
+      </div>
+
+      {/* Date */}
+      <Card.Text className="text-primary fw-semibold">
+        <FaCalendarAlt className="me-2" />
+        {formatDate(expandedCard.timestamp)}
+      </Card.Text>
+
+      {/* Title */}
+      <Card.Title className="fs-4 fw-bold mt-3">
+        {expandedCard.title}
+      </Card.Title>
+
+      {/* Description */}
+      <Card.Text className="mt-3 text-secondary">
+        {expandedCard.description}
+      </Card.Text>
+
+<div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
+        <span
+          className="category-tag px-2 py-1 rounded-pill me-auto"
+          style={{ fontSize: "0.8rem" }}
+        >
+          {expandedCard.category}
+        </span>
+
+        <div className="d-flex align-items-center gap-3 ms-auto">
+          <button
+            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
+              userVotes[expandedCard.complaint_id] === "upvote"
+                ? "bg-success text-white"
+                : "text-success"
+            }`}
+            onClick={() => handleVote(expandedCard.complaint_id, "upvote")}
+            style={{ fontSize: "1rem" }}
+          >
+            <ThumbsUp size={20} />
+            {expandedCard.likes}
+          </button>
+
+          <button
+            className={`btnscolor d-flex align-items-center gap-1 px-2 py-1 rounded-pill shadow-sm border-0 ${
+              userVotes[expandedCard.complaint_id] === "downvote"
+                ? "bg-danger text-white"
+                : "text-danger"
+            }`}
+            onClick={() => handleVote(expandedCard.complaint_id, "downvote")}
+            style={{ fontSize: "1rem" }}
+          >
+            <ThumbsDown size={20} />
+            {expandedCard.dislikes}
+          </button>
+        </div>
+      </div>
+    </Card>
+  </div>
+)}
+
     </div>
+
   );
+  
 };
 
 export default AdminPage;

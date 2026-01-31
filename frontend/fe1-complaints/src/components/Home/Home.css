@@ -842,25 +842,36 @@ margin-top: 5px;
 /* 
 /------Admin updates-----------*/ 
 .admin-update-btn {
-  width: 50%;
+  width: 60%;
+  min-width: 140px;
   background: linear-gradient(to right, #2b5876, #745ec3);
   border: none;
   color: white;
-  padding: 7px;
+  padding: 7px 12px;
   font-size: 14px;
-  font-weight: bold;
-  display: flex;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border-radius: 14px;
+  gap: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.3s ease-in-out;
+  transition: 0.18s ease-in-out;
   margin-top: 10px;
 }
 
 .admin-update-btn.expanded {
-  background: linear-gradient(to right, #2b5876, #4e4376);
+  background: linear-gradient(90deg,#0d47a1 0%, #4e4376 100%);
+}
+
+/* On small screens make the admin updates button full width for better tapping */
+@media (max-width: 576px) {
+  .admin-update-btn {
+    width: 70% !important;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
 }
 
 .admin-updates-wrapper {
@@ -869,7 +880,8 @@ margin-top: 5px;
   transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
   padding: 0;
   margin-top: 0;
-}
+
+  }
 
 .admin-updates-wrapper.expanded {
   max-height: 1000px; /* Set high enough for full expansion */
@@ -1128,4 +1140,74 @@ margin-top: 5px;
     width: 48px;
     height: 48px;
   }
+}
+
+
+/* ================================
+   POPUP CARD SCROLL + FIXED CLOSE
+================================ */
+
+/* Popup overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9998;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Popup card */
+.popup-card {
+  position: relative;
+  max-height: 85vh;              /* limits height */
+  overflow-y: auto;              /* enables scrolling */
+  width: 100%;
+  max-width: 720px;
+  z-index: 9999;
+}
+
+
+/* FIXED CLOSE BUTTON */
+/* .expanded-close-btn {
+  position: fixed;            
+  top: 12px;
+  right: 12px;
+
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border: none;
+
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+
+  z-index: 10001;
+} */
+
+
+/* Optional: smoother scrolling */
+.popup-card::-webkit-scrollbar {
+  width: 6px;
+}
+.popup-card::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 10px;
+}
+.reply-card {
+  background: #f5f7ff !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  box-shadow: none !important;
+  position: relative;
 }

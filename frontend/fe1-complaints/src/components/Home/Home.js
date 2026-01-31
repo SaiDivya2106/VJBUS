@@ -64,6 +64,12 @@ const Home = () => {
   const [showImageModal, setShowImageModal] = useState(false);
 const [modalImageSrc, setModalImageSrc] = useState(null);
 
+// Reply UI state: tracks open reply box and reply texts per comment
+const [openReply, setOpenReply] = useState(null);
+const [replyTexts, setReplyTexts] = useState({});
+
+// Track expanded replies per comment
+const [expandedReplies, setExpandedReplies] = useState({});
 
 
 
@@ -75,6 +81,40 @@ const [popupMessage, setPopupMessage] = useState("");
 const showPopup = (message) => {
   setPopupMessage(message);
   setTimeout(() => setPopupMessage(""), 2000); // disappears in 2 sec
+};
+
+// Reply helpers
+const handleReplyChange = (commentId, value) => {
+  setReplyTexts((prev) => ({ ...prev, [commentId]: value }));
+};
+
+const handleReplySubmit = async (comment) => {
+  const text = (replyTexts[comment.id] || "").trim();
+  if (!text) return showPopup("Reply cannot be empty");
+
+  try {
+    const token = localStorage.getItem("authToken");
+    const url = `${baseUrl}/user-api/complaints/${expandedCard.complaint_id}/comment/${comment.id}/reply`;
+    const res = await axios.post(
+      url,
+      { text, userEmail: user.email },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res?.data?.complaint) {
+      setExpandedCard(res.data.complaint);
+      setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+      // Auto-expand the replies section to show the new reply immediately
+      setExpandedReplies((prev) => ({ ...prev, [comment.id]: true }));
+      setOpenReply(null);
+      showPopup("Reply added successfully");
+    } else {
+      showPopup("Reply added, but failed to refresh comments");
+    }
+  } catch (err) {
+    console.error("Error adding reply:", err);
+    showPopup("Failed to add reply");
+  }
 };
 
 
@@ -156,11 +196,26 @@ const DEFAULT_IMAGE = NoImageIcon;
 };
 
 
-  const formatDate = (timestamp) => {
-    if (!timestamp) return "Unknown Date";
-    const date = new Date(timestamp);
-    return date.toDateString();
-  };
+const formatDate = (timestamp) => {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  const datePart = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${datePart} ${timePart}`;
+};
 
 
 
@@ -312,6 +367,17 @@ const submitEditComplaint = async () => {
       console.error("Error editing complaint:", err);
     }
   }
+};
+
+
+
+
+
+const toggleReplies = (commentId) => {
+  setExpandedReplies((prev) => ({
+    ...prev,
+    [commentId]: !prev[commentId],
+  }));
 };
 
 
@@ -650,8 +716,8 @@ const handleDeleteComplaint = async (id) => {
     }}
     style={{
       cursor: complaint.image ? "pointer" : "default",
-      width: complaint.image ? "100%" : "250px", // smaller for default image
-      height: complaint.image ? "auto" : "250px",
+      width: complaint.image ? "100%" : "220px", // smaller for default image
+      height: complaint.image ? "auto" : "220px",
       display: "block",
       margin: complaint.image ? "0 auto" : "20px auto 0 auto", // moves default image up
       opacity: complaint.image ? 1 : 0.95,
@@ -869,7 +935,7 @@ const handleDeleteComplaint = async (id) => {
     >
       {/* Close button */}
       <button
-        className="expanded-close-btn"
+        className="close-btn-inside-modalh"
         onClick={() => setExpandedCard(null)} // ✅ only close on this button
       >
         ✕
@@ -980,6 +1046,104 @@ const handleDeleteComplaint = async (id) => {
             <strong style={{ color: borderColor }}>{displayName}</strong>
           </div>
           <div style={{ marginLeft: "1.8rem" }}>{comment.text}</div>
+
+          {/* Replies (threaded under this comment) */}
+          {comment.replies && comment.replies.length > 0 && (
+  <div style={{ marginLeft: "2.4rem", marginTop: "0.6rem" }}>
+    {(expandedReplies[comment.id]
+      ? comment.replies
+      : comment.replies.slice(0, 3)
+    ).map((r) => (
+      <div
+        key={r.id}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <span
+          style={{
+            color: "#ff6b6b",
+            fontSize: "1.3rem",
+            marginTop: "14px",
+          }}
+        >
+          ↳
+        </span>
+
+        <div
+          style={{
+            backgroundColor: "#f6f8fa",
+            borderLeft: "3px solid #e2e2e2",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            flex: 1,
+          }}
+        >
+          <strong
+            style={{
+              color: "#ff6b6b",
+              fontSize: "0.9rem",
+            }}
+          >
+            Student
+          </strong>
+
+          <div style={{ fontSize: "0.95rem" }}>{r.text}</div>
+        </div>
+      </div>
+    ))}
+
+    {/* 🔽 View More / View Less Replies */}
+    {comment.replies.length > 5 && (
+      <div style={{ marginLeft: "2.5rem" }}>
+        <button
+          className="btn btn-link p-0"
+          style={{
+        fontSize: "1rem",
+        fontWeight: 500,
+      }}
+          onClick={() => toggleReplies(comment.id)}
+        >
+          {expandedReplies[comment.id]
+            ? "View less replies"
+            : `View more replies (${comment.replies.length - 3})`}
+        </button>
+      </div>
+    )}
+  </div>
+)}
+          {/* Reply UI for admins */}
+          {comment.role === "student" && (
+            <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>     
+            </div>
+          )}
+
+          {/* Reply UI for complaint owner when target comment is admin */}
+          {comment.role === "admin" && user?.email === expandedCard.user_id && (
+            <div style={{ marginLeft: "1.8rem", marginTop: "0.5rem" }}>
+              {openReply === comment.id ? (
+                <div className="d-flex gap-2">
+                  <textarea
+                    className="form-control"
+                    rows="2"
+                    value={replyTexts[comment.id] || ""}
+                    onChange={(e) => handleReplyChange(comment.id, e.target.value)}
+                    placeholder="Write a reply..."
+                  ></textarea>
+                  <div className="d-flex flex-column gap-1 ms-2">
+                    <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment)}>Send</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => { setOpenReply(null); setReplyTexts((prev) => ({ ...prev, [comment.id]: "" })); }}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <button className="btn btn-link btn-sm" onClick={() => setOpenReply(comment.id)}>Reply</button>
+              )}
+            </div>
+          )}
+
         </div>
       );
     })

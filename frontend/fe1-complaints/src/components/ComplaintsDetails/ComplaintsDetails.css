@@ -574,14 +574,14 @@ select.form-select:disabled,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-.comment-role {
+/* .comment-role {
   font-size: 0.95rem;
   display: inline-block;
   padding: 2px 8px;
   border-radius: 6px;
   background-color: rgba(255, 255, 255, 0.6);
   margin-right: 0.5rem;
-}
+} */
 
 .timeline-content .comment-date {
   font-size: 0.85rem;
@@ -630,4 +630,102 @@ select.form-select:disabled,
     width: 160px;   /* ⬅️ even smaller on mobile */
     font-size: 0.9rem;
   }
+}
+
+
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Admin */
+.comment-author.admin {
+  color: #6a1b9a;
+}
+
+.comment-author.admin i {
+  color: #6a1b9a;
+}
+
+/* Student */
+.comment-author.student {
+  color: #ff6b6b;
+}
+
+.comment-author.student i {
+  color: #ff6b6b;
+}
+.comment-card {
+  background-color: #f6f8ff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-left: 5px solid;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Admin */
+.comment-card.admin {
+  border-left-color: #6a1b9a;
+}
+
+/* Student */
+.comment-card.student {
+  border-left-color: #ff6b6b;
+  background-color: #fff5f5;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+}
+
+.comment-body {
+  margin-top: 6px;
+  padding-left: 26px; /* aligns under icon like your image */
+}
+
+
+
+
+
+
+
+
+
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* STUDENT */
+.comment-author.student {
+  color: #ff6b6b;              /* same red everywhere */
+}
+
+.comment-author.student i {
+  color: #ff6b6b;
+  font-size: 1.05rem;
+}
+
+/* ADMIN */
+.comment-author.admin {
+  color: #4c63d2;              /* same admin blue */
+}
+
+.comment-author.admin i {
+  color: #4c63d2;
+  font-size: 1.05rem;
+}
+.comment-body {
+  margin-top: 6px;     /* creates space between header and text */
+  padding-left: 26px;  /* aligns text under name like 2nd image */
 }

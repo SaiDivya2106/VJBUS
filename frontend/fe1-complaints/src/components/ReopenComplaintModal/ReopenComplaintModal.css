@@ -101,7 +101,7 @@
 
 
 /* Close (X) button - circular style */
-.reopen-reason-modal .btn-close {
+/* .reopen-reason-modal .btn-close {
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -112,29 +112,51 @@
   align-items: center;
   justify-content: center;
   transition: 0.25s ease-in-out;
+  background-image: none !important;
+  position: relative;
+} */
 
-  /* Remove default Bootstrap icon background */
+
+
+.reopen-reason-modal .btn-close {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d4d2d2;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;                 /* IMPORTANT */
+  pointer-events: auto;       /* IMPORTANT */
+  cursor: pointer;
+
   background-image: none !important;
   position: relative;
 }
-
-/* Replace default icon */
 .reopen-reason-modal .btn-close::after {
   content: "✕";
   font-size: 18px;
   font-weight: 500;
   color: #181717;
+  pointer-events: none;   /* 🔥 KEY FIX */
 }
 
+
+
+
+
 /* Hover effect */
-.reopen-reason-modal .btn-close:hover {
+/* .reopen-reason-modal .btn-close:hover {
   background: #f4f4f4;
   transform: scale(1.05);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
-/* Active press effect */
 .reopen-reason-modal .btn-close:active {
   transform: scale(0.52);
   background: #e9e9e9;
-}
+} */

@@ -107,73 +107,80 @@ const SuperAdminDashboard = () => {
   return (
     <div className="superadmin-container">
       <Container>
-        <h2 className="text-center mb-4 fw-bold text-light page-title">
+        <h2 className=" text-center mb-4 fw-bold  page-title">
           ⚠ Super Admin - Flagged Requests
         </h2>
 
-        {/* Filters */}
-        <Row className="align-items-center g-4 filter-row">
-          <Col md={6}>
-            <div className="filter-container">
-              <div className="filter-box">
-                {/* Category */}
-{/* Category */}
-<div className="filter-group">
-  <div className="filter-title">
-    <span className="filter-icon blue">
-      <i className="bi bi-funnel"></i>
-    </span>
-    Filter by Category
-  </div>
+{/* Filters */}
+{/* Filters */}
+{/* Filters */}
+<Row className="filter-row justify-content-center">
+  <Col xs={12} lg={10}>
+    <div className="filter-container">
+      <div className="filter-box-grid">
 
-  <div className="select-wrapper">
-  <Form.Select
-    className="filter-select1"
-    value={filters.category}
-    onChange={(e) =>
-      setFilters({ ...filters, category: e.target.value })
-    }
-  >
-    <option value="">All Categories</option>
-    {uniqueCategories.map((cat) => (
-      <option key={cat}>{cat}</option>
-    ))}
-  </Form.Select>
-  <span className="arrow-icon">˅</span>
-</div>
+        {/* Category */}
+        <div className="filter-group">
+          <div className="filter-title">
+            <span className="filter-icon blue">
+              <i className="bi bi-funnel"></i>
+            </span>
+            Filter by Category
+          </div>
 
-</div>
+          <Form.Select
+            className="form-select filter-select-bootstrap"
+            value={filters.category}
+            onChange={(e) =>
+              setFilters({ ...filters, category: e.target.value })
+            }
+          >
+            <option value="">All Categories</option>
+            {uniqueCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </Form.Select>
+        </div>
 
-{/* Reason */}
-<div className="filter-group">
-  <div className="filter-title">
-    <span className="filter-icon purple">
-      <i className="bi bi-funnel"></i>
-    </span>
-    Filter by Reason
-  </div>
+        {/* Reason */}
+        <div className="filter-group">
+          <div className="filter-title">
+            <span className="filter-icon purple">
+              <i className="bi bi-funnel"></i>
+            </span>
+            Filter by Reason
+          </div>
 
-  <div className="select-wrapper">
-    <Form.Select
-      className="filter-select1 purple-border"
-      value={filters.reason}
-      onChange={(e) =>
-        setFilters({ ...filters, reason: e.target.value })
-      }
-    >
-      <option value="">All Reasons</option>
-      {filteredReasons.length > 0
-        ? filteredReasons.map((r) => <option key={r}>{r}</option>)
-        : allowedFlagReasons.map((r) => <option key={r}>{r}</option>)}
-    </Form.Select>
-      <span className="arrow-icon">˅</span>
-  </div>
-</div>
+          <Form.Select
+            className="form-select filter-select-bootstrap purple-border"
+            value={filters.reason}
+            onChange={(e) =>
+              setFilters({ ...filters, reason: e.target.value })
+            }
+          >
+            <option value="">All Reasons</option>
+            {filteredReasons.length > 0
+              ? filteredReasons.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))
+              : allowedFlagReasons.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+          </Form.Select>
+        </div>
 
-              </div>
-            </div>
-          </Col>
-        </Row>
+      </div>
+    </div>
+  </Col>
+</Row>
+
+
 
         {/* Loading */}
         {loading ? (
@@ -184,15 +191,20 @@ const SuperAdminDashboard = () => {
         ) : filteredComplaints.length === 0 ? (
           emptyState
         ) : (
-          <Row xs={1} sm={2} md={3} className="g-4">
-            {filteredComplaints.map((complaint) => {
-              const words = complaint.description.split(" ");
-              const shortDesc = words.slice(0, 25).join(" ");
+          <div className="filter-container">
+            <Row className="gx-4 gy-4">
+    {filteredComplaints.map((complaint) => {
+      const words = complaint.description.split(" ");
+      const shortDesc = words.slice(0, 25).join(" ");
 
-              return (
-                <Col key={complaint.complaint_id}>
-                  <Card className="flag-card">
-                    {/* Category */}
+      return (
+        <Col
+          key={complaint.complaint_id}
+          sm={12}
+          md={6}
+          lg={4}
+        >
+          <Card className="flag-card h-100">
                     <div className="category-chip">{complaint.category}</div>
 
                     <Card.Body className="flag-body">
@@ -218,35 +230,60 @@ const SuperAdminDashboard = () => {
                       {/* Details */}
                       <div className="details-section">
                         <div className="detail-row">
-                          <span className="detail-label">User:</span>
-                          <span className="detail-box">
-                            <FaUserCircle size={16} className="me-2" />
+                          <span className="detail-label text-dark">User:</span>
+                          <span className="">
+                            <FaUserCircle size={16} className="user-icon me-1" />
                             {complaint.user_id}
                           </span>
                         </div>
 
                         <div className="detail-row">
-                          <span className="detail-label">Flagged By:</span>
-                          <span className="detail-box">
+                          <span className="detail-label text-dark">Flagged By:</span>
+                          <span className="">
                             {complaint.flagged.flaggedBy}
                           </span>
                         </div>
 
                         <div className="detail-row">
-                          <span className="detail-label">Reason:</span>
+                          <span className="detail-label text-dark">Reason:</span>
                           <span className="reason-badge">
                             {complaint.flagged.reason}
                           </span>
                         </div>
 
-                        {complaint.flagged.note && (
+                        {/* {complaint.flagged.note && (
                           <div className="detail-row">
-                            <span className="detail-label">Note:</span>
-                            <span className="detail-box note-box">
+                            <span className="detail-label text-dark">Note:</span>
+                            <span className="">
                               {complaint.flagged.note}
                             </span>
                           </div>
-                        )}
+                        )} */}
+
+
+ {complaint.flagged.note && (
+  <div className="detail-row">
+    <span className="detail-label text-dark">Note:</span>
+
+    <span className="note-preview">
+      {complaint.flagged.note.length > 120
+        ? complaint.flagged.note.slice(0, 120) + "..."
+        : complaint.flagged.note}
+
+      {complaint.flagged.note.length > 120 && (
+        <Button
+          variant="link"
+          className="read-more"
+          onClick={() => setFullViewComplaint(complaint)}
+        >
+          View More
+        </Button>
+      )}
+    </span>
+  </div>
+)}
+
+
                       </div>
 
                       <hr className="separator" />
@@ -285,18 +322,19 @@ const SuperAdminDashboard = () => {
                 </Col>
               );
             })}
-          </Row>
+            </Row>
+          </div>
         )}
 
         {/* ACTION MODAL */}
         {/* ACTION MODAL */}
 {selectedComplaint && (
-  <Modal
-    show={!!selectedComplaint}
-    onHide={() => setSelectedComplaint(null)}
-    centered
-    className="confirm-action-modal"
-  >
+<Modal
+  show={!!selectedComplaint}
+  onHide={() => setSelectedComplaint(null)}
+  centered
+  className="white-modal"
+>
     <Modal.Header closeButton>
       <Modal.Title className="modal-header-title">
         Confirm Action
@@ -332,33 +370,34 @@ const SuperAdminDashboard = () => {
 
       {/* Note Input */}
       <div className="modal-section-title">Note (Optional)</div>
-      <Form.Control
-        as="textarea"
-        rows={3}
-        className="note-textarea"
-        placeholder="Add an internal note..."
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-      />
+     <Form.Control
+  as="textarea"
+  rows={3}
+  className="form-control note-textarea-bootstrap"
+  placeholder="Add an internal note..."
+  value={note}
+  onChange={(e) => setNote(e.target.value)}
+/>
+
     </Modal.Body>
 
-    <Modal.Footer className="confirm-footer">
+   <Modal.Footer className="justify-content-end gap-2">
   <Button
-    className="modal-footer-btn cancel-btn"
+    variant="outline-secondary"
+    className="btnsuperadmin"
     onClick={() => setSelectedComplaint(null)}
   >
     Cancel
   </Button>
 
   <Button
-    className={`modal-footer-btn ${
-      actionType === "valid" ? "confirm-btn-valid" : "confirm-btn-warn"
-    }`}
+    variant={actionType === "valid" ? "success" : "warning"}
     onClick={() => handleAction(selectedComplaint.complaint_id)}
   >
     Confirm
   </Button>
 </Modal.Footer>
+
 
   </Modal>
 )}
@@ -372,6 +411,15 @@ const SuperAdminDashboard = () => {
   className="superadmin-detail-modal detail-modal no-scrollbar"
 >
   <Modal.Body>
+
+
+      <button
+    className="modal-close-x"
+    onClick={() => setFullViewComplaint(null)}
+    aria-label="Close"
+  >
+    ×
+  </button>
 
     <h2 className="detail-title">Complaint Details</h2>
 
@@ -400,7 +448,7 @@ const SuperAdminDashboard = () => {
       <div className="detail-value">{fullViewComplaint?.flagged?.flaggedBy}</div>
     </div>
 
-    <div className="detail-row">
+    <div className="detail-row text-white">
       <div className="detail-label">Reason:</div>
       <div className="detail-value reason-box">
         {fullViewComplaint?.flagged?.reason}
