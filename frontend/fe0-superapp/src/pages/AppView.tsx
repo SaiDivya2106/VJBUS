@@ -82,6 +82,12 @@ const apps = [
     name: "Hostel",
     description: "Mention your food taking preferences",
     url: "https://hostel.vjstartup.com/"
+  },
+  {
+    id: "Mous",
+    name: "Mous",
+    description: "mous with companies and organizations",
+    url: "https://dev-mou.vjstartup.com/"
   }
 ];
 
