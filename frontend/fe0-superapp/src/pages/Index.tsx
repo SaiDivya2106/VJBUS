@@ -172,6 +172,16 @@ const apps: App[] = [
     category: "Student Services",
     color: "bg-pink-500",
     gradient: "from-pink-500 to-pink-600"
+  },
+  {
+    id: "Mous",
+    name: "Mous",
+    description: "Mous with compaines and organization",
+    url: "https://dev-mou.vjstartup.com/",
+    icon: FileWarning,
+    category: "Student Services",
+    color: "bg-teal-500",
+    gradient: "from-teal-500 to-teal-600"
   }
   //   {
   //   id: "student-activity",
