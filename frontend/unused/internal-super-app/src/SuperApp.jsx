@@ -36,7 +36,7 @@ const SuperAppContent = () => {
                             </button>
                         </>
                     ) : (
-                        <a href={`http://sso.vnrzone.site/login?redirect=${encodeURIComponent(window.location.href)}`} style={{ color: "white", textDecoration: "none" }}>Login</a>
+                        <a href={`http://sso.vjstartup.com/login?redirect=${encodeURIComponent(window.location.href)}`} style={{ color: "white", textDecoration: "none" }}>Login</a>
                     )}
                 </div>
             </header>

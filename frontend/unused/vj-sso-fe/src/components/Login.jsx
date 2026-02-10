@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "https://sso.vnrzone.site/sa-sso-be/api";  // ✅ SSO Backend  *** /sapp-be/api
+const API_URL = "https://sso.vjstartup.com/sa-sso-be/api";  // ✅ SSO Backend  *** /sapp-be/api
 
 const Login = () => {
     const { login } = useContext(AuthContext);

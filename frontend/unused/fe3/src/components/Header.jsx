@@ -8,7 +8,7 @@ function Header() {
     useEffect(() => {
         const fetchApplications = async () => {
             try {
-                const response = await fetch("http://campus.vnrzone.site/sa-be/public/get-all-applications");
+                const response = await fetch("http://campus.vjstartup.com/sa-be/public/get-all-applications");
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);

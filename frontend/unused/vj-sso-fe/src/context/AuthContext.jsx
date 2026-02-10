@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = "https://superapp.vnrzone.site/sa-sso-be/api";
+const API_URL = "https://superapp.vjstartup.com/sa-sso-be/api";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {

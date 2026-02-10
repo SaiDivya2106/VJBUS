@@ -22,5 +22,5 @@ http://10.45.8.187:3017/
 
 
 ### Public URL (not yet configured)
-http://navi.vnrzone.site
+http://navi.vjstartup.com
 

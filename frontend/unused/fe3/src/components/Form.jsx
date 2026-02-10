@@ -20,7 +20,7 @@ const Form = ({ closeForm }) => {
   
         try {
             // Login API to get the token
-            const response = await fetch("http://campus.vnrzone.site/sso-be/auth/eduprime", { // ✅ Fixed API URL
+            const response = await fetch("http://campus.vjstartup.com/sso-be/auth/eduprime", { // ✅ Fixed API URL
                 method: "POST",
                 credentials: "include",  // Include cookies if required
                 headers: {
@@ -46,7 +46,7 @@ const Form = ({ closeForm }) => {
                 await setTokenOnServer(data.token);
 
                 // ✅ Redirect after successful login
-                window.location.href = "http://campus.vnrzone.site";
+                window.location.href = "http://campus.vjstartup.com";
             } else {
                 setMessage(data.error || "Authentication failed.");
             }
@@ -58,7 +58,7 @@ const Form = ({ closeForm }) => {
 
     const setTokenOnServer = async (token) => {
         try {
-            const response = await fetch("http://campus.vnrzone.site/sa-be/public/set-api", { // ✅ Fixed API URL
+            const response = await fetch("http://campus.vjstartup.com/sa-be/public/set-api", { // ✅ Fixed API URL
                 method: "POST",
                 credentials: "include",
                 headers: {

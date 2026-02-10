@@ -14,10 +14,26 @@ import '../styles/HomePage.css'
 
 
 const HomePage = () => {
-  const user = JSON.parse(localStorage.getItem("user"))
-  let fname="Student"
-  if (user!==null){
-    fname = user.family_name}
+  const [user, setUser] = React.useState(null);
+  React.useEffect(() => {
+    fetch(`${import.meta.env.VITE_AUTH_SERVER_URL}/check-auth`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.user) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      });
+  }, []);
+
+  let fname = "Student";
+  if (user && user.family_name) {
+    fname = user.family_name;
+  }
 
   return (
     <div className="homepage-container">

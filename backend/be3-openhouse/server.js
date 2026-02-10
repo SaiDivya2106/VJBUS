@@ -9,7 +9,7 @@ const app = express();
 
 // Enable CORS for localhost:3000
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://10.45.8.187:3000','http://localhost:5174', 'http://openhouse.vnrzone.site'],
+  origin: ['http://localhost:3102', 'http://10.45.8.187:3000','http://localhost:5174', 'http://openhouse.vjstartup.com'],
   credentials: true
 }));
 
@@ -31,7 +31,7 @@ app.get("/health", (req, res) => {
 });
 
 // Start the server
-const PORT = 3120;
+const PORT = 6103;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

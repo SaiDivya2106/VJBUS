@@ -21,7 +21,7 @@ function MainPage() {
   const {token}=useSelector(state=>state.auth);
   const { ApplicationsData } = useSelector(state => state.applications);
   useEffect(() => {
-    fetch("http://campus.vnrzone.site/sa-be/api/user", {
+    fetch("http://campus.vjstartup.com/sa-be/api/user", {
         method:"GET",
         credentials: 'include'  
     })
@@ -41,13 +41,13 @@ function MainPage() {
 
 
   const handleLogout = () => {
-    fetch("http://campus.vnrzone.site/sa-be/logout", {
+    fetch("http://campus.vjstartup.com/sa-be/logout", {
         method: 'GET',
         credentials: 'include'  
     })
     .then(response => response.json())
     .then(data => {
-        window.location.href = "http://campus.vnrzone.site";  
+        window.location.href = "http://campus.vjstartup.com";  
     })
     .catch(error => console.error('Error:', error));
   };

@@ -19,7 +19,7 @@ const App = ({ appName }) => {
 
             // ✅ Redirect after 10 seconds
             const timeout = setTimeout(() => {
-                window.location.href = "https://superapp.vnrzone.site/";
+                window.location.href = "https://superapp.vjstartup.com/";
             }, 10000);
 
             return () => {

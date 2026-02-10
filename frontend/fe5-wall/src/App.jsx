@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import './App.css';
 import NavigationBar from './components/NavigationBar';
 import './styles/theme.css';
+import { Profiler } from 'react';
 
 function App() {
   const [theme, setTheme] = useState('light'); // 'light' or 'dark'
@@ -76,6 +77,7 @@ function App() {
           <Route path="/submit" element={<SubmitPage />} />
           <Route path="/responses" element={<ViewResponsesPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Login />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
 

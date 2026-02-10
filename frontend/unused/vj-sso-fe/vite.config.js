@@ -11,8 +11,8 @@ export default defineConfig({
     allowedHosts: [
       '127.0.0.1', // or 'localhost' - Important for dev server access
       '103.248.208.119', 
-      'superapp.vnrzone.site',
-      'sso.vnrzone.site'
+      'superapp.vjstartup.com',
+      'sso.vjstartup.com'
     ],
   }
 })

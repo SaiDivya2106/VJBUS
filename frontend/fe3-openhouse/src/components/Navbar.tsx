@@ -16,9 +16,18 @@ function Navbar({ currentRoute, onGoogleCredentialResponse, user, setUser }: Nav
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    localStorage.removeItem('userToken');
-    sessionStorage.removeItem('userToken');
+    const result = fetch(`${import.meta.env.VITE_AUTH_SERVER_URL}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.error('Logout request failed');
+      }
+    })
+    .catch(error => {
+      console.error('Logout request error:', error);
+    });
 
     if (window.google?.accounts?.id) {
       window.google.accounts.id.disableAutoSelect();

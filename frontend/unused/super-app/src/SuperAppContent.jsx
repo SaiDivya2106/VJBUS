@@ -19,15 +19,15 @@ import Login from "./Login"; // ✅ Import Login component
  
 const APPS = [
 
-    { name: "VJ Bus", url: "https://bus.vnrzone.site/", icon: "🚌" },
-    { name: "Fake News Check", url: "https://wall.vnrzone.site/", icon: "📰" },
-    { name: "EasyFind", url: "https://easyfind.vnrzone.site/", icon: "🔍" },
-    { name: "Undoubt", url: "https://undoubt.vnrzone.site/", icon: "🗣️" },
-    { name: "Complaints", url: "https://complaints.vnrzone.site/", icon: "🧑‍⚖️" },
-    { name: "Flask Demo App", url: "https://flaskapp.vnrzone.site/", icon: "🌐" },
-    { name: "App One", url: "https://app1.vnrzone.site/", icon: "1️⃣" },
-    { name: "App Two", url: "https://app2.vnrzone.site/", icon: "2️⃣" },
-    { name: "App Three", url: "https://app3.vnrzone.site/", icon: "3️⃣" },
+    { name: "VJ Bus", url: "https://bus.vjstartup.com/", icon: "🚌" },
+    { name: "Fake News Check", url: "https://wall.vjstartup.com/", icon: "📰" },
+    { name: "EasyFind", url: "https://easyfind.vjstartup.com/", icon: "🔍" },
+    { name: "Undoubt", url: "https://undoubt.vjstartup.com/", icon: "🗣️" },
+    { name: "Complaints", url: "https://complaints.vjstartup.com/", icon: "🧑‍⚖️" },
+    { name: "Flask Demo App", url: "https://flaskapp.vjstartup.com/", icon: "🌐" },
+    { name: "App One", url: "https://app1.vjstartup.com/", icon: "1️⃣" },
+    { name: "App Two", url: "https://app2.vjstartup.com/", icon: "2️⃣" },
+    { name: "App Three", url: "https://app3.vjstartup.com/", icon: "3️⃣" },
 
     
 ];

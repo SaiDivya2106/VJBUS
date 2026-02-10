@@ -14,6 +14,9 @@ interface ProjectModalProps {
 }
 
 function ProjectModal({ user, project, onClose }: ProjectModalProps) {
+    // Add state for PDF page navigation (must be at the top, before return)
+    const [pdfPage, setPdfPage] = useState(1);
+    useEffect(() => { setPdfPage(1); }, [project.pdfPoster]);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,23 +135,34 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
   };
 
   return (
+
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto m-4">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden m-4 flex flex-col">
+        {/* Sticky Title Bar */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4">
+          {/* Title takes remaining space */}
+          <h2 className="flex-1 text-2xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent">
+            {project.title}
+          </h2>
+
+          {/* Right side: department + close */}
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent">
-              {project.title}
-            </h2>
-            <span className="bg-gradient-to-r from-purple-50 to-indigo-50 px-3 py-1 rounded-full text-sm font-medium text-gray-800">
+            <span className="bg-gradient-to-r from-purple-50 to-indigo-50 px-3 py-1 rounded-full text-sm font-medium text-gray-800 whitespace-nowrap">
               {project.department}
             </span>
+
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="h-6 w-6 text-gray-600" />
+            </button>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <X className="h-6 w-6 text-gray-600" />
-          </button>
         </div>
 
-        <div className="p-6 space-y-6">
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="flex items-center gap-2">
             <button
               onClick={handleLike}
@@ -159,13 +173,14 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Horizontally scrollable images */}
+          <div className="flex gap-4 overflow-x-auto pb-2">
             {project.images.map((image, index) => (
-              <div key={index} className="group relative overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <div key={index} className="group relative overflow-hidden rounded-lg bg-black flex items-center justify-center min-w-[300px] max-w-[500px] h-[220px]">
                 <img
                   src={image}
                   alt={`${project.title} screenshot ${index + 1}`}
-                  className="max-w-full max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
             ))}
@@ -179,16 +194,40 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
           {project.pdfPoster && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Project Poster</h3>
-              <div
-                className="w-full h-64 bg-gray-100 border border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition"
-                onClick={() => window.open(project.pdfPoster ?? '', '_blank')}
-              >
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/337/337946.png"
-                  alt="PDF Icon"
-                  className="w-12 h-12 mb-2 opacity-80"
-                />
-                <p className="text-blue-600 font-medium">Click to view Poster</p>
+              <div className="w-full flex flex-col items-center">
+                <div className="relative w-full flex flex-col items-center">
+                  <div className="flex items-center justify-center w-full">
+                    <button
+                      className="absolute left-0 z-10 bg-white/80 hover:bg-emerald-100 rounded-full p-2 m-2 shadow"
+                      onClick={() => setPdfPage((prev) => Math.max(1, prev - 1))}
+                      aria-label="Previous page"
+                      style={{ top: '50%', transform: 'translateY(-50%)' }}
+                    >
+                      &#8592;
+                    </button>
+                    <iframe
+                      key={pdfPage}
+                      src={`${project.pdfPoster}#page=${pdfPage}`}
+                      title="Project Poster"
+                      className="w-full max-w-2xl h-96 border rounded-lg shadow"
+                    />
+                    <button
+                      className="absolute right-0 z-10 bg-white/80 hover:bg-emerald-100 rounded-full p-2 m-2 shadow"
+                      onClick={() => setPdfPage((prev) => prev + 1)}
+                      aria-label="Next page"
+                      style={{ top: '50%', transform: 'translateY(-50%)' }}
+                    >
+                      &#8594;
+                    </button>
+                  </div>
+                  <div className="text-center mt-2 text-sm text-gray-600">Page {pdfPage}</div>
+                </div>
+                <button
+                  className="mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={() => window.open(project.pdfPoster ?? '', '_blank')}
+                >
+                  Open Full Poster in New Tab
+                </button>
               </div>
             </div>
           )}

@@ -14,7 +14,7 @@ export default defineConfig({
         },
         allowedHosts: [
             'localhost',
-            'app3.vnrzone.site' // ✅ Allow this subdomain
+            'app3.vjstartup.com' // ✅ Allow this subdomain
         ],
     },
     preview: {
