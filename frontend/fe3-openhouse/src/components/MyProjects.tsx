@@ -70,7 +70,7 @@ const MyProjects: React.FC<MyProjectsProps> = ({ user }) => {
             startupPotential: item.startup_potential || '',
             uploadedBy: item.user_name || '',
             pdfPoster: item.pdf_poster
-              ? `https://openhouse-dev.vnrzone.site/api/uploads/${item.pdf_poster}`
+              ? `https://openhouse-dev.vjstartup.com/api/uploads/${item.pdf_poster}`
               : null
           }));
           

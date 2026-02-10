@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { AuthProvider } from '../src/pages/context/AuthContext.tsx'; 
+import { AuthProvider } from './pages/context/AuthContext.tsx';
 createRoot(document.getElementById("root")!).render(
-<AuthProvider>
-  <App />
-</AuthProvider>
+  <AuthProvider>
+    <App />
+  </AuthProvider>
 );

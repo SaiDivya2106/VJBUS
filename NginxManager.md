@@ -18,9 +18,9 @@ total 4
 
 Example for bus
 ### Create a 
-nano /etc/nginx/sites-available/bus.vnrzone.site.conf
+nano /etc/nginx/sites-available/bus.vjstartup.com.conf
 
 
 ### Create Symbolic link
-ln -s /etc/nginx/sites-available/bus.vnrzone.site.conf /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/bus.vjstartup.com.conf /etc/nginx/sites-enabled/
 

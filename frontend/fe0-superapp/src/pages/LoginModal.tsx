@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react';
+// Add TypeScript global for Google
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+import * as React from 'react';
 import { X } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { useAuth } from './context/AuthContext';
+import { useEffect, useState } from 'react';
+
 
 interface LoginModalProps {
   onClose: () => void;
@@ -25,7 +33,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
     setIsLoading(true);
     try {
-      const backendResponse = await fetch('https://auth.vjstartup.com/auth/google', {
+      const backendResponse = await fetch(import.meta.env.VITE_AUTH_URL + "/auth/google", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,13 +53,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
       // Set cookies for JWT and user data
       const isSecure = window.location.protocol === 'https:';
-      const isLocalhost = window.location.hostname === 'localhost';
+      const is = window.location.hostname === '';
       const cookieOptions = {
         path: '/',
-        secure: isSecure && !isLocalhost,
+        secure: isSecure && !is,
         sameSite: 'lax' as const,
         expires: 1,
-        ...(isLocalhost ? {} : { domain: '.vjstartup.com' }),                   
+        ...(is ? {} : { domain: '.vjstartup.com' }),
       };
 
       Cookies.set('userToken', token, cookieOptions);
@@ -67,16 +75,38 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
   useEffect(() => {
     // Initialize Google login button on component mount
-    google.accounts.id.initialize({
-      client_id: '522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com', // Replace with your client ID
-      callback: handleCredentialResponse,
-    });
+    // Load Google Identity script if not already present
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (window.google) {
+          window.google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse,
+          });
+          window.google.accounts.id.renderButton(
+            document.getElementById('login')!,
+            { theme: 'outline', size: 'large' }
+          );
+        }
+      };
+      document.body.appendChild(script);
+    } else {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById('login')!,
+        { theme: 'outline', size: 'large' }
+      );
+    }
 
-    // Render Google login button
-    google.accounts.id.renderButton(
-      document.getElementById('login')!,
-      { theme: 'outline', size: 'large' } // Customize button size and theme
-    );
+
+    // (No-op: already handled above)
   }, []); // Empty dependency array ensures this runs only once on mount
 
   return (

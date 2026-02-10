@@ -3,93 +3,21 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, LogIn, ExternalLink, Menu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "./context/AuthContext.tsx";
+import { useQuery } from "@tanstack/react-query";
+import { isAdmin } from "@/lib/utils.ts";
 
-const apps = [
-  {
-    id: "bus-tracking",
-    name: "Bus Tracking",
-    description: "Track college buses in real-time",
-    url: "https://bus.vjstartup.com/"
-  },
-  {
-    id: "complaints",
-    name: "Thrive",
-    description: "Register Support Requests, Issues",
-    url: "https://thrive.vjstartup.com/"
-  },
-  {
-    id: "fake-news",
-    name: "Fake News Check",
-    description: "Fake message verification",
-    url: "https://wall.vjstartup.com/"
-  },
-  {
-    id: "projects",
-    name: "Projects App",
-    description: "Manage Projects life cycle",
-    url: "https://dev-projecthub.vjstartup.com/"
-  },
-  {
-    id: "open-house",
-    name: "Open House",
-    description: "Explore working projects through demos",
-    url: "https://openhouse.vjstartup.com/"
-  },
-  {
-    id: "easyfind",
-    name: "EasyFind",
-    description: "Find your lost items here",
-    url: "https://easyfind.vjstartup.com/"
-  },
-  {
-    id: "student-placements",
-    name: "Placements",
-    description: "Help students get placements",
-    url: "https://placements.vjstartup.com/"
-  },
-  {
-    id: "doubts",
-    name: "Doubts",
-    description: "Ask doubts during seminars and talks",
-    url: "https://undoubt-ai.vercel.app/"
-  },
-  {
-    id: "problemhub",
-    name: "ProblemHub",
-    description: "Report Community Problems that you see in day to day",
-    url: "https://www.vjstartup.com/problems"
-  },
-  {
-    id: "ideahub",
-    name: "IdeaHub",
-    description: "Ideas and Solutions that may transform society around you",
-    url: "https://www.vjstartup.com/ideas"
-  },
-  {
-    id: "outpass",
-    name: "Outpass",
-    description: "Student pass to leave campus",
-    url: "https://outpass.vjstartup.com/"
-  },
-  {
-    id: "keys",
-    name: "Keys",
-    description: "Campus room keys handover",
-    url: "https://vnr-keys.vercel.app/"
-  },
-  {
-    id: "hostel",
-    name: "Hostel",
-    description: "Mention your food taking preferences",
-    url: "https://hostel.vjstartup.com/"
-  },
-  {
-    id: "Mous",
-    name: "Mous",
-    description: "mous with companies and organizations",
-    url: "https://dev-mou.vjstartup.com/"
-  }
-];
+interface App {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  icon?: string;
+  category?: string;
+  color?: string;
+  gradient?: string;
+  newTab?: boolean;
+  isenabled: number;
+}
 
 const AppView = () => {
   const { appId } = useParams();
@@ -100,21 +28,30 @@ const AppView = () => {
   const [iframeError, setIframeError] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  const app = apps.find(a => a.id === appId);
+  const { data: apps, isLoading, error } = useQuery<App[]>({
+    queryKey: ["apps"],
+    queryFn: async () => {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apps`);
+      return res.json();
+    },
+  });
 
-  if (!app) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-blue-100 to-indigo-100">
-        <div className="text-center px-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">App Not Found</h1>
-          <Button onClick={() => navigate("/")} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
+  const [adminLoading, setAdminLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const result = await isAdmin();
+      setIsAdminUser(result);
+      setAdminLoading(false);
+    };
+    checkAdmin();
+  }, []);
+
+  // Only show enabled apps to users
+  const app = (apps ?? []).find(a =>
+    a.id === appId && (isAdminUser || a.isenabled === 1)
+  );
 
   const openInNewTab = () => {
     window.open(app.url, "_blank");
@@ -136,6 +73,37 @@ const AppView = () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
   }, [appId]);
+
+
+  console.log("AppView rendering for appId:", appId, "Found app:", app);
+  // console.log("isAdmin:", isAdminUser);
+  if (isLoading || adminLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error || !app) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-blue-100 to-indigo-100">
+        <div className="text-center px-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">App Not Found</h1>
+          <Button onClick={() => navigate("/")} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  // else if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-blue-100 to-indigo-100">
+  //       <div className="text-center px-4">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-4 border-t-blue-600 border-gray-200 mx-auto mb-4"></div>
+  //         <h1 className="text-xl font-bold text-gray-800 mb-2">Loading App...</h1>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
@@ -233,7 +201,7 @@ const AppView = () => {
                 setIframeError(null);
                 if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
               }}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation allow-modals"
             />
 
             {/* Loading overlay: show app name & description for better context */}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -22,9 +22,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await fetch('https://auth.vjstartup.com/logout', {
+      await fetch(`${import.meta.env.VITE_AUTH_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
+
       });
     } catch (error) {
       console.error('Logout failed:', error);
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     async function checkAuthStatus() {
       try {
-        const response = await fetch('https://auth.vjstartup.com/check-auth', {
+        const response = await fetch(`${import.meta.env.VITE_AUTH_URL}/check-auth`, {
           method: 'GET',
           credentials: 'include',
         });
