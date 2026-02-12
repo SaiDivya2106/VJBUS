@@ -14,9 +14,9 @@ export default defineConfig({
     allowedHosts: [
       '127.0.0.1',
       '103.248.208.119',
-      'openhouse.vnrzone.site'
+      'openhouse.vjstartup.com'
     ],
-    port: 3000,
+    port: 3105,
     strictPort: true,
     open: true,
     cors: true, // ✅ Enable CORS

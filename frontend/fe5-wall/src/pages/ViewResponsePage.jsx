@@ -176,7 +176,7 @@ const ViewResponses = () => {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('https://dev-wall.vjstartup.com/wall-be/api/datas');
+        const res = await axios.get(import.meta.env.VITE_WALL_API_URL + '/api/datas');
         const serverMessages = res.data.map((item, index) => ({
           id: item.id || index + 1,
           category: item.category || 'Not specified',
@@ -208,7 +208,7 @@ const ViewResponses = () => {
   // Update message status
   const updateMessageStatus = async (messageId, newStatus) => {
     try {
-      await axios.put(`https://dev-wall.vjstartup.com/wall-be/api/update-status/${messageId}`, {
+      await axios.put(`${import.meta.env.VITE_WALL_API_URL}/api/update-status/${messageId}`, {
         status: newStatus.toLowerCase() === 'fake'
       });
       const updatedMessages = messages.map(msg =>

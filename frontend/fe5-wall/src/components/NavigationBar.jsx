@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './Navi.css';
 import logo from '../assets/logo2.jpeg';
 import '../styles/Navbar.css';
@@ -7,30 +7,44 @@ import { FaHome, FaEnvelopeOpenText, FaListAlt, FaUser } from 'react-icons/fa';
 
 
 function NavigationBar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const navRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Function to update login state (can be called from outside)
-  window.updateNavbarLoginState = function() {
-    const user = localStorage.getItem('user');
-    setIsLoggedIn(!!user);
+  // Fetch user state from /check-auth endpoint
+  const fetchUserState = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_AUTH_SERVER_URL}/check-auth`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      // console.log("NavigationBar: Fetched /check-auth response", res.json());
+      const data = await res.json();
+      console.log("NavigationBar: /check-auth data =", data.logged_in);
+      if (data && data.logged_in) {
+        setUser(data.logged_in);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      setUser(null);
+    }
   };
 
   useEffect(() => {
-    window.updateNavbarLoginState();
+    fetchUserState();
 
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
 
-    // Listen for login/logout events
-    const handleLogin = () => setIsLoggedIn(true);
-    const handleLogout = () => setIsLoggedIn(false);
+    // Listen for login/logout events to refresh user state
+    const handleLogin = () => fetchUserState();
+    const handleLogout = () => fetchUserState();
     window.addEventListener('user-login', handleLogin);
     window.addEventListener('user-logout', handleLogout);
 
@@ -45,7 +59,6 @@ function NavigationBar() {
   const toggleMenu = () => {
     const nav = navRef.current;
     if (!nav) return;
-
     if (menuVisible) {
       collapseMenu(nav);
     } else {
@@ -110,11 +123,19 @@ function NavigationBar() {
             </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav" to="login">
-              <button className="btn btn-primary px-3 mx-2">
-                <FaUser className="nav-icon" /> {isLoggedIn ? 'Profile' : 'Login'}
+            
+            {user ? (
+              <button className="btn btn-primary px-3 mx-2" onClick={() => navigate('/profile')}>
+                <FaUser className="nav-icon" /> Profile
               </button>
-            </Link>
+            ) : (
+              <button className="btn btn-primary px-3 mx-2" onClick={() => navigate('/login')}>
+                <FaUser className="nav-icon" /> Login
+              </button>
+            )}
+          </li>
+          <li>
+            <p> {user} </p>
           </li>
         </ul>
       </div>
