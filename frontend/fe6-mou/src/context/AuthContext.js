@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -14,36 +15,60 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is already logged in (from localStorage)
-    const savedUser = localStorage.getItem('mou_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem('mou_user');
-      }
-    }
-    setLoading(false);
-  }, []);
+  // Auth Server URL
+  const AUTH_URL = process.env.REACT_APP_AUTH_URL || 'http://localhost:2999';
 
-  const login = (email) => {
-    const userData = {
-      email,
-      loginTime: new Date().toISOString()
-    };
-    setUser(userData);
-    localStorage.setItem('mou_user', JSON.stringify(userData));
+  const checkAuth = React.useCallback(async () => {
+    try {
+      const response = await axios.get(`${AUTH_URL}/check-auth`, {
+        withCredentials: true
+      });
+      if (response.data.logged_in && response.data.user) {
+        setUser(response.data.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [AUTH_URL]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const loginWithGoogle = async (token) => {
+    try {
+      const response = await axios.post(`${AUTH_URL}/auth/google`, { token }, {
+        withCredentials: true
+      });
+      if (response.data.user) {
+        setUser(response.data.user);
+        return { success: true };
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      return { success: false, error: error.response?.data?.message || 'Login failed' };
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await axios.post(`${AUTH_URL}/logout`, {}, {
+        withCredentials: true
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
     setUser(null);
-    localStorage.removeItem('mou_user');
   };
 
   const value = {
     user,
-    login,
+    login: loginWithGoogle, // Replaced email login with Google login handler
     logout,
     isAuthenticated: !!user,
     loading

@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
 
 function Login() {
-  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login } = useAuth(); // login is now loginWithGoogle
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      setError('Please enter your email');
-      return;
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      if (credentialResponse.credential) {
+        const result = await login(credentialResponse.credential);
+        if (!result.success) {
+          setError(result.error);
+        }
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
     }
-    
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
+  };
 
-    // Login (no password required)
-    login(email.trim().toLowerCase());
+  const handleGoogleError = () => {
+    setError('Google Login Failed');
   };
 
   return (
@@ -34,35 +32,26 @@ function Login() {
           <p>Vignana Jyothi Institute of Engineering and Technology</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError('');
-              }}
-              placeholder="your.email@vnrvjiet.in"
-              className={error ? 'error' : ''}
-              autoFocus
-            />
-            {error && <span className="error-message">{error}</span>}
-          </div>
+        <div className="login-actions">
+          {error && <div className="error-message">{error}</div>}
 
-          <button type="submit" className="btn-login">
-            Continue
-          </button>
+          <div className="google-login-wrapper">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="filled_blue"
+              shape="pill"
+              text="signin_with"
+            />
+          </div>
 
           <div className="login-info">
             <p className="info-text">
-              <strong>Note:</strong> This is a simplified login. 
-              Google OAuth will be integrated later.
+              Please sign in with your VNRVJIET email.
             </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
