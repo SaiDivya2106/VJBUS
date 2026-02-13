@@ -13,9 +13,12 @@ app.use(cors());
 // Parse JSON bodies
 app.use(express.json());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'));
+
 app.use(cors({
   origin: [
-    'http://localhost:3220',
+    'http://localhost:3000',
     'https://hub.vjstartup.com'
   ],
   credentials: true // allow cookies if needed
@@ -34,6 +37,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Routes
 app.use('/problem-api', require('./APIs/problems-api'));
 app.use('/idea-api', require('./APIs/ideas-api'));
+app.use('/questionnaire-api', require('./APIs/questionnaire-api'));
 app.use('/startup-api', require('./APIs/startups-api'));
 app.use('/auth', require('./APIs/auth-api'));
 

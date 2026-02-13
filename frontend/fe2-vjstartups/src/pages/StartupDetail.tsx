@@ -1,25 +1,105 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Users, MessageCircle, Share2, Bookmark, Eye, Download, Award, TrendingUp, Target, Building, Calendar, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Users, MessageCircle, Share2, Bookmark, Eye, Download, Award, TrendingUp, Target, Building, Calendar, CheckCircle, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import UpvoteButton from "@/components/UpvoteButton";
 import StatusBadge from "@/components/StatusBadge";
 import CommentSection from "@/components/CommentSection";
-import { mockStartups, stageLabels, mockComments } from "@/data/mockData";
-import studyspaceImage from "@/assets/studyspace-startup.jpg";
-import ecotrackImage from "@/assets/ecotrack-startup.jpg";
-
-const imageMap: Record<string, string> = {
-  "1": studyspaceImage,
-  "2": ecotrackImage,
-};
+import { stageLabels, mockComments } from "@/data/mockData";
+import axios from "axios";
 
 export default function StartupDetail() {
   const { id } = useParams();
-  const startup = mockStartups.find(s => s.id === id);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [startup, setStartup] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [comments, setComments] = useState(mockComments);
+
+  // Check if current user can edit/delete this startup
+  // For now, we'll assume any logged-in user can edit (you can add proper auth later)
+  const canEditDelete = true; // TODO: Replace with actual user permission check
+
+  // Format date to readable format
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return dateString; // Fallback to original string if parsing fails
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/startup-api/${id}`);
+      
+      toast({
+        title: "Startup Deleted",
+        description: "The startup has been successfully deleted.",
+      });
+      
+      navigate('/startups');
+    } catch (error) {
+      console.error('Error deleting startup:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete startup. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchStartup = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/startup-api/${id}`);
+        setStartup(response.data);
+      } catch (err) {
+        console.error('Error fetching startup:', err);
+        setStartup(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (id) {
+      fetchStartup();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-startup-primary mx-auto mb-4"></div>
+          <p className="text-vj-muted">Loading startup...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!startup) {
     return (
@@ -27,7 +107,9 @@ export default function StartupDetail() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-vj-primary mb-4">Startup Not Found</h1>
           <Link to="/startups">
-            <Button>Back to Startups</Button>
+            <Button className="bg-startup-primary hover:bg-startup-primary/90 text-white">
+              Back to Startups
+            </Button>
           </Link>
         </div>
       </div>
@@ -73,7 +155,9 @@ export default function StartupDetail() {
     ));
   };
 
-  const startupImage = imageMap[startup.id] || "/api/placeholder/800/400";
+  const startupImage = startup?.coverImage 
+    ? `${import.meta.env.VITE_API_BASE_URL}${startup.coverImage}` 
+    : "/api/placeholder/800/400";
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -92,7 +176,7 @@ export default function StartupDetail() {
           <div className="aspect-video relative overflow-hidden rounded-vj-large mb-6">
             <img 
               src={startupImage}
-              alt={startup.name}
+              alt={startup.startupName || startup.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -107,16 +191,33 @@ export default function StartupDetail() {
             </div>
             <div className="absolute bottom-6 left-6 right-6">
               <div className="flex items-end justify-between">
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 font-playfair">
-                    {startup.name}
-                  </h1>
-                  <p className="text-white/90 text-lg">
-                    Stage {startup.stage}: {stageLabels[startup.stage - 1]}
-                  </p>
+                <div className="flex items-end gap-4">
+                  {startup.logo && (
+                    <div className="w-16 h-16 bg-white rounded-lg p-2 border-2 border-white/20">
+                      <img 
+                        src={`${import.meta.env.VITE_API_BASE_URL}${startup.logo}`}
+                        alt={`${startup.startupName || startup.name} logo`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 font-playfair">
+                      {startup.startupName || startup.name}
+                    </h1>
+                    {startup.tagline && (
+                      <p className="text-white/80 text-base mb-1 italic">
+                        "{startup.tagline}"
+                      </p>
+                    )}
+                    <p className="text-white/90 text-lg">
+                      Stage {startup.stage}: {stageLabels[startup.stage - 1]}
+                    </p>
+                  </div>
                 </div>
                 <UpvoteButton 
                   upvotes={startup.upvotes}
+                  onClick={() => console.log('Upvote clicked')}
                   className="bg-white/90 backdrop-blur-sm"
                 />
               </div>
@@ -128,15 +229,54 @@ export default function StartupDetail() {
             <div className="flex items-center gap-4 text-sm text-vj-muted">
               <div className="flex items-center gap-1">
                 <Eye size={16} />
-                <span>156 views</span>
+                <span>{startup.views} views</span>
               </div>
               <span>•</span>
               <div className="flex items-center gap-1">
                 <MessageCircle size={16} />
-                <span>12 comments</span>
+                <span>{comments.length} comments</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {canEditDelete && (
+                <>
+                  <Link to={`/startup-form?edit=${id}`}>
+                    <Button variant="ghost" size="sm" className="text-startup-primary hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                      <Edit size={16} className="mr-2" />
+                      Edit
+                    </Button>
+                  </Link>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50">
+                        <Trash2 size={16} className="mr-2" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the startup
+                          "{startup?.startupName || startup?.name}" and remove all associated data.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDelete}
+                          disabled={deleting}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          {deleting ? "Deleting..." : "Delete Startup"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
+              
               <Button variant="ghost" size="sm">
                 <Share2 size={16} className="mr-2" />
                 Share
@@ -177,50 +317,29 @@ export default function StartupDetail() {
               </h3>
               <div className="space-y-4 text-vj-muted">
                 <p>
-                  {startup.id === "1" ? 
-                    "StudySpace revolutionizes how students access and utilize study spaces through AI-powered room booking and collaborative learning features. Our platform eliminates the frustration of finding available study rooms by providing real-time availability, smart scheduling, and personalized recommendations." :
-                    "EcoTrack Campus provides comprehensive sustainability tracking and carbon footprint reduction tools specifically designed for college campuses. Our platform helps institutions monitor energy consumption, waste management, and overall environmental impact."
-                  }
+                  {startup.businessModel || startup.description || "Business model information will be available soon."}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-medium text-startup-primary mb-2">Key Features</h4>
                     <ul className="text-sm space-y-1">
-                      {startup.id === "1" ? (
-                        <>
-                          <li>• AI-powered room recommendations</li>
-                          <li>• Real-time availability tracking</li>
-                          <li>• Group study matching</li>
-                          <li>• Study session analytics</li>
-                        </>
-                      ) : (
-                        <>
-                          <li>• Carbon footprint tracking</li>
-                          <li>• Energy consumption monitoring</li>
-                          <li>• Waste management analytics</li>
-                          <li>• Student engagement features</li>
-                        </>
-                      )}
+                      {startup.keyFeatures && startup.keyFeatures.length > 0 ? 
+                        startup.keyFeatures.map((feature, index) => (
+                          <li key={index}>• {feature}</li>
+                        )) : (
+                          <li>• Key features will be available soon</li>
+                        )}
                     </ul>
                   </div>
                   <div>
                     <h4 className="font-medium text-startup-primary mb-2">Technology</h4>
                     <ul className="text-sm space-y-1">
-                      {startup.id === "1" ? (
-                        <>
-                          <li>• React Native mobile app</li>
-                          <li>• Machine learning algorithms</li>
-                          <li>• IoT sensor integration</li>
-                          <li>• Cloud infrastructure</li>
-                        </>
-                      ) : (
-                        <>
-                          <li>• IoT environmental sensors</li>
-                          <li>• Data analytics platform</li>
-                          <li>• Mobile and web apps</li>
-                          <li>• API integrations</li>
-                        </>
-                      )}
+                      {startup.technologyStack && startup.technologyStack.length > 0 ? 
+                        startup.technologyStack.map((tech, index) => (
+                          <li key={index}>• {tech}</li>
+                        )) : (
+                          <li>• Technology stack will be available soon</li>
+                        )}
                     </ul>
                   </div>
                 </div>
@@ -236,19 +355,19 @@ export default function StartupDetail() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-startup-light rounded-lg border border-startup-primary/20">
                   <p className="text-2xl font-bold text-startup-primary">
-                    {startup.id === "1" ? "$1.2B" : "$800M"}
+                    {startup.marketSize || "N/A"}
                   </p>
                   <p className="text-sm text-vj-muted">Market Size</p>
                 </div>
                 <div className="text-center p-4 bg-startup-light rounded-lg border border-startup-primary/20">
                   <p className="text-2xl font-bold text-startup-primary">
-                    {startup.id === "1" ? "15%" : "22%"}
+                    {startup.annualGrowthRate || "N/A"}
                   </p>
-                  <p className="text-sm text-vj-muted">Annual Growth</p>
+                  <p className="text-sm text-vj-muted">Market Growth Rate</p>
                 </div>
                 <div className="text-center p-4 bg-startup-light rounded-lg border border-startup-primary/20">
                   <p className="text-2xl font-bold text-startup-primary">
-                    {startup.id === "1" ? "2.5M" : "1.8M"}
+                    {startup.targetUsers || "N/A"}
                   </p>
                   <p className="text-sm text-vj-muted">Target Users</p>
                 </div>
@@ -262,7 +381,7 @@ export default function StartupDetail() {
                 Milestones & Progress
               </h3>
               <div className="space-y-4">
-                {startup.milestones.map((milestone, index) => (
+                {startup.milestones && startup.milestones.length > 0 ? startup.milestones.map((milestone, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className={`p-1.5 rounded-full ${milestone.completed ? 'bg-startup-primary' : 'bg-startup-muted/30'}`}>
                       <CheckCircle className={`h-4 w-4 ${milestone.completed ? 'text-white' : 'text-startup-muted'}`} />
@@ -273,11 +392,13 @@ export default function StartupDetail() {
                       </p>
                       <p className="text-sm text-startup-muted flex items-center">
                         <Calendar className="mr-1 h-3 w-3" />
-                        {milestone.date}
+                        {formatDate(milestone.date)}
                       </p>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <p className="text-gray-500 text-sm">No milestones added yet</p>
+                )}
               </div>
             </div>
           </div>
@@ -291,20 +412,40 @@ export default function StartupDetail() {
                 Leadership Team
               </h3>
               <div className="space-y-4">
-                {startup.team.map((member, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={member.avatar} />
-                      <AvatarFallback className="bg-startup-primary/20 text-startup-primary">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium text-vj-primary">{member.name}</p>
-                      <p className="text-sm text-startup-muted">{member.role}</p>
+                {/* Founders */}
+                {startup.founders && (
+                  <div>
+                    <h4 className="font-medium text-startup-primary mb-2">Founders & Team</h4>
+                    <p className="text-vj-muted text-sm whitespace-pre-line">{startup.founders}</p>
+                  </div>
+                )}
+                
+                {/* Team Members */}
+                {startup.team && startup.team.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-startup-primary mb-2">Team Members</h4>
+                    <div className="space-y-2">
+                      {startup.team.map((member, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={member.avatar} />
+                            <AvatarFallback className="bg-startup-primary/20 text-startup-primary text-xs">
+                              {member.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-vj-primary text-sm">{member.name}</p>
+                            <p className="text-xs text-startup-muted">{member.role}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
+                
+                {(!startup.founders && (!startup.team || startup.team.length === 0)) && (
+                  <p className="text-gray-500 text-sm">Team information will be available soon</p>
+                )}
               </div>
             </div>
 
@@ -318,11 +459,13 @@ export default function StartupDetail() {
                 <div>
                   <h4 className="font-medium text-startup-primary mb-2">Programs</h4>
                   <div className="flex flex-wrap gap-2">
-                    {startup.schemes.map((scheme, index) => (
+                    {startup.supportPrograms && startup.supportPrograms.length > 0 ? startup.supportPrograms.map((program, index) => (
                       <Badge key={index} variant="outline" className="border-startup-primary/30 text-startup-primary text-xs">
-                        {scheme}
+                        {program}
                       </Badge>
-                    ))}
+                    )) : (
+                      <p className="text-gray-500 text-sm">No support programs listed</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -338,15 +481,46 @@ export default function StartupDetail() {
                 <Button className="w-full bg-startup-primary hover:bg-startup-primary/90 text-white">
                   Schedule Meeting
                 </Button>
-                <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-startup-light">
+                <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Send Message
                 </Button>
+                {startup.website && (
+                  <a 
+                    href={startup.website.startsWith('http') ? startup.website : `https://${startup.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
+                    <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+                      <Building className="mr-2 h-4 w-4" />
+                      Visit Website
+                    </Button>
+                  </a>
+                )}
+                {startup.pitchDeck && (
+                  <a 
+                    href={`${import.meta.env.VITE_API_BASE_URL}/startup-api/${startup._id}/download/pitchDeck`}
+                    download
+                    className="w-full"
+                  >
+                    <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Pitch Deck
+                    </Button>
+                  </a>
+                )}
                 {startup.onePager && (
-                  <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-startup-light">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Pitch Deck
-                  </Button>
+                  <a 
+                    href={`${import.meta.env.VITE_API_BASE_URL}/startup-api/${startup._id}/download/onePager`}
+                    download
+                    className="w-full"
+                  >
+                    <Button variant="outline" className="w-full border-startup-primary/30 text-startup-primary hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+                      <Download className="mr-2 h-4 w-4" />
+                      Download One Pager
+                    </Button>
+                  </a>
                 )}
               </div>
             </div>
@@ -355,6 +529,18 @@ export default function StartupDetail() {
             <div className="vj-card-startup">
               <h3 className="text-lg font-semibold text-vj-primary mb-4">Company Metrics</h3>
               <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-vj-muted">Revenue</span>
+                  <span className="font-medium text-startup-primary">
+                    {startup.revenue ? `₹${startup.revenue}` : 'Not disclosed'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-vj-muted">Customers</span>
+                  <span className="font-medium text-startup-primary">
+                    {startup.customers || 'Not disclosed'}
+                  </span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-vj-muted">Community Support</span>
                   <span className="font-medium text-startup-primary">{startup.upvotes} upvotes</span>
@@ -365,12 +551,14 @@ export default function StartupDetail() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-vj-muted">Team Size</span>
-                  <span className="font-medium text-startup-primary">{startup.team.length} members</span>
+                  <span className="font-medium text-startup-primary">
+                    {startup.teamSize || startup.team?.length || 'Not specified'} 
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-vj-muted">Milestones Achieved</span>
                   <span className="font-medium text-startup-primary">
-                    {startup.milestones.filter(m => m.completed).length}/{startup.milestones.length}
+                    {startup.milestones?.filter(m => m.completed).length || 0}/{startup.milestones?.length || 0}
                   </span>
                 </div>
               </div>

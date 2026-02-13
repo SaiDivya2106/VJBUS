@@ -2,13 +2,18 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Lightbulb, Users, TrendingUp, Award, Rocket, Globe, Zap, Sparkles, Brain, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import { counters, mockProblems, mockIdeas, mockStartups } from "@/data/mockData";
+import QuestionnaireHistory from "@/components/QuestionnaireHistory";
+import { counters, mockProblems, mockStartups } from "@/data/mockData";
 import innovationHero from "@/assets/3.jpeg";
+import vjLogo from "@/assets/vj-logo.png";
 import GalaxyBackground from "@/components/GalaxyBackground";
+import { useUser } from "./UserContext";
+import VirtualStartupJourney from "@/components/InteractiveLearningHub";
 
 const user = JSON.parse(localStorage.getItem("user") || "null");
 
 const Home = () => {
+  const { user: currentUser } = useUser();
   const achievements = [
     {
       icon: Award,
@@ -18,8 +23,8 @@ const Home = () => {
     },
     {
       icon: Rocket,
-      title: "5 Startups Funded",
-      description: "Total funding raised: $2.8M",
+      title: "8 Startups Funded",
+      description: "Total funding raised: Rs 2.8Cr",
       year: "2024"
     },
     {
@@ -32,24 +37,28 @@ const Home = () => {
 
   const innovations = [
     {
-      title: "AI-Powered Study Assistant",
-      category: "EdTech",
-      image: "/src/assets/studyspace-startup.jpg",
-      description: "Revolutionary learning platform using machine learning"
-    },
-    {
-      title: "Sustainable Campus Energy",
-      category: "GreenTech",
-      image: "/src/assets/ecotrack-startup.jpg", 
-      description: "IoT-based energy optimization for university buildings"
-    },
-    {
-      title: "Mental Health Companion",
-      category: "HealthTech",
-      image: "/src/assets/mindbridge-idea.jpg",
-      description: "24/7 peer support network with crisis intervention"
-    }
+    title: "ATLAST Hydrogen Solutions",
+    category: "Clean Energy",
+    image: "/src/assets/ecotrack-startup.jpg",
+    description: "Revolutionary hydrogen fuel-cell technology transforming automotive and energy sectors"
+  },
+  {
+    title: "Salcit AI Health",
+    category: "HealthTech",
+    image: "/src/assets/studyspace-startup.jpg", 
+    description: "AI-powered cough analysis platform for respiratory health screening and remote patient monitoring"
+  },
+  {
+    title: "Alltronics IoT Solutions",
+    category: "Industrial IoT",
+    image: "/src/assets/mindbridge-idea.jpg",
+    description: "Smart IoT and AI-enabled electronic test equipment, EV battery monitoring, and industrial automation"
+  }
   ];
+
+  // image: ,
+  // image: "/src/assets/ecotrack-startup.jpg",
+  // image: "/src/assets/mindbridge-idea.jpg",
 
   return (
     <div className="min-h-screen">
@@ -71,7 +80,16 @@ const Home = () => {
             <span className="text-sm font-medium text-vj-accent">Innovation Starts Here</span>
           </div>
           
-          <h1 className="text-6xl md:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.3)] animate-fade-in">
+          {/* VJ Startups Logo */}
+          <div className="mb-8 animate-fade-in">
+            <img 
+              src={vjLogo} 
+              alt="VJ Startups" 
+              className="h-32 md:h-40 mx-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.3)] animate-fade-in">
   Build for the future,<br />start here.
 </h1>
 
@@ -116,9 +134,26 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Virtual Startup Journey - NEW SECTION */}
+      <VirtualStartupJourney />
+
       {/* Achievements Section */}
       <section className="py-32 px-4 bg-gradient-to-br from-vj-surface via-vj-neutral to-vj-accent-light/30">
         <div className="max-w-7xl mx-auto">
+          {/* Brand Showcase */}
+          <div className="text-center mb-20">
+            <div className="mb-12">
+              <img 
+                src={vjLogo} 
+                alt="VJ Startups" 
+                className="h-24 md:h-32 mx-auto mb-6 opacity-90 hover:opacity-100 transition-opacity duration-300"
+              />
+              <p className="text-lg text-vj-muted max-w-2xl mx-auto">
+                Empowering the next generation of innovators and entrepreneurs
+              </p>
+            </div>
+          </div>
+
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-vj-accent-light border border-vj-accent/20 rounded-full mb-6">
               <Target size={16} className="text-vj-accent" />
@@ -246,30 +281,6 @@ const Home = () => {
               </Link>
             </div>
 
-            {/* Ideas Preview */}
-            <div className="vj-card-minimal">
-              <div className="flex items-center mb-4">
-                <Users className="text-vj-accent mr-3" size={24} />
-                <h3 className="text-xl font-semibold text-vj-primary">Ideas</h3>
-              </div>
-              <p className="text-vj-muted mb-6">
-                Innovative solutions being developed by student teams
-              </p>
-              <div className="space-y-4 mb-6">
-                {mockIdeas.slice(0, 2).map(idea => (
-                  <div key={idea.id} className="border-l-2 border-vj-accent/20 pl-4">
-                    <h4 className="font-medium text-vj-primary text-sm">{idea.title}</h4>
-                    <p className="text-xs text-vj-muted mt-1">Stage {idea.stage} • {idea.upvotes} upvotes</p>
-                  </div>
-                ))}
-              </div>
-              <Link to="/ideas">
-                <Button variant="ghost" className="btn-ghost w-full">
-                  View All Ideas
-                </Button>
-              </Link>
-            </div>
-
             {/* Startups Preview */}
             <div className="vj-card-minimal">
               <div className="flex items-center mb-4">
@@ -305,20 +316,20 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">15+</div>
-              <div className="text-sm text-vj-muted">Universities</div>
+              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">8</div>
+              <div className="text-sm text-vj-muted">Entrepreneurship Partners</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">$2.8M</div>
+              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">₹2.8M</div>
               <div className="text-sm text-vj-muted">Total Funding</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">95%</div>
-              <div className="text-sm text-vj-muted">Success Rate</div>
+              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">15</div>
+              <div className="text-sm text-vj-muted">Research Partners</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">200+</div>
-              <div className="text-sm text-vj-muted">Mentors</div>
+              <div className="text-3xl md:text-4xl font-bold text-vj-accent mb-2">10+</div>
+              <div className="text-sm text-vj-muted">Industry Mentors</div>
             </div>
           </div>
         </div>
@@ -336,38 +347,25 @@ const Home = () => {
           <p className="text-xl text-vj-muted mb-8">
             Join thousands of student entrepreneurs building tomorrow's solutions
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-  {user ? (
-    // If user is logged in, show profile button
-    <Link to="/profile">
-      <Button size="lg" className="btn-primary flex items-center gap-2">
-        <img
-          src={user.avatar || "/default-avatar.png"} // fallback avatar
-          alt="Profile"
-          className="w-6 h-6 h-6 rounded-full"
-        />
-        {user.name || "Profile"}
-      </Button>
-    </Link>
-  ) : (
-    // If not logged in, show submit & join buttons
-    <>
-      <Link to="/submit">
-        <Button size="lg" className="btn-primary">
-          Submit Your Idea
-        </Button>
-      </Link>
-      <Link to="/login">
-        <Button size="lg" className="btn-secondary">
-          Join Community
-        </Button>
-      </Link>
-    </>
-  )}
-</div>
+          
 
         </div>
       </section>
+
+      {/* Questionnaire History Section - Only show if user is logged in */}
+      {currentUser && (
+        <section className="py-16 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Your Validation Journey</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Track your idea validation progress and see how your concepts evolve over time
+              </p>
+            </div>
+            <QuestionnaireHistory />
+          </div>
+        </section>
+      )}
     </div>
   );
 };

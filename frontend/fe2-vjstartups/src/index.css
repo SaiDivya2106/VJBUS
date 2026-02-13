@@ -100,6 +100,14 @@
     --startup-light: 263 85% 12%;
     --startup-muted: 263 30% 55%;
     
+    /* Dark mode gradients */
+    --vj-gradient-primary: linear-gradient(135deg, hsl(217, 92%, 65%), hsl(217, 92%, 75%));
+    --vj-gradient-subtle: linear-gradient(135deg, hsl(220, 10%, 8%), hsl(220, 10%, 12%));
+    --vj-gradient-innovation: linear-gradient(135deg, hsl(217, 92%, 65%) 0%, hsl(280, 92%, 75%) 100%);
+    --vj-gradient-problem: linear-gradient(135deg, hsl(25, 95%, 63%) 0%, hsl(45, 95%, 70%) 100%);
+    --vj-gradient-idea: linear-gradient(135deg, hsl(142, 76%, 46%) 0%, hsl(120, 76%, 55%) 100%);
+    --vj-gradient-startup: linear-gradient(135deg, hsl(263, 85%, 66%) 0%, hsl(280, 85%, 75%) 100%);
+    
     /* Dark mode shadcn mappings */
     --primary: 217 92% 65%;
     --primary-foreground: 220 10% 9%;
@@ -149,6 +157,21 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-in-left {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
   @keyframes scale-in {
     from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
@@ -192,6 +215,34 @@
 
   .animate-glow {
     animation: glow 4s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .delay-400 {
+    animation-delay: 400ms;
   }
 
   /* Premium Hover effects */
@@ -353,5 +404,58 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Safe Area Utilities for mobile devices */
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mr-safe {
+    margin-right: env(safe-area-inset-right);
+  }
+  
+  .ml-safe {
+    margin-left: env(safe-area-inset-left);
+  }
+  
+  .mt-safe {
+    margin-top: env(safe-area-inset-top);
+  }
+}
+
+/* FAB Animation */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }

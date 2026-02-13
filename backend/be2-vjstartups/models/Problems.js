@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const problemSchema = new mongoose.Schema({
-  problemId: String,
+  problemId: { type: String, unique: true },
   title: String,
   briefparagraph: String,
   description: String,   // added
@@ -17,6 +17,7 @@ const problemSchema = new mongoose.Schema({
   scalability: String,
   addedByName: String,
   addedByEmail: String,
+  collaborators: [{ type: String }], // array of email IDs
   tags: [String],
   createdAt: { type: Date, default: Date.now }
 });

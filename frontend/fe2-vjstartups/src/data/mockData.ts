@@ -59,13 +59,13 @@ export interface Milestone {
 export const mockProblems: Problem[] = [
   {
     id: "1",
-    title: "Campus Food Waste Management",
-    excerpt: "College cafeterias waste tons of food daily while students struggle with meal costs",
+    title: "Socialize - Fill Student Gaps",
+    excerpt: "It can be very challenging for new students to engage and socialize with their peers, especially for those who come from other states, face language barriers, lack confidence, feel insecure, or identify as introverted.",
     description: "Every day, college cafeterias across the country throw away massive amounts of perfectly good food while many students face food insecurity. This problem represents a massive opportunity to address both environmental sustainability and student welfare simultaneously. Current cafeteria operations lack efficient systems to redistribute surplus food, creating a dual crisis of waste and hunger on campus.",
     image: "food-waste-problem.jpg",
     author: "Sarah Chen",
     date: "2024-01-15",
-    upvotes: 147,
+    upvotes: 30,
     comments: 23,
     tags: ["Sustainability", "Food", "Campus Life"],
     background: "Studies show that college cafeterias waste 22% of food purchased, while 39% of students experience food insecurity.",
@@ -76,13 +76,13 @@ export const mockProblems: Problem[] = [
   },
   {
     id: "2", 
-    title: "Mental Health Support Accessibility",
+    title: "Unawareness of Road Blockages in Rainy Season due to water",
     excerpt: "Limited counseling resources create massive wait times for student mental health support",
     description: "College counseling centers are overwhelmed, with average wait times of 2-3 weeks for appointments. The mental health crisis among college students has reached unprecedented levels, yet traditional support systems remain inadequate. Students facing acute mental health challenges often go without timely intervention, leading to academic failure, withdrawal, and in severe cases, self-harm. The gap between demand and available resources continues to widen each semester.",
     image: "mental-health-problem.jpg",
     author: "Marcus Johnson",
     date: "2024-01-12",
-    upvotes: 203,
+    upvotes: 23,
     comments: 41,
     tags: ["Mental Health", "Student Support", "Healthcare"],
     background: "1 in 3 college students experience significant mental distress, but only 34% seek help due to accessibility barriers.",
@@ -93,13 +93,13 @@ export const mockProblems: Problem[] = [
   },
   {
     id: "3",
-    title: "Textbook Cost Crisis", 
+    title: "Silent Mental Health", 
     excerpt: "Students pay thousands for textbooks they use for one semester",
     description: "The average student spends $1,240 annually on textbooks, creating financial barriers to education. This unsustainable cost structure forces students to choose between buying required materials and meeting basic needs like food and housing. Many students resort to sharing books, using outdated editions, or going without, directly impacting their academic performance and future career prospects.",
     image: "textbook-cost-problem.jpg",
     author: "Alex Rivera",
     date: "2024-01-10",
-    upvotes: 89,
+    upvotes: 20,
     comments: 15,
     tags: ["Education", "Finance", "Resources"],
     background: "Textbook costs have increased 812% since 1980, far outpacing inflation and tuition increases.",
@@ -107,44 +107,6 @@ export const mockProblems: Problem[] = [
     marketSize: "$5B annual textbook market in higher education",
     competitors: ["Chegg", "VitalSource", "Pearson"],
     currentGaps: "Limited peer-to-peer sharing platforms with quality assurance"
-  }
-];
-
-export const mockIdeas: Idea[] = [
-  {
-    id: "1",
-    problemId: "1",
-    title: "FoodShare Campus",
-    description: "AI-powered platform connecting cafeterias with students for discounted surplus food pickup",
-    team: [
-      { name: "Emma Wilson", role: "CEO & Developer", avatar: "/api/placeholder/64/64" },
-      { name: "David Park", role: "CTO", avatar: "/api/placeholder/64/64" },
-      { name: "Lisa Zhang", role: "Operations", avatar: "/api/placeholder/64/64" }
-    ],
-    stage: 4,
-    upvotes: 87,
-    downvotes: 3,
-    comments: 12,
-    mentor: "Prof. Susan Miller - Sustainability",
-    attachments: ["prototype-demo.mp4", "business-plan.pdf"],
-    contact: "emma.wilson@student.edu"
-  },
-  {
-    id: "2", 
-    problemId: "2",
-    title: "MindBridge Peer Network",
-    description: "24/7 peer support platform with trained student counselors and crisis intervention",
-    team: [
-      { name: "Jordan Smith", role: "Founder", avatar: "/api/placeholder/64/64" },
-      { name: "Priya Patel", role: "Psychology Lead", avatar: "/api/placeholder/64/64" }
-    ],
-    stage: 6,
-    upvotes: 142,
-    downvotes: 7,
-    comments: 28,
-    mentor: "Dr. Rachel Green - Clinical Psychology",
-    attachments: ["pilot-results.pdf", "user-testimonials.pdf"],
-    contact: "jordan.smith@student.edu"
   }
 ];
 
@@ -159,7 +121,7 @@ export const mockStartups: Startup[] = [
       { name: "James Kim", role: "Head of Product", avatar: "/api/placeholder/64/64" }
     ],
     stage: 8,
-    fundingStatus: "Series A - $2.3M raised",
+    fundingStatus: "Series A - ₹2.3Cr raised",
     schemes: ["University Innovation Grant", "Tech Stars Accelerator"],
     upvotes: 234,
     milestones: [
@@ -233,15 +195,15 @@ export const mockComments = [
 ];
 
 export const stageLabels = [
-  "Ideation",
-  "Research", 
+  "Idea & Concept",
+  "Research & Feasibility", 
   "Validation",
   "Prototype",
-  "Testing",
-  "Launch Prep",
-  "MVP Launch",
-  "Growth",
-  "Scale/Exit"
+  "MVP",
+  "Testing & Iteration",
+  "Launch & Early Growth",
+  "Scaling",
+  "Maturity & Exit Options"
 ];
 
 export const counters = {

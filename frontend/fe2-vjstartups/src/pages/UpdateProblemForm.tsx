@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "../pages/UserContext";
+import { QuestionHelp } from "@/components/QuestionHelp";
 import axios from "axios";
 
 interface UpdateProblemData {
@@ -21,6 +22,7 @@ interface UpdateProblemData {
   existingSolutions: string;
   currentGaps: string;
   targetCustomers: string;
+  collaborators: string;
   tags: string;
   authorName: string;
   image?: File | null;
@@ -35,6 +37,7 @@ const UpdateProblemForm = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [open, setOpen] = useState(true);
+  const [collaboratorErrors, setCollaboratorErrors] = useState<string[]>([]);
 
   const { register, handleSubmit, setValue, formState, reset } = useForm<UpdateProblemData>({
     defaultValues: {},
@@ -60,6 +63,11 @@ const UpdateProblemForm = () => {
         setValue("existingSolutions", data.existingSolutions);
         setValue("currentGaps", data.currentGaps);
         setValue("targetCustomers", data.targetCustomers);
+        
+        // Set collaborators if they exist
+        if (data.collaborators && Array.isArray(data.collaborators)) {
+          setValue("collaborators", data.collaborators.join(", "));
+        }
         
         // Set tags if they exist
         if (data.tags && Array.isArray(data.tags)) {
@@ -90,6 +98,20 @@ const UpdateProblemForm = () => {
     setImagePreview(null);
   };
 
+  const validateCollaborators = (collaboratorsText: string) => {
+    if (!collaboratorsText.trim()) {
+      setCollaboratorErrors([]);
+      return [];
+    }
+
+    const emails = collaboratorsText.split(",").map(email => email.trim()).filter(email => email);
+    const invalidEmails = emails.filter(email => !email.endsWith('@vnrvjiet.in'));
+    const validEmails = emails.filter(email => email.endsWith('@vnrvjiet.in'));
+    
+    setCollaboratorErrors(invalidEmails);
+    return validEmails;
+  };
+
  const handleDialogChange = (isOpen: boolean) => {
   setOpen(isOpen);
   if (!isOpen) {
@@ -111,6 +133,17 @@ const UpdateProblemForm = () => {
       return;
     }
 
+    // Validate collaborators before submission
+    const validCollaborators = validateCollaborators(data.collaborators || "");
+    if (collaboratorErrors.length > 0) {
+      toast({
+        title: "Invalid collaborators",
+        description: `The following emails are invalid: ${collaboratorErrors.join(", ")}. Only @vnrvjiet.in emails are allowed.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("title", data.title);
@@ -124,6 +157,9 @@ const UpdateProblemForm = () => {
       formData.append("targetCustomers", data.targetCustomers);
       formData.append("addedByName", data.authorName);
       formData.append("addedByEmail", user.email);
+
+      // Process collaborators (use already validated emails)
+      validCollaborators.forEach(email => formData.append("collaborators[]", email));
 
       const tagsArray = data.tags ? data.tags.split(",").map(t => t.trim()) : [];
       tagsArray.forEach(tag => formData.append("tags[]", tag));
@@ -149,7 +185,7 @@ const UpdateProblemForm = () => {
 
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl md:max-w-2xl w-full max-h-[90vh] overflow-y-auto p-3 md:p-6 m-0 md:m-4 rounded-none md:rounded-lg h-full md:h-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-orange-600">
             Update Problem
@@ -158,7 +194,13 @@ const UpdateProblemForm = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <Label htmlFor="title">Problem Title *</Label>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemTitle" 
+                questionText="What makes a good problem title?"
+              />
+              <Label htmlFor="title">Problem Title *</Label>
+            </div>
             <Input
               id="title"
               {...register("title", { required: "Title is required" })}
@@ -168,11 +210,17 @@ const UpdateProblemForm = () => {
           </div>
 
           <div>
-            <Label htmlFor="briefparagraph">Brief Summary *</Label>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemSummary" 
+                questionText="How to write an effective problem summary?"
+              />
+              <Label htmlFor="briefparagraph">Brief Summary *</Label>
+            </div>
             <Textarea
               id="briefparagraph"
               {...register("briefparagraph", { required: "Summary is required" })}
-              placeholder="Brief description"
+              placeholder="Explain why this problem is important to solve (2-3 sentences)"
               rows={2}
             />
             {errors.briefparagraph && (
@@ -183,7 +231,13 @@ const UpdateProblemForm = () => {
           </div>
 
           <div>
-            <Label htmlFor="targetCustomers">Target Customer(s) *</Label>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="targetAudience" 
+                questionText="How to identify your target customers?"
+              />
+              <Label htmlFor="targetCustomers">Target Customer(s) *</Label>
+            </div>
             <Textarea
               id="targetCustomers"
               {...register("targetCustomers", { required: "Target customers is required" })}
@@ -196,41 +250,129 @@ const UpdateProblemForm = () => {
           </div>
 
           <div>
-            <Label htmlFor="description">Detailed Description *</Label>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemDescription" 
+                questionText="What details should a problem description include?"
+              />
+              <Label htmlFor="description">Detailed Description *</Label>
+            </div>
             <Textarea
               id="description"
               {...register("description", { required: "Description is required" })}
-              placeholder="Provide a detailed explanation of the problem"
+              placeholder="Who has the problem, intensity, what they tried, why it's still an issue, how badly they need solution & urgency"
               rows={4}
             />
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
           </div>
 
           <div>
-            <Label htmlFor="background">Background</Label>
-            <Textarea id="background" {...register("background")} rows={3} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="scalability">Scalability</Label>
-              <Textarea id="scalability" {...register("scalability")} rows={2} />
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemBackground" 
+                questionText="What background information should I include?"
+              />
+              <Label htmlFor="background">Problem Background</Label>
             </div>
-
-            <div>
-              <Label htmlFor="marketSize">Market Size</Label>
-              <Input id="marketSize" {...register("marketSize")} />
-            </div>
+            <Textarea 
+              id="background" 
+              {...register("background")} 
+              placeholder="Stats, reports, surveys, research work, external links that provide deeper insights"
+              rows={3} 
+            />
           </div>
 
           <div>
-            <Label htmlFor="existingSolutions">Existing Solutions / Competitors</Label>
-            <Input id="existingSolutions" {...register("existingSolutions")} />
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemScale" 
+                questionText="How big is this problem geographically and population-wise?"
+              />
+              <Label htmlFor="scalability">Problem Scale</Label>
+            </div>
+            <Textarea 
+              id="scalability" 
+              {...register("scalability")} 
+              placeholder="How big is this problem geographically and population-wise?"
+              rows={2} 
+            />
           </div>
 
           <div>
-            <Label htmlFor="currentGaps">Current Gaps</Label>
-            <Textarea id="currentGaps" {...register("currentGaps")} rows={2} />
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemMarketSize" 
+                questionText="What's the revenue potential of this problem area?"
+              />
+              <Label htmlFor="marketSize">Market Potential</Label>
+            </div>
+            <Input 
+              id="marketSize" 
+              {...register("marketSize")} 
+              placeholder="e.g., $2.3B annual market potential"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemExistingSolutions" 
+                questionText="What existing solutions should I research?"
+              />
+              <Label htmlFor="existingSolutions">Existing Solutions/Competitors</Label>
+            </div>
+            <Input 
+              id="existingSolutions" 
+              {...register("existingSolutions")} 
+              placeholder="List existing solutions (comma-separated)"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemCurrentGaps" 
+                questionText="How to identify gaps in existing solutions?"
+              />
+              <Label htmlFor="currentGaps">Current Gaps</Label>
+            </div>
+            <Textarea 
+              id="currentGaps" 
+              {...register("currentGaps")} 
+              placeholder="What's missing in current solutions? Why existing solutions couldn't address the problem fully?"
+              rows={2} 
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <QuestionHelp 
+                questionKey="problemCollaborators" 
+                questionText="What should I know about adding collaborators?"
+              />
+              <Label htmlFor="collaborators">Collaborators (Optional)</Label>
+            </div>
+            <Textarea
+              id="collaborators"
+              {...register("collaborators", {
+                onChange: (e) => validateCollaborators(e.target.value)
+              })}
+              placeholder="Co-developers who will help edit and improve this problem statement"
+              rows={2}
+            />
+            {collaboratorErrors.length > 0 && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-sm font-medium">Invalid email addresses:</p>
+                <ul className="text-red-600 text-sm mt-1">
+                  {collaboratorErrors.map((email, index) => (
+                    <li key={index}>• {email} (must end with @vnrvjiet.in)</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Collaborators can edit and delete this problem. Only @vnrvjiet.in emails are allowed.
+            </p>
           </div>
 
           <div>

@@ -4,8 +4,7 @@ import { Search, Filter, Users, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import UpvoteButton from "@/components/UpvoteButton";
-import StatusBadge from "@/components/StatusBadge";
+import IdeaCard from "@/components/IdeaCardCompact";
 import IdeaSubmissionForm from "@/components/IdeaSubmissionForm";
 import axios from "axios";
 import { useUser } from "./UserContext";
@@ -16,7 +15,7 @@ const Ideas = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [stageFilter, setStageFilter] = useState("");
-  const [sortBy, setSortBy] = useState("upvotes");
+  const [sortBy, setSortBy] = useState("newest");
   const [showAllTags, setShowAllTags] = useState(false);
   const [ideas, setIdeas] = useState<any[]>([]);
   const [relatedProblem, setRelatedProblem] = useState<any>(null);
@@ -26,8 +25,12 @@ const Ideas = () => {
   // Fetch ideas from backend
   useEffect(() => {
     const fetchIdeas = async () => {
-      if (!user?.email) return;
+      if (!user?.email) {
+        setLoading(false);
+        return;
+      }
 
+      setLoading(true);
       try {
         let endpoint = `${import.meta.env.VITE_API_BASE_URL}/idea-api/ideas`;
         
@@ -37,13 +40,48 @@ const Ideas = () => {
         }
         
         const res = await axios.get(endpoint);
-        
-        // Mark which ideas the current user has already liked
+        console.log('Ideas fetched:', res.data);
+
+        // Build a map of related problemId -> problem (title) to avoid N+1 fetches
+        const uniqueProblemIds: string[] = Array.from(
+          new Set(
+            (res.data || [])
+              .map((i: any) => i.relatedProblemId)
+              .filter((id: any) => id && id !== 'undefined' && id.trim() !== '')
+          )
+        );
+        console.log('Unique problem IDs:', uniqueProblemIds);
+
+        let problemMap: Record<string, any> = {};
+        if (uniqueProblemIds.length > 0) {
+          const results = await Promise.all(
+            uniqueProblemIds.map((pid) =>
+              axios
+                .get(`${import.meta.env.VITE_API_BASE_URL}/problem-api/problems/${pid}`)
+                .then((r) => ({ id: pid, data: r.data }))
+                .catch((err) => {
+                  console.error(`Failed to fetch problem ${pid}:`, err);
+                  return { id: pid, data: null };
+                })
+            )
+          );
+          problemMap = results.reduce((acc: Record<string, any>, cur) => {
+            acc[cur.id] = cur.data;
+            return acc;
+          }, {});
+          console.log('Problem map:', problemMap);
+        }
+
+        // Mark which ideas the current user has already liked and attach problem info
         const updatedIdeas = res.data.map((i: any) => ({
           ...i,
-          likedByUser: i.upvotedBy.includes(user.email)
+          likedByUser: i.upvotedBy.includes(user.email),
+          relatedProblemId: i.relatedProblemId,
+          relatedProblemTitle: i.relatedProblemId && problemMap[i.relatedProblemId]
+            ? problemMap[i.relatedProblemId].title
+            : null,
         }));
-        
+
         setIdeas(updatedIdeas);
       } catch (err) {
         console.error("Error fetching ideas:", err);
@@ -134,6 +172,17 @@ const Ideas = () => {
       console.error("Error toggling upvote:", err);
     }
   };
+
+  // Handle stage updates
+  const handleStageUpdate = async (ideaId: string, newStage: number) => {
+    setIdeas(prev =>
+      prev.map(idea =>
+        idea.ideaId === ideaId
+          ? { ...idea, stage: newStage }
+          : idea
+      )
+    );
+  };
   
   // Get all tags with counts from ideas
   const getTagsWithCounts = (ideas: any[]) => {
@@ -166,6 +215,8 @@ const Ideas = () => {
     )
     .sort((a, b) => {
       switch (sortBy) {
+        case "newest":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case "upvotes":
           return b.upvotes - a.upvotes;
         case "stage":
@@ -193,20 +244,25 @@ const Ideas = () => {
               }
             </p>
           </div>
-          <div className="hidden lg:block">
+          {/* Submit Idea Button - Only show when user is logged in */}
+          {user && (
+            <div className="hidden lg:block">
+              <IdeaSubmissionForm />
+            </div>
+          )}
+        </div>
+        
+        {/* Mobile Submit Button - Only show when user is logged in */}
+        {user && (
+          <div className="lg:hidden flex justify-center mb-8">
             <IdeaSubmissionForm />
           </div>
-        </div>
+        )}
         
-        {/* Mobile Submit Button */}
-        <div className="lg:hidden flex justify-center mb-8">
-          <IdeaSubmissionForm />
-        </div>
-        
-        {/* Filters & Search */}
-        <div className="bg-vj-neutral rounded-xl p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
-            {/* Search */}
+        {/* Filters & Search - Only show when user is logged in */}
+        {user && (
+          <div className="bg-vj-neutral rounded-xl p-6 mb-8">
+            <div className="flex flex-col lg:flex-row gap-4 items-center">{/* Search */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-vj-muted" size={20} />
               <Input
@@ -226,15 +282,15 @@ const Ideas = () => {
                 className="bg-background border border-vj-border rounded-lg px-3 py-2 text-sm"
               >
                 <option value="">All Stages</option>
-                <option value="1">Ideation</option>
-                <option value="2">Research</option>
+                <option value="1">Idea & concept</option>
+                <option value="2">Research & Feasability</option>
                 <option value="3">Validation</option>
                 <option value="4">Prototype</option>
-                <option value="5">Testing</option>
-                <option value="6">Launch Prep</option>
-                <option value="7">MVP Launch</option>
-                <option value="8">Growth</option>
-                <option value="9">Scale/Exit</option>
+                <option value="5">MVP</option>
+                <option value="6">Testing & Iteration</option>
+                <option value="7">Launch & Early Growth</option>
+                <option value="8">Scaling</option>
+                <option value="9">Maturity & Exit</option>
               </select>
             </div>
             
@@ -244,6 +300,7 @@ const Ideas = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-background border border-vj-border rounded-lg px-3 py-2 text-sm"
             >
+              <option value="newest">Latest Added</option>
               <option value="upvotes">Highest Rated</option>
               <option value="stage">Most Advanced</option>
               <option value="comments">Most Discussed</option>
@@ -279,6 +336,7 @@ const Ideas = () => {
             </div>
           )}
         </div>
+        )}
         
         {loading ? (
           <div className="text-center py-16">
@@ -288,132 +346,68 @@ const Ideas = () => {
         ) : (
           <>
             {/* Ideas Grid */}
-            <div className="ideas-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredIdeas.map((idea) => (
-                <div 
-                  key={idea.ideaId} 
-                  id={`idea-${idea.ideaId}`}
-                  className="vj-card-idea group"
-                >
-                  {/* Idea Header with Title Image or Creative Visual */}
-                  <div className="aspect-video relative overflow-hidden rounded-vj-large mb-6 bg-gradient-to-br from-idea-light to-idea-primary/20">
-                    {idea.titleImage ? (
-                      <img 
-                        src={idea.titleImage} 
-                        alt={idea.title} 
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 bg-idea-primary/30 rounded-full flex items-center justify-center">
-                          <span className="text-3xl">💡</span>
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute top-4 left-4">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-black/70 rounded-full">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span className="text-white text-xs font-medium">Idea</span>
-                      </div>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <StatusBadge stage={idea.stage || 1} />
-                    </div>
-                    <div className="absolute bottom-4 left-4">
-                      <div className="flex items-center gap-1 text-white bg-black/70 px-2 py-1 rounded-full">
-                        <MessageCircle size={12} />
-                        <span className="text-xs">{idea.comments?.length || 0}</span>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-4 right-4">
-                      <UpvoteButton 
-                        upvotes={idea.upvotes || 0}
-                        hasUpvoted={!!idea.likedByUser}
-                        onClick={() => handleUpvote(idea.ideaId)}
-                        className="bg-white/90 backdrop-blur-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-bold text-vj-primary mb-2 group-hover:text-idea-primary transition-colors">
-                      {idea.title}
-                    </h3>
-                    
-                    <div className="h-24 relative overflow-hidden">
-                      <p className="text-vj-muted leading-relaxed">
-                        {idea.description}
-                      </p>
-                      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background to-transparent"></div>
-                    </div>
-                    
-                    {/* Team */}
-                    {idea.team && idea.team.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-vj-primary mb-3 flex items-center gap-2">
-                          <Users size={16} className="text-idea-primary" />
-                          Team Members
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {idea.team.map((member, idx) => (
-                            <div key={idx} className="flex items-center gap-2 dark:bg-gray-800 bg-idea-light border border-idea-primary/20 px-3 py-2 rounded-full hover:bg-idea-primary/10 dark:hover:bg-idea-primary/20 transition-colors">
-                              <div className="w-6 h-6 rounded-full bg-idea-primary/20 flex items-center justify-center">
-                                <span className="text-xs font-bold text-idea-primary">{member.name[0]}</span>
-                              </div>
-                              <div className="text-xs">
-                                <div className="font-medium text-idea-primary">{member.name}</div>
-                                <div className="text-idea-muted dark:text-gray-300">{member.role}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Mentor */}
-                    {idea.mentor && (
-                      <div className="p-3 bg-idea-light rounded-lg border border-idea-primary/20">
-                        <p className="text-sm">
-                          <span className="font-medium text-idea-primary">🎓 Mentor:</span> 
-                          <span className="text-vj-muted ml-1">{idea.mentor}</span>
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-3 pt-2">
-                      <Link to={`/ideas/${idea.ideaId}`} className="flex-1">
-                        <Button size="sm" className="w-full bg-idea-primary hover:bg-idea-primary/90 text-white">
-                          View Details
-                        </Button>
-                      </Link>
-                      <Button size="sm" variant="outline" className="flex-1 border-idea-primary/30 text-idea-primary hover:bg-idea-light">
-                        Contact Team
-                      </Button>
-                    </div>
-                  </div>
+                <div key={idea.ideaId} id={`idea-${idea.ideaId}`}>
+                  <IdeaCard
+                    idea={{
+                      ideaId: idea.ideaId,
+                      title: idea.title,
+                      description: idea.description,
+                      titleImage: idea.titleImage,
+                      stage: idea.stage || 1,
+                      upvotes: idea.upvotes || 0,
+                      likedByUser: idea.likedByUser,
+                      comments: idea.comments,
+                      team: idea.team,
+                      mentor: idea.mentor,
+                      addedByEmail: idea.addedByEmail,
+                      createdAt: idea.createdAt,
+                      relatedProblemId: idea.relatedProblemId,
+                      relatedProblemTitle: idea.relatedProblemTitle,
+                    }}
+                    onUpvote={handleUpvote}
+                    onStageUpdate={handleStageUpdate}
+                  />
                 </div>
               ))}
             </div>
             
-            {filteredIdeas.length === 0 && !loading && (
-              <div className="text-center py-16">
-                <p className="text-vj-muted text-lg">
-                  {problemFilter ? "No ideas found for this problem yet." : "No ideas match your current filters."}
+            {/* Show "Join the Community" for logged-out users */}
+            {!user ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-green-950/30 dark:via-gray-900 dark:to-green-900/30 rounded-xl shadow-inner border border-green-200 dark:border-green-800/50">
+                <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-3">Join the Community 🚀</h2>
+                <p className="text-vj-muted max-w-md text-center mb-6">
+                  You need to be logged in to explore innovative ideas, upvote solutions, and submit your own creative concepts.  
+                  Sign in and start building the future today!
                 </p>
-                <div className="flex gap-4 justify-center mt-4">
-                  {problemFilter && (
-                    <Button className="btn-primary" onClick={() => {}}>
-                      Submit First Idea
-                    </Button>
-                  )}
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => { setSearchTerm(""); setStageFilter(""); }}
-                  >
-                    Clear Filters
+                <Link to="/login">
+                  <Button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 dark:from-green-600 dark:to-green-700 dark:hover:from-green-700 dark:hover:to-green-800 text-white px-6 py-2 rounded-lg shadow-lg transition-transform hover:scale-105">
+                    Login to Continue
                   </Button>
-                </div>
+                </Link>
               </div>
+            ) : (
+              filteredIdeas.length === 0 && !loading && (
+                <div className="text-center py-16">
+                  <p className="text-vj-muted text-lg">
+                    {problemFilter ? "No ideas found for this problem yet." : "No ideas match your current filters."}
+                  </p>
+                  <div className="flex gap-4 justify-center mt-4">
+                    {problemFilter && (
+                      <Button className="btn-primary" onClick={() => {}}>
+                        Submit First Idea
+                      </Button>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => { setSearchTerm(""); setStageFilter(""); }}
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              )
             )}
           </>
         )}
