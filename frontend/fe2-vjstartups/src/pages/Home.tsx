@@ -10,7 +10,13 @@ import GalaxyBackground from "@/components/GalaxyBackground";
 import { useUser } from "./UserContext";
 import VirtualStartupJourney from "@/components/InteractiveLearningHub";
 
-const user = JSON.parse(localStorage.getItem("user") || "null");
+const userDetails = await fetch(`${import.meta.env.VITE_AUTH_URL}/check-auth`, {
+  method: "GET",
+  credentials: "include",
+}).then(res => res.json()).catch(() => null); 
+console.log("Home: Authenticated User Details:", userDetails);
+const user = (userDetails.logged_in && userDetails.user) ? userDetails.user : null;
+console.log("Authenticated User:", user);
 
 const Home = () => {
   const { user: currentUser } = useUser();

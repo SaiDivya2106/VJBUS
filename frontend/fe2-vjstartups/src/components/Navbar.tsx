@@ -17,6 +17,9 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+
+  console.log("Navbar User: here", user); // Debugging statement
+
   // Smart name truncation for better UX
   const truncateName = (name: string, maxLength: number = 15) => {
     if (!name || name.length <= maxLength) return name;
@@ -32,7 +35,24 @@ const Navbar = () => {
   };
 
   // logout function
-  const handleLogout = () => {
+  const handleLogout = async () => {
+
+    try {
+      console.log('🔍 Step 1: Logging out from auth server (3115)...');
+      
+      // Step 1: Logout from auth server (3115)
+      await fetch(`${import.meta.env.VITE_AUTH_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      console.log('✅ Step 1 Complete - Logged out from auth server');
+      
+      setUser(null);
+      }
+      catch (error) {
+      console.error('❌ Logout error:', error);
+      setUser(null); // Still log out locally even if server request fails
+    }
     setUser(null); // clears context and localStorage
     navigate("/login"); // redirect to login page
     setIsOpen(false); // close mobile menu
@@ -240,15 +260,15 @@ const Navbar = () => {
                           <div className="flex-1 min-w-0">
                             <p 
                               className="font-medium text-sm truncate"
-                              title={user.name}
+                              title={user.name || ''}
                             >
-                              {truncateName(user.name, 20)}
+                              {truncateName(user.name || '', 20)}
                             </p>
                             <p 
                               className="text-xs text-muted-foreground truncate"
-                              title={user.email}
+                              title={user.email || ''}
                             >
-                              {user.email.length > 25 ? `${user.email.substring(0, 22)}...` : user.email}
+                              {user.email && user.email.length > 25 ? `${user.email.substring(0, 22)}...` : user.email || ''}
                             </p>
                           </div>
                         </div>
