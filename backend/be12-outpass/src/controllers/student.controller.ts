@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma/client';
 import QRCode from 'qrcode';
+import { smsService } from '../utils/sms.util';
+import { API_BASE_URL } from '../config';
 
 export async function applyGatePass(req: Request, res: Response): Promise<any> {
   const user = (req as any).user;
@@ -54,6 +56,30 @@ export async function applyGatePass(req: Request, res: Response): Promise<any> {
       },
     });
 
+    // Send SMS notifications to mentor and parent
+    try {
+      const student = await prisma.user.findUnique({
+        where: { email: user.email.toLowerCase() }
+      });
+
+      const mentor = await prisma.user.findUnique({
+        where: { email: mentorMap.mentor.email.toLowerCase() }
+      });
+
+      if (student?.name) {
+        // Send notification ONLY to mentor (not parent)
+        const mentorMobile = (mentor as any)?.mobile || '';
+        if (mentorMobile && mentor?.name) {
+          // Extract roll number from email (assuming format: rollno@domain.com)
+          const rollno = student.email.split('@')[0];
+          await smsService.sendMentorNotification(mentor.name, student.name, rollno, reason, mentorMobile);
+        }
+      }
+    } catch (smsError) {
+      console.error('SMS notification error:', smsError);
+      // Don't fail the request if SMS fails
+    }
+
     res.status(201).json({ message: 'Submitted', gatePass });
   } catch (err) {
     console.error('Apply error:', err);
@@ -82,7 +108,7 @@ export async function getStudentStatus(req: Request, res: Response) {
     const enhanced = await Promise.all(
       passes.map(async (p) => {
         if (p.status === 'APPROVED' && p.qrToken) {
-          const url = `http://localhost:4000/api/security/scan/${p.id}/${p.qrToken}`;
+          const url = `${API_BASE_URL}/security/scan/${p.id}/${p.qrToken}`;
           const qr = await QRCode.toDataURL(url);
           return { ...p, qr };
         }
