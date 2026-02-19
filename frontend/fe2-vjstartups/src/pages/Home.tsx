@@ -9,17 +9,43 @@ import vjLogo from "@/assets/vj-logo.png";
 import GalaxyBackground from "@/components/GalaxyBackground";
 import { useUser } from "./UserContext";
 import VirtualStartupJourney from "@/components/InteractiveLearningHub";
-
-const userDetails = await fetch(`${import.meta.env.VITE_AUTH_URL}/check-auth`, {
-  method: "GET",
-  credentials: "include",
-}).then(res => res.json()).catch(() => null); 
-console.log("Home: Authenticated User Details:", userDetails);
-const user = (userDetails.logged_in && userDetails.user) ? userDetails.user : null;
-console.log("Authenticated User:", user);
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const { user: currentUser } = useUser();
+
+  // ✅ FIXED: auth fetch moved inside component
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_AUTH_URL}/check-auth`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        const userDetails = await res.json();
+        console.log("Home: Authenticated User Details:", userDetails);
+
+        if (userDetails.logged_in && userDetails.user) {
+          setUser(userDetails.user);
+          console.log("Authenticated User:", userDetails.user);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.log("Auth check failed", err);
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   const achievements = [
     {
       icon: Award,
@@ -43,28 +69,24 @@ const Home = () => {
 
   const innovations = [
     {
-    title: "ATLAST Hydrogen Solutions",
-    category: "Clean Energy",
-    image: "/src/assets/ecotrack-startup.jpg",
-    description: "Revolutionary hydrogen fuel-cell technology transforming automotive and energy sectors"
-  },
-  {
-    title: "Salcit AI Health",
-    category: "HealthTech",
-    image: "/src/assets/studyspace-startup.jpg", 
-    description: "AI-powered cough analysis platform for respiratory health screening and remote patient monitoring"
-  },
-  {
-    title: "Alltronics IoT Solutions",
-    category: "Industrial IoT",
-    image: "/src/assets/mindbridge-idea.jpg",
-    description: "Smart IoT and AI-enabled electronic test equipment, EV battery monitoring, and industrial automation"
-  }
+      title: "ATLAST Hydrogen Solutions",
+      category: "Clean Energy",
+      image: "/src/assets/ecotrack-startup.jpg",
+      description: "Revolutionary hydrogen fuel-cell technology transforming automotive and energy sectors"
+    },
+    {
+      title: "Salcit AI Health",
+      category: "HealthTech",
+      image: "/src/assets/studyspace-startup.jpg",
+      description: "AI-powered cough analysis platform for respiratory health screening and remote patient monitoring"
+    },
+    {
+      title: "Alltronics IoT Solutions",
+      category: "Industrial IoT",
+      image: "/src/assets/mindbridge-idea.jpg",
+      description: "Smart IoT and AI-enabled electronic test equipment, EV battery monitoring, and industrial automation"
+    }
   ];
-
-  // image: ,
-  // image: "/src/assets/ecotrack-startup.jpg",
-  // image: "/src/assets/mindbridge-idea.jpg",
 
   return (
     <div className="min-h-screen">
@@ -96,17 +118,17 @@ const Home = () => {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.3)] animate-fade-in">
-  Build for the future,<br />start here.
-</h1>
+            Build for the future,<br />start here.
+          </h1>
 
-          
-<p 
-  className="hero-subtitle mb-16 mx-auto animate-fade-in text-lg md:text-xl text-gray-200 max-w-3xl leading-relaxed tracking-wide"
-  style={{ animationDelay: '0.2s' }}
->
-  Empowering college entrepreneurs to turn real-world challenges into <span className="text-indigo-400 font-semibold">bold innovations</span>. 
-  Connect, create, and shape the <span className="text-indigo-300">future of startups</span>.
-</p>
+                    
+          <p 
+            className="hero-subtitle mb-16 mx-auto animate-fade-in text-lg md:text-xl text-gray-200 max-w-3xl leading-relaxed tracking-wide"
+            style={{ animationDelay: '0.2s' }}
+          >
+            Empowering college entrepreneurs to turn real-world challenges into <span className="text-indigo-400 font-semibold">bold innovations</span>. 
+            Connect, create, and shape the <span className="text-indigo-300">future of startups</span>.
+          </p>
 
           
           {/* Animated Counters with modern styling */}

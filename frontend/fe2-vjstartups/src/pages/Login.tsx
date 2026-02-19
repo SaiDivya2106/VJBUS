@@ -9,7 +9,7 @@ const Login = () => {
   const handleGoogleLogin = async (credentialResponse: any) => {
     if (credentialResponse.credential) {
       const token = credentialResponse.credential;
-
+      console.log("Google token received:", token);
       const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

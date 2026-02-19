@@ -43,7 +43,8 @@ const QuestionnaireHistory = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/questionnaire-api/responses/${user?.email}`
       );
-      setResponses(response.data);
+      // Ensure we always set an array to avoid .map errors
+      setResponses(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching questionnaire responses:", error);
       toast({

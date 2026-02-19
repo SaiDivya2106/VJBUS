@@ -132,10 +132,11 @@ router.get("/problems", async (req, res) => {
       .sort({ createdAt: -1 }) // latest first
       .skip(skip)
       .limit(limit);
-    
+    console.log(`Fetched problems for page ${page} with limit ${limit}: ${problems.length} items`);
     // If no problems in database, return mock data
     if (problems.length === 0) {
       const mockProblems = require('../data/mockProblems');
+      console.log("No problems found in DB, returning mock data");
       return res.status(200).json({
         problems: mockProblems,
         pagination: {
