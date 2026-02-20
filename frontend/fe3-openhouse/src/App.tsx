@@ -11,6 +11,7 @@ import './App.css';
 import bgImage from './images/12.png'; // adjust the path if you're in a subfolder
 
 
+
 declare global {
   interface Window {
     google: any;
@@ -67,9 +68,24 @@ function App() {
   useEffect(() => {
     fetchUserFromAuthServer().then(setUser);
   }, []);
+
+  // useEffect(() => {
+  //   const handleMessage = async (event: MessageEvent) => {
+  //     // security check
+  //     if (event.origin !== window.location.origin) return;
+
+  //     if (event.data?.type === "AUTH_UPDATED") {
+  //       await fetchUserFromAuthServer();
+  //       setUser(event.data.user)
+  //     }
+  //   };
+
+  //   window.addEventListener("message", handleMessage);
+  //   return () => window.removeEventListener("message", handleMessage);
+  // }, []);
+
   useEffect(() => {
   if (user) return;
-
   const script = document.createElement("script");
   script.src = "https://accounts.google.com/gsi/client";
   script.async = true;

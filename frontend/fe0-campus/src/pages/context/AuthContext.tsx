@@ -31,6 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Logout failed:', error);
     }
     setIsAuthenticated(false);
+    const iframe = document.getElementById("app-iframe");
+    if (iframe instanceof HTMLIFrameElement) {
+      iframe.src = iframe.src;
+    }else{
+      console.warn("Iframe with id 'app-iframe' not found or is not an HTMLIFrameElement");
+    }
   };
 
   useEffect(() => {

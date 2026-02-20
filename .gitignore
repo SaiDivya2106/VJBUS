@@ -1,3 +1,5 @@
+# Ignore superapp.db
+superapp.db
 ############################################
 # ENV & SECRETS (NEVER COMMIT)
 ############################################
@@ -102,4 +104,5 @@ Thumbs.db
 ############################################
 
 # .db and .sqlite files are intentionally allowed
+backend/be0-campus/*.db
 # because you said you want to commit them

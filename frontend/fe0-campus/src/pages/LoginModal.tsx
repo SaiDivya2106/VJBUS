@@ -9,6 +9,7 @@ import { X } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { useAuth } from './context/AuthContext';
 import { useEffect, useState } from 'react';
+import './AppView';
 
 
 interface LoginModalProps {
@@ -45,7 +46,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
       if (!backendResponse.ok) {
         throw new Error('Failed to authenticate with backend');
       }
-
+      
+      const iframe = document.getElementById("app-iframe");
+      if (iframe instanceof HTMLIFrameElement) {
+        iframe.src = iframe.src;
+      }else{
+        console.warn("Iframe with id 'app-iframe' not found or is not an HTMLIFrameElement");
+      }
       const data = await backendResponse.json();
       // console.log('Server Response:', data);
 

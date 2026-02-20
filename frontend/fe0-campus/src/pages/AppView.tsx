@@ -192,6 +192,7 @@ const AppView = () => {
         <div className="h-full w-full">
           <div className="h-full w-full overflow-hidden relative">
             <iframe
+              id = "app-iframe"
               src={app.url}
               className="w-full h-full"
               title={app.name}
