@@ -1,84 +1,98 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { isExperimental } from "../utils/isExperimental";
+
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAssistant, setIsAssistant] = useState(false);
   const [adminCategory, setAdminCategory] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshTimeout, setRefreshTimeout] = useState(null);
 
+  // Experimental Mode State
+  const [demoRole, setDemoRole] = useState(localStorage.getItem("demoRole") || "student");
+
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
   const authServerUrl = process.env.REACT_APP_AUTH_SERVER_URL || "https://authv2.vjstartup.com";
 
- useEffect(() => {
-  // Attach token globally and keep interceptor ids so we can eject them on cleanup
-  const reqInterceptorId = axios.interceptors.request.use((config) => {
-    // allow callers to explicitly skip auth (e.g., public uploads)
-    if (config && config._skipAuth) return config;
+  useEffect(() => {
+    // Attach token globally and keep interceptor ids so we can eject them on cleanup
+    const reqInterceptorId = axios.interceptors.request.use((config) => {
+      // allow callers to explicitly skip auth (e.g., public uploads)
+      if (config && config._skipAuth) return config;
 
-    // don't attach cookies to third-party upload endpoints (Cloudinary)
-    const url = config && config.url ? config.url.toString() : "";
-    const skipHosts = ["api.cloudinary.com", "res.cloudinary.com"];
-    if (skipHosts.some((h) => url.includes(h))) return config;
+      // don't attach cookies to third-party upload endpoints (Cloudinary)
+      const url = config && config.url ? config.url.toString() : "";
+      const skipHosts = ["api.cloudinary.com", "res.cloudinary.com"];
+      if (skipHosts.some((h) => url.includes(h))) return config;
 
-    // Auth now relies on HttpOnly cookie from auth-server
-    config.withCredentials = true;
-    config._hasAuth = true;
-    return config;
-  });
+      // Auth now relies on HttpOnly cookie from auth-server
+      config.withCredentials = true;
+      config._hasAuth = true;
 
-  // Handle token expiry globally
-  const resInterceptorId = axios.interceptors.response.use(
-    // Success handler: catch cases where authenticated requests unexpectedly return no body
-    (response) => {
-      try {
-        const wasAuth = response?.config?._hasAuth;
-        // If an authenticated request returned no data or 204, consider token/session failure
-        if (wasAuth && (response.status === 204 || response.data == null)) {
-          console.warn("⛔ Authenticated request returned empty — forcing logout");
-          // Force logout and redirect, but reject so component-level catch handlers execute
+      // 🔓 EXPERIMENTAL MODE HEADER
+      if (isExperimental) {
+        config.headers['x-demo-role'] = localStorage.getItem("demoRole") || "student";
+      }
+
+      return config;
+    });
+
+    // Handle token expiry globally
+    const resInterceptorId = axios.interceptors.response.use(
+      // Success handler: catch cases where authenticated requests unexpectedly return no body
+      (response) => {
+        try {
+          const wasAuth = response?.config?._hasAuth;
+          // If an authenticated request returned no data or 204, consider token/session failure
+          if (wasAuth && (response.status === 204 || response.data == null)) {
+            console.warn("⛔ Authenticated request returned empty — forcing logout");
+            // Force logout and redirect, but reject so component-level catch handlers execute
+            logout();
+            window.location.href = "/complaints-website";
+            return Promise.reject({ message: "Empty authenticated response", response });
+          }
+        } catch (e) {
+          // ignore
+        }
+        return response;
+      },
+      (error) => {
+        const status = error?.response?.status;
+
+        // Force logout on common auth-related status codes
+        if ([401, 403, 419, 440].includes(status)) {
+          if (isExperimental) return Promise.reject(error); // Don't force logout in demo mode usually
+
+          console.log("⛔ Token/session failure detected (status)");
           logout();
           window.location.href = "/complaints-website";
-          return Promise.reject({ message: "Empty authenticated response", response });
+          return Promise.reject(error);
         }
-      } catch (e) {
-        // ignore
-      }
-      return response;
-    },
-    (error) => {
-      const status = error?.response?.status;
 
-      // Force logout on common auth-related status codes
-      if ([401, 403, 419, 440].includes(status)) {
-        console.log("⛔ Token/session failure detected (status)");
-        logout();
-        window.location.href = "/complaints-website";
+        // Network or CORS failures (no response) for authenticated requests
+        const wasAuthReq = error?.config?._hasAuth;
+        if (!error.response && wasAuthReq) {
+          console.log("⛔ Network/CORS error on authenticated request — forcing logout");
+          logout();
+          window.location.href = "/complaints-website";
+          return Promise.reject(error);
+        }
+
         return Promise.reject(error);
       }
+    );
 
-      // Network or CORS failures (no response) for authenticated requests
-      const wasAuthReq = error?.config?._hasAuth;
-      if (!error.response && wasAuthReq) {
-        console.log("⛔ Network/CORS error on authenticated request — forcing logout");
-        logout();
-        window.location.href = "/complaints-website";
-        return Promise.reject(error);
-      }
-
-      return Promise.reject(error);
-    }
-  );
-
-  return () => {
-    axios.interceptors.request.eject(reqInterceptorId);
-    axios.interceptors.response.eject(resInterceptorId);
-  };
-}, []);
+    return () => {
+      axios.interceptors.request.eject(reqInterceptorId);
+      axios.interceptors.response.eject(resInterceptorId);
+    };
+  }, []);
 
 
 
@@ -137,6 +151,8 @@ export const AuthProvider = ({ children }) => {
 
   // --- Initialize Google ---
   const initializeGoogle = () => {
+    if (isExperimental) return; // Skip in demo mode
+
     if (!window.google?.accounts?.id || window.googleInitialized) return;
 
     window.google.accounts.id.initialize({
@@ -153,6 +169,8 @@ export const AuthProvider = ({ children }) => {
   // --- Silent refresh ---
   const silentRefreshToken = () =>
     new Promise((resolve) => {
+      if (isExperimental) return resolve(true);
+
       if (!window.google?.accounts?.id) return resolve(false);
       initializeGoogle();
 
@@ -174,40 +192,98 @@ export const AuthProvider = ({ children }) => {
     });
 
   // --- Check admin ---
- const checkAdminStatus = async (email) => {
-  try {
-    const token = localStorage.getItem("authToken");
+  const checkAdminStatus = async (email) => {
+    try {
+      if (isExperimental) {
+        // In demo mode, we simulate the response based on the role
+        const currentRole = localStorage.getItem("demoRole") || "student";
+        if (currentRole === 'admin') {
+          setIsAdmin(true);
+          setIsAssistant(false);
+          setAdminCategory(["Mess"]);
+          return;
+        }
+        if (currentRole === 'assistant') {
+          setIsAdmin(true);
+          setIsAssistant(true);
+          setAdminCategory(["Hostel"]);
+          return;
+        }
+        if (currentRole === 'superadmin') {
+          setIsAdmin(true);
+          // Superadmin usually has access to everything or specific flag
+          // For this app logic, let's just say they are admin + super logic handled elsewhere
+          setIsAssistant(false);
+          setAdminCategory(["Mess", "Hostel"]);
+          return;
+        }
+        // student
+        setIsAdmin(false);
+        setIsAssistant(false);
+        setAdminCategory([]);
+        return;
+      }
 
-    const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // ✅ REQUIRED
-      },
-      body: JSON.stringify({ email }),
-    });
+      const token = localStorage.getItem("authToken");
 
-    if (!res.ok) {
-      throw new Error(`Admin check failed: ${res.status}`);
+      const res = await fetch(`${baseUrl}/admin-api/check-admin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ✅ REQUIRED
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Admin check failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setIsAdmin(data.isAdmin);
+      setIsAssistant(data.isAssistant || false);
+      setAdminCategory(
+        data.isAdmin
+          ? Array.isArray(data.adminCategories)
+            ? data.adminCategories
+            : [data.adminCategory].filter(Boolean)
+          : []
+      );
+    } catch (err) {
+      console.error("Error checking admin:", err);
     }
+  };
 
-    const data = await res.json();
-    setIsAdmin(data.isAdmin);
-    setAdminCategory(
-      data.isAdmin
-        ? Array.isArray(data.adminCategories)
-          ? data.adminCategories
-          : [data.adminCategory].filter(Boolean)
-        : []
-    );
-  } catch (err) {
-    console.error("Error checking admin:", err);
-  }
-};
+  // --- Switch demo role ---
+  const switchRole = (role) => {
+    localStorage.setItem("demoRole", role);
+    setDemoRole(role);
 
+    // Update admin status based on role
+    if (role === 'admin') {
+      setIsAdmin(true);
+      setIsAssistant(false);
+      setAdminCategory(["Mess"]);
+    } else if (role === 'assistant') {
+      setIsAdmin(true);
+      setIsAssistant(true);
+      setAdminCategory(["Hostel"]);
+    } else if (role === 'superadmin') {
+      setIsAdmin(true);
+      setIsAssistant(false);
+      setAdminCategory(["Mess", "Hostel"]);
+    } else {
+      // student
+      setIsAdmin(false);
+      setIsAssistant(false);
+      setAdminCategory([]);
+    }
+  };
 
   // --- Render Google login button ---
   const showLoginButton = () => {
+    if (isExperimental) return; // No login button in demo mode
+
     if (!window.google?.accounts?.id) return;
     const div = document.getElementById("googleLoginDiv");
     if (!div) return;
@@ -222,6 +298,8 @@ export const AuthProvider = ({ children }) => {
 
   // --- Login trigger ---
   const loginWithSSO = () => {
+    if (isExperimental) return; // No SSO in demo mode
+
     if (window.google?.accounts?.id) {
       window.google.accounts.id.prompt({ select_account: true });
     } else {
@@ -231,6 +309,16 @@ export const AuthProvider = ({ children }) => {
 
   // --- Logout ---
   const logout = async () => {
+    if (isExperimental) {
+      localStorage.removeItem("demoRole");
+      setUser(null);
+      setIsAdmin(false);
+      setIsAssistant(false);
+      setAdminCategory(null);
+      window.location.reload();
+      return;
+    }
+
     if (refreshTimeout) clearTimeout(refreshTimeout);
 
     await fetch(`${authServerUrl}/logout`, {
@@ -240,6 +328,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser(null);
     setIsAdmin(false);
+    setIsAssistant(false);
     setAdminCategory(null);
     localStorage.removeItem("authToken");
     setAuthToken(null);
@@ -249,8 +338,19 @@ export const AuthProvider = ({ children }) => {
     setTimeout(() => showLoginButton(), 50);
   };
 
+
   // --- Inject Google script ---
   useEffect(() => {
+    if (isExperimental) {
+      // Init Demo User ONLY if role exists
+      const role = localStorage.getItem("demoRole");
+      if (role) {
+        switchRole(role);
+      }
+      setLoading(false);
+      return;
+    }
+
     const loadGoogleScript = () => {
       if (document.getElementById("google-js")) {
         initializeGoogle();
@@ -310,11 +410,14 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isAdmin,
+        isAssistant,
         adminCategory,
         loginWithSSO,
         logout,
         authToken,
         loading,
+        switchRole, // 👈 New
+        isExperimental // 👈 New
       }}
     >
       {loading ? null : children}

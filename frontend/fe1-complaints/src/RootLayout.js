@@ -4,7 +4,8 @@ import NavBar from './components/NavBar/NavBar';
 import Footer from './components/Footer/Footer';
 import LandingPage from './components/LandingPage/LandingPage';
 import { useAuth } from './Context/AuthContext';
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import RoleSwitcher from "./components/Demo/RoleSwitcher";
 
 function RootLayout() {
   const { user, loginWithSSO, logout } = useAuth();
@@ -27,6 +28,7 @@ function RootLayout() {
         // Show the Landing Page if the user is not logged in
         <LandingPage />
       )}
+      <RoleSwitcher />
     </div>
   );
 }

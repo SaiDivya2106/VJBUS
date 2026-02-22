@@ -177,6 +177,15 @@ const formatDateTime = (timestamp) => {
 
 
 
+const getVisibleAdminComments = (complaint) => {
+  if (!complaint.comments) return [];
+
+  return complaint.comments.filter((comment) =>
+    comment.text &&
+    !comment.text.includes("[Assistant Update]") &&
+    !comment.text.toLowerCase().includes("updated status to")
+  );
+};
 
 
 
@@ -599,9 +608,12 @@ const formatDateTime = (timestamp) => {
                       return null;
                     })()}
 
-                    {complaint.comments && complaint.comments.length > 0 && (
-                      <button className="admin-update-btn" onClick={() => setExpandedCard(complaint)}>Show Admin Updates <ChevronDown size={18} /></button>
-                    )}
+{getVisibleAdminComments(complaint).length > 0 && (
+  <button className="admin-update-btn" onClick={() => setExpandedCard(complaint)}>
+    Show Admin Updates <ChevronDown size={18} />
+  </button>
+)}
+
 
                     {/* "Issue Not Fixed?" button for Resolved complaints */}
                     {/* {complaint.status === "Resolved" && (
@@ -827,8 +839,11 @@ const formatDateTime = (timestamp) => {
         <h5 className="mb-2">
           <MdOutlineTextsms className="me-2" /> Admin Updates:
         </h5>
-        {expandedCard.comments && expandedCard.comments.length > 0 ? (
-          expandedCard.comments.map((comment) => {
+        {/* {expandedCard.comments && expandedCard.comments.length > 0 ? (
+          expandedCard.comments.map((comment) => { */}
+          {getVisibleAdminComments(expandedCard).length > 0 ? (
+  getVisibleAdminComments(expandedCard).map((comment) => {
+
             const isStudent = comment.role === "student";
             const displayName = isStudent ? "Student" : (comment.email || "Admin");
             const borderColor = isStudent ? "#ff6b6b" : "purple";

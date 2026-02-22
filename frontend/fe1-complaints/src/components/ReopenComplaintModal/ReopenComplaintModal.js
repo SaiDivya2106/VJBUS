@@ -3,6 +3,7 @@ import { Modal, Form, Button } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./ReopenComplaintModal.css";
+import { isExperimental } from "../../utils/isExperimental";
 
 const ReopenComplaintModal = ({
   show,
@@ -45,6 +46,7 @@ const ReopenComplaintModal = ({
       setComment("");
       onHide();
       onSuccess?.();
+      if (isExperimental) toast.info("📧 Demo: Reopen email simulated.");
     } catch (error) {
       const errorMsg =
         error.response?.data?.message || "Failed to reopen complaint";

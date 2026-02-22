@@ -3,24 +3,33 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./NotificationBell.css";
 
-const NotificationBell = ({ baseUrl, adminCategory, user }) => {
+const NotificationBell = ({ baseUrl, adminCategory, user, isAssistant }) => {
   const navigate = useNavigate();
   const [reopenedComplaints, setReopenedComplaints] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch reopened complaints in admin's category
+  // Fetch reopened complaints in admin's category (or assigned to assistant)
   const fetchReopenedComplaints = async () => {
-    if (!adminCategory || adminCategory.length === 0) return;
+    // If Admin: needs categories
+    // If Assistant: needs email (categories ignored or optional)
+    if (!isAssistant && (!adminCategory || adminCategory.length === 0)) return;
 
     setIsLoading(true);
     try {
       const token = localStorage.getItem("authToken");
+      const params = { categories: adminCategory };
+
+      if (isAssistant && user?.email) {
+        params.email = user.email;
+        params.isAssistant = "true";
+      }
+
       const res = await axios.get(
         `${baseUrl}/admin-api/get-reopened-complaints`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          params: { categories: adminCategory },
+          params: params,
         }
       );
 
@@ -37,12 +46,12 @@ const NotificationBell = ({ baseUrl, adminCategory, user }) => {
     fetchReopenedComplaints();
     const interval = setInterval(fetchReopenedComplaints, 30000);
     return () => clearInterval(interval);
-  }, [adminCategory]);
+  }, [adminCategory, isAssistant, user]);
 
   const handleComplaintClick = (complaintId) => {
     navigate(`/complaints-details/${complaintId}`);
     setShowDropdown(false);
-    
+
     // Refetch reopened complaints after a delay to reflect the change
     // The complaint may no longer be \"Reopened\" after admin views/updates it
     setTimeout(() => {
@@ -63,7 +72,7 @@ const NotificationBell = ({ baseUrl, adminCategory, user }) => {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
-    
+
     return date.toLocaleDateString();
   };
 

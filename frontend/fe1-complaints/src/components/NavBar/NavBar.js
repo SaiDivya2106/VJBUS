@@ -19,7 +19,7 @@ const NavBar = () => {
     setIsNavbarOpen(false); // close navbar after logout
   };
 
-   // ✅ Check if user is SuperAdmin when navbar loads
+  // ✅ Check if user is SuperAdmin when navbar loads
   useEffect(() => {
     const checkSuperAdmin = async () => {
       if (!user?.email) return;
@@ -128,7 +128,7 @@ const NavBar = () => {
                 </NavLink>
               </li>
             )}
-                        {isSuperAdmin && (
+            {isSuperAdmin && (
               <li className="nav-item">
                 <NavLink className="nav-link" to="/superadmin-dashboard" onClick={() => setIsNavbarOpen(false)}>
                   SuperAdmin

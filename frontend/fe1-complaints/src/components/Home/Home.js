@@ -368,6 +368,15 @@ const submitEditComplaint = async () => {
 };
 
 
+const getVisibleAdminComments = (complaint) => {
+  if (!complaint.comments) return [];
+
+  return complaint.comments.filter((comment) =>
+    comment.text &&
+    !comment.text.includes("[Assistant Update]") &&
+    !comment.text.toLowerCase().includes("updated status to")
+  );
+};
 
 
 
@@ -803,6 +812,23 @@ const handleDeleteComplaint = async (id) => {
             {complaint.title}
           </Card.Title>
 
+                    <Card.Text className="text-secondary mb-2" style={{ marginTop: 0, maxHeight: 140, overflow: "hidden" }}>
+  {expandedDescriptions[complaint.complaint_id]
+    ? complaint.description
+    : `${complaint.description.substring(0, 200)}${
+        complaint.description.length > 200 ? "..." : ""
+      }`}
+  {complaint.description.length > 200 && (
+    <span
+      className="view-more-link ms-2"
+      onClick={() => setExpandedCard(complaint)} // open popup
+      style={{ color: "#007bff", cursor: "pointer", fontWeight: 500 }}
+    >
+      View More
+    </span>
+  )}
+</Card.Text>
+
           {/* Show IT-specific summary when category is IT and Networking */}
           {(() => {
             const cat = (complaint.category || "").toString().toLowerCase();
@@ -844,33 +870,30 @@ const handleDeleteComplaint = async (id) => {
             return null;
           })()}
 
-          <Card.Text className="text-secondary mb-2" style={{ marginTop: 0, maxHeight: 140, overflow: "hidden" }}>
-  {expandedDescriptions[complaint.complaint_id]
-    ? complaint.description
-    : `${complaint.description.substring(0, 200)}${
-        complaint.description.length > 200 ? "..." : ""
-      }`}
-  {complaint.description.length > 200 && (
-    <span
-      className="view-more-link ms-2"
-      onClick={() => setExpandedCard(complaint)} // open popup
-      style={{ color: "#007bff", cursor: "pointer", fontWeight: 500 }}
-    >
-      View More
-    </span>
-  )}
-</Card.Text>
 
 
 
-                  {complaint.comments && complaint.comments.length > 0 && (
+                  {/* {complaint.comments && complaint.comments.length > 0 && (
                     <button
                       className="admin-update-btn"
                       onClick={() => setExpandedCard(complaint)}
                     >
                       Show Admin Updates <ChevronDown size={18} />
                     </button>
-                  )}
+                  )} */}
+
+
+
+                  
+                  {getVisibleAdminComments(complaint).length > 0 && (
+  <button
+    className="admin-update-btn"
+    onClick={() => setExpandedCard(complaint)}
+  >
+    Show Admin Updates <ChevronDown size={18} />
+  </button>
+)}
+
 
                   {/* Footer: category + edit/delete + votes */}
                   <div className="mt-auto d-flex w-100 align-items-center pt-2 px-0">
@@ -1024,8 +1047,25 @@ const handleDeleteComplaint = async (id) => {
     <MdOutlineTextsms className="me-2" /> Admin Updates:
   </h5>
 
-  {expandedCard.comments && expandedCard.comments.length > 0 ? (
-    expandedCard.comments.map((comment) => {
+  {/* {expandedCard.comments && expandedCard.comments.length > 0 ? (
+    expandedCard.comments.map((comment) => { */}
+
+
+    {expandedCard.comments &&
+ expandedCard.comments.filter((comment) =>
+   comment.text &&
+   !comment.text.includes("[Assistant Update]") &&
+   !comment.text.toLowerCase().includes("updated status to")
+ ).length > 0 ? (
+
+  expandedCard.comments
+    .filter((comment) =>
+      comment.text &&
+      !comment.text.includes("[Assistant Update]") &&
+      !comment.text.toLowerCase().includes("updated status to")
+    )
+    .map((comment) => {
+
       const isStudent = comment.role === "student";
       const displayName = isStudent ? "Student" : (comment.email || "Admin");
       const borderColor = isStudent ? "#ff6b6b" : "purple";

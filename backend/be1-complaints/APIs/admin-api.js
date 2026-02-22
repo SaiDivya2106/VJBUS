@@ -1,7 +1,7 @@
 const exp = require('express');
 const asyncHandler = require('express-async-handler');
-const jwt = require("jsonwebtoken"); 
-const nodemailer=require("nodemailer");
+const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/emailService");
 const verifyGoogleToken = require("../Middleware/verifyGoogleToken");
 
 const adminApp = exp.Router();
@@ -11,14 +11,16 @@ let complaintsCollectionObj;
 let adminsCollectionObj;
 let flaggedusersCollectionObj;
 let superAdminCollectionObj;
+let assistantsCollectionObj;
 
 // Middleware to get the collection object from the app
 adminApp.use((req, res, next) => {
-    complaintsCollectionObj = req.app.get('complaintsCollectionObj');
-    adminsCollectionObj= req.app.get('adminsCollectionObj');
-    superAdminCollectionObj=req.app.get('superAdminCollectionObj');
-    flaggedusersCollectionObj=req.app.get('flaggedusersCollectionObj')
-    next();
+  complaintsCollectionObj = req.app.get('complaintsCollectionObj');
+  adminsCollectionObj = req.app.get('adminsCollectionObj');
+  superAdminCollectionObj = req.app.get('superAdminCollectionObj');
+  flaggedusersCollectionObj = req.app.get('flaggedusersCollectionObj');
+  assistantsCollectionObj = req.app.get('assistantsCollectionObj');
+  next();
 });
 
 
@@ -57,14 +59,18 @@ adminApp.post("/check-admin", verifyGoogleToken, asyncHandler(async (req, res) =
   }
 
   try {
+    // Check if user is an assistant
+    const assistant = await assistantsCollectionObj.findOne({ email });
+    const isAssistant = !!assistant;
+
     // Find all admin records with this email
     const adminRecords = await adminsCollectionObj.find({ email }).toArray();
 
     if (adminRecords.length > 0) {
       const categories = adminRecords.map(a => a.category);
-      res.json({ isAdmin: true, adminCategories: categories });
+      res.json({ isAdmin: true, adminCategories: categories, isAssistant });
     } else {
-      res.json({ isAdmin: false, adminCategories: [] });
+      res.json({ isAdmin: false, adminCategories: [], isAssistant });
     }
   } catch (error) {
     console.error("Error checking admin:", error);
@@ -76,35 +82,35 @@ adminApp.post("/check-admin", verifyGoogleToken, asyncHandler(async (req, res) =
 
 
 // GET API to view all complaints (sorted by priority)
-adminApp.get('/view-complaints',verifyGoogleToken, asyncHandler(async (req, res) => {
-    const complaints = await complaintsCollectionObj
-        .find()
-        .sort({ priority_score: -1, timestamp: -1 })
-        .toArray();
+adminApp.get('/view-complaints', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const complaints = await complaintsCollectionObj
+    .find()
+    .sort({ priority_score: -1, timestamp: -1 })
+    .toArray();
 
-    if (complaints.length === 0) {
-        return res.status(404).json({ message: "No complaints found" });
-    }
+  if (complaints.length === 0) {
+    return res.status(404).json({ message: "No complaints found" });
+  }
 
-    res.status(200).json({ complaints });
+  res.status(200).json({ complaints });
 }));
 
 //GET Complaint Details by complaint ID
-adminApp.get('/view-complaint/:complaintId',verifyGoogleToken, asyncHandler(async (req, res) => {
-    const complaintId = req.params.complaintId; // Get complaint ID from request params
+adminApp.get('/view-complaint/:complaintId', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const complaintId = req.params.complaintId; // Get complaint ID from request params
 
-    try {
-        const complaint = await complaintsCollectionObj.findOne({ complaint_id: complaintId });
+  try {
+    const complaint = await complaintsCollectionObj.findOne({ complaint_id: complaintId });
 
-        if (!complaint) {
-            return res.status(404).json({ message: "Complaint not found" });
-        }
-
-        res.status(200).json({ complaint });
-    } catch (error) {
-        console.error("Error fetching complaint:", error);
-        res.status(500).json({ message: "Internal server error" });
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found" });
     }
+
+    res.status(200).json({ complaint });
+  } catch (error) {
+    console.error("Error fetching complaint:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }));
 
 
@@ -115,28 +121,28 @@ adminApp.get('/view-complaint/:complaintId',verifyGoogleToken, asyncHandler(asyn
 //       try {
 //         // Get category from the URL parameter
 //         const { category } = req.params;
-  
+
 //         // Fetch counts for each status within the specified category
 //         const [pendingCount, resolvedCount, ongoingCount] = await Promise.all([
 //           complaintsCollectionObj.countDocuments({ status: "Pending", category }),
 //           complaintsCollectionObj.countDocuments({ status: "Resolved", category }),
 //           complaintsCollectionObj.countDocuments({ status: "Ongoing", category })
 //         ]);
-  
+
 //         // Send response with the counts for the given category
 //         res.status(200).json({
 //           pending: pendingCount,
 //           resolved: resolvedCount,
 //           ongoing: ongoingCount,
 //         });
-        
+
 //       } catch (error) {
 //         console.error("Error fetching complaint counts:", error);
 //         res.status(500).json({ message: "Internal Server Error" });
 //       }
 //     })
 //   );
-  
+
 
 
 
@@ -175,7 +181,7 @@ adminApp.get(
 );
 
 
-  adminApp.put('/update-status/:complaint_id', verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.put('/update-status/:complaint_id', verifyGoogleToken, asyncHandler(async (req, res) => {
   const complaintId = req.params.complaint_id;
   const { status, adminEmail } = req.body;
 
@@ -213,17 +219,7 @@ adminApp.get(
     return res.status(500).json({ message: "Failed to update status" });
   }
 
-  // ✅ Step 4: Setup email transporter
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.ADMIN_EMAIL,
-      pass: process.env.ADMIN_PASS
-    }
-  });
-
-  // ✅ Step 5: Prepare email content
-  // Include IT details HTML if present and category is IT and Networking
+  // ✅ Step 4: Prepare email content
   const isITCategory = (complaint.category || "").toLowerCase().includes('it') && (complaint.category || "").toLowerCase().includes('network');
   const itDetailsHTML = isITCategory && complaint.it_details ? `
     <p><strong>IT Details:</strong></p>
@@ -248,27 +244,9 @@ adminApp.get(
     <p>This update was made by admin: <strong>${adminEmail}</strong>.</p>
   `;
 
-  // if (status === 'Resolved') {
-  //   mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
-  //   mailHtml = `
-  //     <p>Dear User,</p>
-  //     <p>We're happy to let you know that your complaint titled <strong>"${complaintTitle}"</strong> has been marked as <strong>Resolved</strong> by our team.</p>
-  //     ${itDetailsHTML}
-  //     <p>If you feel the issue is not resolved or something still needs fixing, please reopen the complaint from your complaints page and provide a short comment explaining what's still wrong. Your comment will be shared with the admin team anonymously.</p>
-  //     <p>You can view and manage your complaints here: <a href="https://thrive.vjstartup.com/my-complaints">https://thrive.vjstartup.com/my-complaints</a></p>
-  //     <p>Best regards,<br>Complaint Management Team</p>
-  //   `;
-  // } else {
-  //   mailHtml += `
-  //     <p>Thank you for using our Complaint Management System.</p>
-  //     <p>Best regards,<br>Complaint Management Team</p>
-  //   `;
-  // }
-
-
   if (status === 'Resolved') {
-  mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
-  mailHtml = `
+    mailSubject = `Your Complaint "${complaintTitle}" Has Been Resolved`;
+    mailHtml = `
     <div style="font-family:Arial, sans-serif; color:#333;">
       <p>Dear User,</p>
 
@@ -304,12 +282,12 @@ adminApp.get(
       </p>
     </div>
   `;
-} else {
-  mailHtml += `
+  } else {
+    mailHtml += `
     <p>Thank you for using our Complaint Management System.</p>
     <p>Best regards,<br>Complaint Management Team</p>
   `;
-}
+  }
 
 
   const mailOptions = {
@@ -319,8 +297,8 @@ adminApp.get(
     html: mailHtml
   };
 
-  // ✅ Step 6: Send email asynchronously
-  transporter.sendMail(mailOptions)
+  // ✅ Step 5: Send email asynchronously
+  sendEmail(mailOptions)
     .then(info => console.log("✅ Status update email sent:", info.response))
     .catch(err => console.error("❌ Error sending status email:", err));
 
@@ -363,15 +341,7 @@ adminApp.delete(
       return res.status(500).json({ message: "Failed to delete complaint" });
     }
 
-    // Step 5: Setup Nodemailer
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.ADMIN_EMAIL,
-        pass: process.env.ADMIN_PASS,
-      },
-    });
-
+    // Step 5: Send email
     const mailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: userEmail,
@@ -380,15 +350,14 @@ adminApp.delete(
     };
 
     // Step 6: Send email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-        return res.status(500).json({ message: "Complaint deleted, but failed to send email" });
-      } else {
-        console.log("Email sent:", info.response);
-        return res.status(200).json({ message: "Complaint deleted and email sent to user" });
-      }
-    });
+    try {
+      const info = await sendEmail(mailOptions);
+      console.log("Email sent:", info.response);
+      return res.status(200).json({ message: "Complaint deleted and email sent to user" });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      return res.status(500).json({ message: "Complaint deleted, but failed to send email" });
+    }
   })
 );
 
@@ -467,28 +436,28 @@ adminApp.get('/filter-complaints', verifyGoogleToken, asyncHandler(async (req, r
 
 // Helper function to get the start and end of the week or month
 function getDateRange(dateRange) {
-    const now = new Date();
-    let startDate, endDate;
+  const now = new Date();
+  let startDate, endDate;
 
-    if (dateRange === 'weekly') {
-        const dayOfWeek = now.getDay();
-        startDate = new Date(now.setDate(now.getDate() - dayOfWeek));
-        endDate = new Date(now.setDate(now.getDate() + (6 - dayOfWeek)));
-    } else if (dateRange === 'monthly') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    } else {
-        return null;
-    }
+  if (dateRange === 'weekly') {
+    const dayOfWeek = now.getDay();
+    startDate = new Date(now.setDate(now.getDate() - dayOfWeek));
+    endDate = new Date(now.setDate(now.getDate() + (6 - dayOfWeek)));
+  } else if (dateRange === 'monthly') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  } else {
+    return null;
+  }
 
-    return { startDate, endDate };
+  return { startDate, endDate };
 }
 
 // Route to add a comment to a complaint
 // adminApp.post('/complaints/:id/comment', asyncHandler(async (req, res) => {
 //     const { id } = req.params; // Get complaint ID from URL
 //     const { comment } = req.body; // Get the full comment object from request body
-   
+
 
 //     if (!comment || !comment.text) {
 //         return res.status(400).json({ message: "Comment cannot be empty" });
@@ -520,6 +489,23 @@ adminApp.post(
       return res.status(400).json({ message: "Comment text and admin email are required" });
     }
 
+    // ✅ Check if user is an assistant and validate assignment
+    const assistant = await assistantsCollectionObj.findOne({ email: adminEmail });
+    if (assistant) {
+      // If commenter is an assistant, verify they're still assigned to this complaint
+      const complaint = await complaintsCollectionObj.findOne({ complaint_id: id });
+      if (!complaint) {
+        return res.status(404).json({ message: "Complaint not found" });
+      }
+      
+      if (complaint.assignedAssistant && complaint.assignedAssistant !== adminEmail) {
+        return res.status(403).json({ 
+          message: "Complaint not assigned to you",
+          currentAssignee: complaint.assignedAssistant 
+        });
+      }
+    }
+
     // ✅ Create comment object with role and timestamp (compatible with new structure)
     const comment = {
       id: new Date().getTime(),
@@ -547,7 +533,7 @@ adminApp.post(
 
     // ✅ Respond immediately to admin
     res.json({ message: "Comment added successfully" });
-    console.log("user email",complaint.user_id)
+    console.log("user email", complaint.user_id)
 
     // ✅ Send email asynchronously
     setImmediate(async () => {
@@ -558,14 +544,6 @@ adminApp.post(
           console.warn(`⚠️ No user email found for complaint ${id}`);
           return;
         }
-
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.ADMIN_EMAIL,
-            pass: process.env.ADMIN_PASS,
-          },
-        });
 
         const formattedDate = new Date(comment.date).toLocaleString("en-IN", {
           timeZone: "Asia/Kolkata",
@@ -594,12 +572,13 @@ adminApp.post(
               text-decoration: none;
               border-radius: 16px;
               font-weight: 500;
+              margin-top: 6px;
             ">🔍 View request</a></p>
             <p>Best Regards,<br>Thrive</p>
           `,
         };
 
-        await transporter.sendMail(mailOptions);
+        await sendEmail(mailOptions);
         console.log(`📧 Email sent to user (${complaint.user_id}) for complaint: ${complaint.title}`);
       } catch (err) {
         console.error("⚠️ Error sending email to user:", err);
@@ -631,9 +610,9 @@ adminApp.post(
 
 
 // ✅ Flag a complaint (without async IIFE)
-adminApp.post('/flag-complaint/:id',verifyGoogleToken, asyncHandler(async (req, res) => {
+adminApp.post('/flag-complaint/:id', verifyGoogleToken, asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log("params",req.params)
+  console.log("params", req.params)
   const { reason, note, flaggedBy } = req.body;
 
   console.log("Request body:", req.body);
@@ -648,13 +627,13 @@ adminApp.post('/flag-complaint/:id',verifyGoogleToken, asyncHandler(async (req, 
   if (!admin) {
     return res.status(404).json({ message: "Admin not found" });
   }
-  const comp= await complaintsCollectionObj.findOne({ complaint_id: id.toString() });
-console.log("Complaint found:", comp);
+  const comp = await complaintsCollectionObj.findOne({ complaint_id: id.toString() });
+  console.log("Complaint found:", comp);
 
 
   // Update complaint with flag details
   const result = await complaintsCollectionObj.updateOne(
-    { complaint_id: id.toString()},
+    { complaint_id: id.toString() },
     {
       $set: {
         flagged: {
@@ -694,14 +673,6 @@ console.log("Complaint found:", comp);
 
   // Send email
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.ADMIN_EMAIL,
-        pass: process.env.ADMIN_PASS
-      }
-    });
-
     const mailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: superAdminEmails,
@@ -720,7 +691,7 @@ console.log("Complaint found:", comp);
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendEmail(mailOptions);
     console.log("✅ Flag email sent to Super Admins:", superAdminEmails);
   } catch (error) {
     console.error("❌ Failed to send flag email:", error);
@@ -784,7 +755,7 @@ adminApp.post('/superadmin/complaints/:id/action', asyncHandler(async (req, res)
         }
       }
     };
-  } 
+  }
   else if (action === "warn") {
     // Unflag and send warning email
     updateQuery = {
@@ -830,7 +801,7 @@ adminApp.post('/superadmin/complaints/:id/action', asyncHandler(async (req, res)
         console.error("❌ Failed to send warning email:", err);
       }
     })();
-  } 
+  }
   else {
     return res.status(400).json({ message: "Invalid action. Allowed: valid | warn" });
   }
@@ -908,7 +879,7 @@ adminApp.put(
         ${complaint.it_details.mobile_number ? `<li><strong>Mobile Number:</strong> ${complaint.it_details.mobile_number}</li>` : ''}
       </ul>
     ` : '';
-    
+
     const studentMailOptions = {
       from: process.env.ADMIN_EMAIL,
       to: studentEmail,
@@ -987,25 +958,34 @@ adminApp.get(
   '/get-reopened-complaints',
   verifyGoogleToken,
   asyncHandler(async (req, res) => {
-    const { categories } = req.query;
+    const { categories, email, isAssistant } = req.query;
 
-    if (!categories) {
-      return res.status(400).json({
-        message: "Categories parameter is required",
-      });
+    console.log("🔔 Get Reopened Params:", { categories, email, isAssistant });
+
+    let query = {
+      status: "Reopened"
+    };
+
+    if (isAssistant === "true" && email) {
+      // ✅ Assistant: Show only assigned reopened complaints
+      query.assignedAssistant = email;
+    } else {
+      // ✅ Admin: Show reopened complaints in their categories
+      if (!categories) {
+        return res.status(400).json({
+          message: "Categories parameter is required for admins",
+        });
+      }
+      const categoriesArray = Array.isArray(categories) ? categories : categories.split(",");
+      query.category = { $in: categoriesArray };
     }
 
-    const categoriesArray = Array.isArray(categories)
-      ? categories
-      : categories.split(",");
-
     try {
-      // Find all Reopened complaints in the admin's categories that have recent comments
+      console.log("🔔 Executing Reopened Query:", JSON.stringify(query, null, 2));
+
+      // Find all Reopened complaints based on query
       const reopenedComplaints = await complaintsCollectionObj
-        .find({
-          status: "Reopened",
-          category: { $in: categoriesArray },
-        })
+        .find(query)
         .sort({ lastCommentAt: -1 })
         .limit(10)
         .toArray();
@@ -1020,5 +1000,366 @@ adminApp.get(
     }
   })
 );
+
+// -------------------- ASSISTANT MANAGEMENT API --------------------
+
+// ✅ Add Assistant (Admin Only)
+adminApp.post('/add-assistant', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { email, name, categories } = req.body;
+
+  if (!email || !categories || !Array.isArray(categories)) {
+    return res.status(400).json({ message: "Email and categories are required" });
+  }
+
+  const existing = await assistantsCollectionObj.findOne({ email });
+  if (existing) {
+    return res.status(400).json({ message: "Assistant already exists" });
+  }
+
+  await assistantsCollectionObj.insertOne({
+    email,
+    name: name || null,
+    categories,   // 👈 ARRAY
+    createdAt: new Date()
+  });
+
+  res.status(201).json({ message: "Assistant added successfully" });
+}));
+
+
+// ✅ Assign Complaint to Assistant (Admin Only)
+adminApp.post('/assign-complaint', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { complaintId, assistantEmail, adminEmail } = req.body;
+
+  if (!complaintId || !assistantEmail || !adminEmail) {
+    return res.status(400).json({ message: "Complaint ID, Assistant Email, and Admin Email are required" });
+  }
+
+  // Verify Assistant exists
+  const assistant = await assistantsCollectionObj.findOne({ email: assistantEmail });
+  if (!assistant) {
+    return res.status(404).json({ message: "Assistant not found" });
+  }
+
+  // Update Complaint
+  const result = await complaintsCollectionObj.updateOne(
+    { complaint_id: complaintId },
+    {
+      $set: {
+        assignedAssistant: assistantEmail,
+        assignedBy: adminEmail,
+        assignedAt: new Date()
+      }
+    }
+  );
+
+  if (result.modifiedCount === 0) {
+    return res.status(404).json({ message: "Complaint not found or assignment failed" });
+  }
+
+  res.json({ message: `Complaint assigned to ${assistantEmail}` });
+}));
+
+// ✅ Get Assigned Complaints (Assistant Only)
+adminApp.get('/assistant-complaints', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { email, category, status } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  const assistant = await assistantsCollectionObj.findOne({ email });
+  if (!assistant) {
+    return res.status(403).json({ message: "Access denied. Not an assistant." });
+  }
+
+  let query = { assignedAssistant: email };
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (status) {
+    query.status = status;
+  }
+
+  const complaints = await complaintsCollectionObj
+    .find(query)
+    .sort({ timestamp: -1 })
+    .toArray();
+
+  res.json({ complaints });
+}));
+
+
+// ✅ Update Complaint Status (Assistant Only)
+adminApp.put('/update-complaint-status-assistant', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { complaintId, status, remarks, assistantEmail } = req.body;
+
+  if (!complaintId || !status || !assistantEmail) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  // Verify is assistant
+  const isAssistant = await assistantsCollectionObj.findOne({ email: assistantEmail });
+  if (!isAssistant) {
+    return res.status(403).json({ message: "Access denied. Not an assistant." });
+  }
+
+  // Verify complaint is assigned to this assistant
+  const complaint = await complaintsCollectionObj.findOne({ complaint_id: complaintId, assignedAssistant: assistantEmail });
+  if (!complaint) {
+    return res.status(403).json({ message: "Complaint not assigned to you" });
+  }
+// Get assistant info
+const assistant = await assistantsCollectionObj.findOne({ email: assistantEmail });
+
+const updateData = {
+  status: status,
+  assistantRemarks: remarks || "",  // 🔥 ONLY WHAT ASSISTANT TYPES
+  lastUpdatedBy: assistant?.name
+    ? `${assistant.name} (${assistantEmail})`
+    : assistantEmail,
+  lastUpdatedAt: new Date()
+};
+
+
+
+
+  // Add remarks to comments array for strict tracking if needed, or just keep as field
+if (remarks) {
+  const comment = {
+    id: new Date().getTime(),
+    text: `${assistantEmail} updated status to ${status}. ${remarks}`,
+    role: "assistant",
+    timestamp: new Date().toISOString(),
+    email: assistantEmail
+  };
+
+  await complaintsCollectionObj.updateOne(
+    { complaint_id: complaintId },
+    { $push: { comments: comment } }
+  );
+}
+
+
+  const result = await complaintsCollectionObj.updateOne(
+    { complaint_id: complaintId },
+    { $set: updateData }
+  );
+
+  if (result.modifiedCount === 0) {
+    return res.status(500).json({ message: "Failed to update status" });
+  }
+
+  res.json({ message: "Status updated successfully" });
+}));
+
+
+
+
+
+// ✅ Get categories of logged-in assistant
+adminApp.get('/assistant-categories', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email required" });
+  }
+
+  const records = await assistantsCollectionObj.find({ email }).toArray();
+
+  const categories = [...new Set(records.map(r => r.category))];
+
+
+  res.json({ categories });
+}));
+
+
+
+adminApp.get("/team-performance/:category", verifyGoogleToken, asyncHandler(async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    // Get all complaints in this category
+    const complaints = await complaintsCollectionObj.find({ category }).toArray();
+
+    const grouped = {};
+
+    complaints.forEach((complaint) => {
+      // Skip if not assigned to anyone
+      if (!complaint.assignedAssistant) return;
+
+      const email = complaint.assignedAssistant;
+      const name = complaint.assignedAssistantName || email.split("@")[0]; // Use name if available
+
+      if (!grouped[email]) {
+        grouped[email] = {
+          name: name,
+          email: email,
+          total: 0,
+          resolved: 0,
+          pending: 0,
+          ongoing: 0,
+          completionRate: 0,
+          lastUpdated: null,
+          complaints: []
+        };
+      }
+
+      grouped[email].total++;
+      grouped[email].complaints.push({
+        id: complaint.complaint_id,
+        title: complaint.title,
+        status: complaint.status,
+        category: complaint.category,
+        timestamp: complaint.timestamp
+      });
+
+      // Count by status
+      if (complaint.status === "Resolved") {
+        grouped[email].resolved++;
+      } else if (complaint.status === "Pending") {
+        grouped[email].pending++;
+      } else if (complaint.status === "Ongoing") {
+        grouped[email].ongoing++;
+      }
+
+      // Track last update
+      if (!grouped[email].lastUpdated || new Date(complaint.lastUpdatedAt) > new Date(grouped[email].lastUpdated)) {
+        grouped[email].lastUpdated = complaint.lastUpdatedAt || complaint.timestamp;
+      }
+    });
+
+    // Calculate completion rate for each assistant
+    // Ensure assistants with zero complaints in this category are included
+    const assistants = await assistantsCollectionObj.find({ category }).toArray();
+    assistants.forEach(a => {
+      const email = a.email;
+      const name = a.name || a.email.split("@")[0];
+      if (!grouped[email]) {
+        grouped[email] = {
+          name: name,
+          email: email,
+          total: 0,
+          resolved: 0,
+          pending: 0,
+          ongoing: 0,
+          completionRate: 0,
+          lastUpdated: null,
+          complaints: []
+        };
+      }
+    });
+
+    const result = Object.values(grouped).map(assistant => ({
+      ...assistant,
+      completionRate: assistant.total > 0 ? Math.round((assistant.resolved / assistant.total) * 100) : 0
+    }));
+
+    // Sort by total complaints (descending)
+    result.sort((a, b) => b.total - a.total);
+
+    res.json(result);
+
+  } catch (err) {
+    console.error("Error fetching team performance:", err);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+}));
+
+
+adminApp.put("/take-back-complaint", verifyGoogleToken, async (req, res) => {
+  const { complaintId } = req.body;
+
+  const complaint = await complaintsCollectionObj.findOne({
+    complaint_id: complaintId
+  });
+
+  if (!complaint) {
+    return res.status(404).json({ message: "Complaint not found" });
+  }
+
+  // 🔒 Allow only if Pending
+  if (complaint.status !== "Pending") {
+    return res.status(400).json({
+      message: "You can only take back Pending complaints"
+    });
+  }
+
+  await complaintsCollectionObj.updateOne(
+    { complaint_id: complaintId },
+    { $set: { assignedAssistant: null } }
+  );
+
+  res.json({ message: "Complaint taken back successfully" });
+});
+
+
+
+
+adminApp.put("/take-back-complaint", verifyGoogleToken, asyncHandler(async (req, res) => {
+  const { complaintId, adminEmail } = req.body;
+
+  if (!complaintId) {
+    return res.status(400).json({ message: "Complaint ID required" });
+  }
+
+  const complaint = await complaintsCollectionObj.findOne({
+    complaint_id: complaintId
+  });
+
+  if (!complaint) {
+    return res.status(404).json({ message: "Complaint not found" });
+  }
+
+  if (complaint.status !== "Pending") {
+    return res.status(400).json({
+      message: "You can only take back Pending complaints"
+    });
+  }
+
+  await complaintsCollectionObj.updateOne(
+    { complaint_id: complaintId },
+    {
+      $set: {
+        assignedAssistant: null,
+        assignedBy: null,
+        lastUpdatedBy: adminEmail,
+        assignedAt: null
+      }
+    }
+  );
+
+  res.json({ message: "Complaint taken back successfully" });
+}));
+
+
+
+
+
+
+// ✅ Get All Assistants (Admin Only)
+adminApp.get('/all-assistants', verifyGoogleToken, asyncHandler(async (req, res) => {
+  const assistants = await assistantsCollectionObj.find().toArray();
+
+  // Calculate active complaints for each assistant
+  // Active = Pending + Ongoing + Reopened (NOT Resolved)
+  const assistantsWithWorkload = await Promise.all(
+    assistants.map(async (assistant) => {
+      const activeCount = await complaintsCollectionObj.countDocuments({
+        assignedAssistant: assistant.email,
+        status: { $in: ["Pending", "Ongoing", "Reopened"] }
+      });
+
+      return {
+        ...assistant,
+        activeComplaints: activeCount
+      };
+    })
+  );
+
+  res.json({ assistants: assistantsWithWorkload });
+}));
 
 module.exports = adminApp;

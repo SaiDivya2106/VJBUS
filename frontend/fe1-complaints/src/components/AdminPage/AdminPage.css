@@ -14,6 +14,23 @@
   color: #4caf50;
 }
 
+
+
+.takebackfun{
+  width: 90px;
+  height: 25px;
+   border-radius: 30px !important;
+   padding: 0px 10px !important;
+}
+
+.reassignfun{
+  width: 90px;
+  height: 25px;
+   border-radius: 30px !important;
+   padding: 0px 10px !important;
+}
+
+
 .loading-wrapper {
   display: flex;
   flex-direction: column;
@@ -433,4 +450,256 @@
   height: 34px;
   cursor: pointer;
   font-size: 18px;
+}
+
+
+
+
+
+
+/* ===== Assign Complaint Modal – Premium Theme ===== */
+
+.assign-modal .modal-content {
+  background: #f1f5ff;
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 25px 60px rgba(30, 60, 180, 0.25);
+}
+
+.assign-modal .modal-header {
+  border-bottom: 1px solid #dde3ff;
+  padding: 20px 24px;
+}
+
+.assign-modal .modal-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+.assign-modal .btn-close {
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 8px;
+  opacity: 1;
+}
+
+.assign-modal .modal-body {
+  padding: 24px;
+}
+
+.assign-modal label {
+  font-weight: 600;
+  color: #2c3553;
+  margin-bottom: 8px;
+}
+
+.assign-modal select {
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid #cfd7ff;
+  background-color: #ffffff;
+}
+
+.assign-modal select:focus {
+  border-color: #6c8cff;
+  box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25);
+}
+
+.assign-modal .modal-footer {
+  border-top: 1px solid #dde3ff;
+  padding: 18px 24px;
+}
+
+.assign-modal .btn-secondary {
+  background: #e0e4f5;
+  color: #333;
+  border-radius: 12px;
+  border: none;
+  padding: 8px 18px;
+  font-weight: 600;
+}
+
+.assign-modal .btn-secondary:hover {
+  background: #d2d8ef;
+}
+
+.assign-modal .btn-primary {
+  background: linear-gradient(135deg, #5b7cff, #7a8dff);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 22px;
+  font-weight: 600;
+}
+
+.assign-modal .btn-primary:disabled {
+  opacity: 0.6;
+}
+/* ===== Enhanced Assign Modal Styling ===== */
+
+.assign-modal select {
+width: 1900px;
+  height: 46px;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  border: 1px solid #cfd7ff;
+  background-color: #ffffff;
+}
+
+.assign-modal .modal-footer {
+  display: flex;
+  gap: 14px;
+  padding: 20px 24px;
+}
+
+/* Equal-size buttons */
+.assign-modal .modal-footer .btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+/* Cancel button */
+.assign-modal .btn-secondary {
+  background: #edf0ff;
+  color: #3a3f5c;
+  border: 1px solid #d5dcff;
+}
+
+.assign-modal .btn-secondary:hover {
+  background: #e1e6ff;
+  transform: translateY(-1px);
+}
+
+/* Assign button */
+.assign-modal .btn-primary {
+  background: linear-gradient(135deg, #5b7cff, #7b8dff);
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(91, 124, 255, 0.35);
+}
+
+.assign-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #4b6cff, #6a7cff);
+  transform: translateY(-1px);
+}
+
+.assign-modal .btn-primary:disabled {
+  background: #bfc8ff;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+
+/* ===== Assign Modal – Final Polished Layout ===== */
+
+.assign-modal .modal-content {
+  background: #f1f5ff;
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 25px 60px rgba(30, 60, 180, 0.25);
+}
+
+/* Body spacing */
+.assign-modal .modal-body {
+  padding: 24px;
+}
+
+/* Label */
+.assign-modal label {
+  font-weight: 600;
+  color: #2c3553;
+  margin-bottom: 10px;
+}
+
+/* ✅ FULL WIDTH SELECT */
+.assign-modal select {
+  width: 100%;              /* ✅ key fix */
+  height: 46px;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  border: 1px solid #cfd7ff;
+  background-color: #ffffff;
+}
+
+/* Disabled dropdown look */
+.assign-modal select:disabled {
+  background-color: #eef2ff;
+  color: #6c728a;
+  cursor: not-allowed;
+}
+
+/* Footer layout */
+.assign-footer {
+  display: flex;
+  gap: 14px;
+  padding: 20px 24px;
+  border-top: 1px solid #dde3ff;
+}
+
+/* ✅ Equal-size buttons */
+.assign-footer .btn {
+  flex: 1;                  /* same width */
+  height: 46px;             /* same height as select */
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+/* Cancel button */
+.assign-footer .btn-secondary {
+  background: #edf0ff;
+  color: #3a3f5c;
+  border: 1px solid #d5dcff;
+}
+
+.assign-footer .btn-secondary:hover {
+  background: #e1e6ff;
+}
+
+/* Assign button */
+.assign-footer .btn-primary {
+  background: linear-gradient(135deg, #5b7cff, #7b8dff);
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(91, 124, 255, 0.35);
+}
+
+.assign-footer .btn-primary:disabled {
+  background: #bfc8ff;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+
+
+
+/* Full-width, long select dropdown */
+.assign-modal .form-select {
+  width: 100% !important;        /* full container width */
+  min-width: 100%;               /* prevent shrink */
+  height: 48px;                  /* taller box */
+  padding: 10px 44px 10px 16px;  /* right padding for arrow */
+  font-size: 1rem;
+  border-radius: 14px;
+  border: 1px solid #cfd7ff;
+  background-color: #ffffff;
+}
+
+/* Make dropdown arrow align nicely */
+.assign-modal .form-select {
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
+/* Focus effect */
+.assign-modal .form-select:focus {
+  border-color: #6c8cff;
+  box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25);
 }

@@ -1,4 +1,6 @@
 const { OAuth2Client } = require("google-auth-library");
+const isExperimental = require("../utils/isExperimental");
+const demoUserFactory = require("../demo/demoUserFactory");
 
 // Replace with your actual Google client ID
 const client = new OAuth2Client(
@@ -6,6 +8,17 @@ const client = new OAuth2Client(
 );
 
 const verifyGoogleToken = async (req, res, next) => {
+  if (isExperimental) {
+    const demoRole = req.headers['x-demo-role'] || 'student';
+    const demoUser = demoUserFactory.getUser(demoRole);
+
+    if (demoUser) {
+      req.user = demoUser;
+      console.log(`🔓 [EXPERIMENTAL] Auth Bypassed. User: ${demoUser.email} (${demoUser.role})`);
+      return next();
+    }
+  }
+
   try {
     const authHeader = req.headers.authorization;
 
@@ -32,6 +45,14 @@ const verifyGoogleToken = async (req, res, next) => {
 
     next(); // Allow route to proceed
   } catch (error) {
+    if (isExperimental) {
+      // Fallback if token is sent even in demo mode but is invalid
+      const demoRole = req.headers['x-demo-role'] || 'student';
+      const demoUser = demoUserFactory.getUser(demoRole);
+      req.user = demoUser;
+      console.log(`🔓 [EXPERIMENTAL] Auth Bypassed (Token Invalid). User: ${demoUser.email}`);
+      return next();
+    }
     console.error("Token verification failed:", error.message);
     res.status(403).json({ message: "Invalid or expired token" });
   }

@@ -11,6 +11,7 @@ import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 import AdminAnalysis from './components/AdminAnalysis/AdminAnalysis';
 import UserAnalysis from './components/UserAnalysis/UserAnalysis';
 import SuperAdminDashboard from './components/SuperAdminDashboard/SuperAdminDashboard'
+import AssistantDashboard from './components/AssistantDashboard/AssistantDashboard';
 function App() {
   let router = createBrowserRouter([
     {
@@ -18,28 +19,30 @@ function App() {
       element: <RootLayout />,
       children: [
         { path: 'all-complaints', element: <Home /> },
-    
-        {path:'complaints-website',element:<LandingPage/>},
+
+        { path: 'complaints-website', element: <LandingPage /> },
         { path: 'complaint-form', element: <ComplaintForm /> },
         { path: 'adminpage', element: <AdminPage /> },
         { path: 'admin-analysis', element: <AdminAnalysis /> },
-        {path:'user-analysis',element:<UserAnalysis/>},
-        {path:'my-complaints',element:<UserDashboard/>},
+        { path: 'user-analysis', element: <UserAnalysis /> },
+        { path: 'my-complaints', element: <UserDashboard /> },
         {
           path: 'complaints-details/:complaint_id', // ✅ Moved outside AdminPage
           element: <ComplaintsDetails />
         },
         {
-          path:'',element:<Navigate to="all-complaints"/>
+          path: '', element: <Navigate to="all-complaints" />
 
-        },{
-          path:'/superadmin-dashboard',element:<SuperAdminDashboard/>
+        }, {
+          path: '/superadmin-dashboard', element: <SuperAdminDashboard />
+        }, {
+          path: '/assistant-dashboard', element: <AssistantDashboard />
         }
-        
+
       ]
     }
   ]);
-  
+
 
   return (
     <div>

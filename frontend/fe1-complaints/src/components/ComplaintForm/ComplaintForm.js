@@ -16,6 +16,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import "./ComplaintForm.css";
 import { suggestCategory } from "../../utils/categorySuggester";
+import { isExperimental } from "../../utils/isExperimental";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const categoriesList = [
@@ -69,7 +72,7 @@ const ComplaintForm = () => {
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
 
 
-const [suggestedCategories, setSuggestedCategories] = useState([]);
+  const [suggestedCategories, setSuggestedCategories] = useState([]);
 
 
 
@@ -102,29 +105,29 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
 
 
   const handleChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  const updatedData = { ...formData, [name]: value };
-  setFormData(updatedData);
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
 
-  // Auto suggest category when typing title or description
-  if (name === "title" || name === "description") {
-    const suggestions = suggestCategory(
-      updatedData.title,
-      updatedData.description
-    );
+    // Auto suggest category when typing title or description
+    if (name === "title" || name === "description") {
+      const suggestions = suggestCategory(
+        updatedData.title,
+        updatedData.description
+      );
 
-    setSuggestedCategories(suggestions);
-  }
+      setSuggestedCategories(suggestions);
+    }
 
-  // Existing logic (keep this)
-  if (name === "connectionType" && value === "WiFi") {
-    const isHostel =
-      formData.location === "Boys Hostel" ||
-      formData.location === "Girls Hostel";
-    setWifiAtHostelWarning(isHostel);
-  }
-};
+    // Existing logic (keep this)
+    if (name === "connectionType" && value === "WiFi") {
+      const isHostel =
+        formData.location === "Boys Hostel" ||
+        formData.location === "Girls Hostel";
+      setWifiAtHostelWarning(isHostel);
+    }
+  };
 
 
   const handleCategorySelect = (cat) => {
@@ -219,15 +222,15 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
         image: imageUrl,
         ...(isITCategory
           ? {
-              it_details: {
-                location: formData.location,
-                connectionType: formData.connectionType,
-                room_number: formData.room_number || "",
-                internet_speed: formData.internet_speed || "",
-                mobile_number: formData.mobile_number || "",
-                issue_duration: formData.issue_duration || "",
-              },
-            }
+            it_details: {
+              location: formData.location,
+              connectionType: formData.connectionType,
+              room_number: formData.room_number || "",
+              internet_speed: formData.internet_speed || "",
+              mobile_number: formData.mobile_number || "",
+              issue_duration: formData.issue_duration || "",
+            },
+          }
           : {}),
       };
 
@@ -248,6 +251,13 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
         setImage(null);
         setImagePreview(null);
         setWifiAtHostelWarning(false);
+
+        if (isExperimental) {
+          toast.info("📧 Experimental Mode: Simulating email to Admin...", {
+            autoClose: 3000,
+            position: "top-center"
+          });
+        }
       } else {
         setMessage("Failed to register complaint. Please try again.");
       }
@@ -297,6 +307,7 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
 
   return (
     <div className="complaint-container">
+      <ToastContainer />
       <h2 style={headingStyle}>Register a Complaint</h2>
 
       <form className="form" onSubmit={handleSubmit}>
@@ -333,30 +344,30 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
 
 
 
-{suggestedCategories.length > 0 && !formData.category && (
-  <div className="suggested-wrapper">
-    <div className="suggested-header">
-      💡 Suggested categories
-    </div>
+        {suggestedCategories.length > 0 && !formData.category && (
+          <div className="suggested-wrapper">
+            <div className="suggested-header">
+              💡 Suggested categories
+            </div>
 
-    <div className="suggested-pills">
-      {suggestedCategories.map((cat) => (
-        <button
-          key={cat}
-          type="button"
-          className="suggested-pill"
-          onClick={() => handleCategorySelect(cat)}
-        >
-          {cat}
-        </button>
-      ))}
-    </div>
+            <div className="suggested-pills">
+              {suggestedCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className="suggested-pill"
+                  onClick={() => handleCategorySelect(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
 
-    <div className="suggested-hint">
-      (optional – you can change this)
-    </div>
-  </div>
-)}
+            <div className="suggested-hint">
+              (optional – you can change this)
+            </div>
+          </div>
+        )}
 
 
 
@@ -539,114 +550,114 @@ const [suggestedCategories, setSuggestedCategories] = useState([]);
 
 
         {isITCategory && (
-  <div className="it-fields">
+          <div className="it-fields">
 
-    {/* LOCATION */}
-    <div className="input-group">
-      <label style={labelStyle}>Location *</label>
+            {/* LOCATION */}
+            <div className="input-group">
+              <label style={labelStyle}>Location *</label>
 
-      <select
-        name="location"
-        value={formData.location}
-        onChange={handleChange}
-        className="styled-select"
-        required
-      >
-        <option value="">-- Select Location --</option>
-        <option value="Main Campus">Main Campus</option>
-        <option value="Boys Hostel">Boys Hostel</option>
-        <option value="Girls Hostel">Girls Hostel</option>
-      </select>
-    </div>
+              <select
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="styled-select"
+                required
+              >
+                <option value="">-- Select Location --</option>
+                <option value="Main Campus">Main Campus</option>
+                <option value="Boys Hostel">Boys Hostel</option>
+                <option value="Girls Hostel">Girls Hostel</option>
+              </select>
+            </div>
 
-    {/* CONNECTION TYPE */}
-    {formData.location && (
-      <div className="input-group">
-        <label style={labelStyle}>Connection Type *</label>
+            {/* CONNECTION TYPE */}
+            {formData.location && (
+              <div className="input-group">
+                <label style={labelStyle}>Connection Type *</label>
 
-        <select
-          name="connectionType"
-          value={formData.connectionType}
-          onChange={handleChange}
-          className="styled-select"
-          required
-        >
-          <option value="">-- Select Connection --</option>
-          <option value="WiFi">WiFi</option>
-          <option value="LAN">LAN</option>
-        </select>
-      </div>
-    )}
+                <select
+                  name="connectionType"
+                  value={formData.connectionType}
+                  onChange={handleChange}
+                  className="styled-select"
+                  required
+                >
+                  <option value="">-- Select Connection --</option>
+                  <option value="WiFi">WiFi</option>
+                  <option value="LAN">LAN</option>
+                </select>
+              </div>
+            )}
 
-    {/* WARNING */}
-    {wifiAtHostelWarning && (
-      <div style={{
-        padding: "12px",
-        backgroundColor: "#fff3cd",
-        border: "1px solid #ffc107",
-        borderRadius: "4px",
-        marginBottom: "15px",
-        color: "#856404"
-      }}>
-        <strong>⚠️ Warning:</strong> WiFi is not supported at hostels. Please use LAN or contact IT support.
-      </div>
-    )}
+            {/* WARNING */}
+            {wifiAtHostelWarning && (
+              <div style={{
+                padding: "12px",
+                backgroundColor: "#fff3cd",
+                border: "1px solid #ffc107",
+                borderRadius: "4px",
+                marginBottom: "15px",
+                color: "#856404"
+              }}>
+                <strong>⚠️ Warning:</strong> WiFi is not supported at hostels. Please use LAN or contact IT support.
+              </div>
+            )}
 
-    {/* IT FIELDS (when no hostel wifi error) */}
-    {!wifiAtHostelWarning && (
-      <>
-        <div className="input-group">
-          <label style={labelStyle}>Room Number *</label>
-          <input
-            type="text"
-            name="room_number"
-            value={formData.room_number || ""}
-            onChange={handleChange}
-            placeholder="e.g. B-204 or Lab-A"
-            required
-          />
-        </div>
+            {/* IT FIELDS (when no hostel wifi error) */}
+            {!wifiAtHostelWarning && (
+              <>
+                <div className="input-group">
+                  <label style={labelStyle}>Room Number *</label>
+                  <input
+                    type="text"
+                    name="room_number"
+                    value={formData.room_number || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. B-204 or Lab-A"
+                    required
+                  />
+                </div>
 
-        <div className="input-group">
-          <label style={labelStyle}>Internet Speed *</label>
-          <input
-            type="text"
-            name="internet_speed"
-            value={formData.internet_speed || ""}
-            onChange={handleChange}
-            placeholder="e.g. 0.5 Mbps or 10 Mbps"
-            required
-          />
-        </div>
+                <div className="input-group">
+                  <label style={labelStyle}>Internet Speed *</label>
+                  <input
+                    type="text"
+                    name="internet_speed"
+                    value={formData.internet_speed || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 0.5 Mbps or 10 Mbps"
+                    required
+                  />
+                </div>
 
-        <div className="input-group">
-          <label style={labelStyle}>Mobile Number *</label>
-          <input
-            type="tel"
-            name="mobile_number"
-            value={formData.mobile_number || ""}
-            onChange={handleChange}
-            placeholder="e.g. 9876543210"
-            required
-          />
-        </div>
+                <div className="input-group">
+                  <label style={labelStyle}>Mobile Number *</label>
+                  <input
+                    type="tel"
+                    name="mobile_number"
+                    value={formData.mobile_number || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 9876543210"
+                    required
+                  />
+                </div>
 
-        <div className="input-group">
-          <label style={labelStyle}>Issue Duration *</label>
-          <input
-            type="text"
-            name="issue_duration"
-            value={formData.issue_duration || ""}
-            onChange={handleChange}
-            placeholder="e.g. 2 hours, since yesterday"
-            required
-          />
-        </div>
-      </>
-    )}
+                <div className="input-group">
+                  <label style={labelStyle}>Issue Duration *</label>
+                  <input
+                    type="text"
+                    name="issue_duration"
+                    value={formData.issue_duration || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 2 hours, since yesterday"
+                    required
+                  />
+                </div>
+              </>
+            )}
 
-  </div>
-)}
+          </div>
+        )}
 
 
         {!wifiAtHostelWarning && (

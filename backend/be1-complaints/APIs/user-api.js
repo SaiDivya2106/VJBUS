@@ -7,7 +7,7 @@ const Sentiment = require("sentiment");
 const natural = require("natural");
 const validWords = new Set(require("an-array-of-english-words"));
 const sentiment = new Sentiment();
-const nodemailer = require("nodemailer");
+const { sendEmail } = require("../utils/emailService");
 const verifyGoogleToken = require("../Middleware/verifyGoogleToken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -152,8 +152,8 @@ userApp.post(
       // Only add IT-specific details when category is IT & Networking
       ...(isITCategory && it_details
         ? {
-            it_details,
-          }
+          it_details,
+        }
         : {}),
       // timestamp: new Date().toISOString(),
       timestamp: new Date(),
@@ -189,14 +189,6 @@ userApp.post(
           try {
             const admins = await adminsCollectionObj.find({ category }).toArray();
             if (admins.length > 0) {
-              const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                  user: process.env.ADMIN_EMAIL,
-                  pass: process.env.ADMIN_PASS,
-                },
-              });
-
               const mailPromises = admins.map((admin) => {
                 const mailOptions = {
                   from: process.env.ADMIN_EMAIL,
@@ -218,9 +210,8 @@ userApp.post(
                         <li><strong>Mobile Number:</strong> ${mobile_number}</li>
                         <li><strong>Issue Duration:</strong> ${issue_duration}</li>
                       ` : ''}
-                      ${
-                        image
-                          ? `<li><strong>Image:</strong><br>
+                      ${image
+                      ? `<li><strong>Image:</strong><br>
                               <a href="${image}" 
                                  target="_blank" 
                                  style="
@@ -236,15 +227,15 @@ userApp.post(
                                 📷 Click to View Image
                               </a>
                              </li>`
-                          : ""
-                      }
+                      : ""
+                    }
                     </ul>
                     <p><a href="https://thrive.vjstartup.com">View and manage the request</a></p>
                     <p>Please take action as soon as possible.</p>
                     <p>Regards,<br>Thrive</p>
                   `,
                 };
-                return transporter.sendMail(mailOptions);
+                return sendEmail(mailOptions);
               });
 
               await Promise.all(mailPromises);
@@ -332,22 +323,22 @@ userApp.get("/view-complaints/:userId", verifyGoogleToken, asyncHandler(async (r
 }));
 
 // -------------------- EDIT COMPLAINT --------------------
-  userApp.put(
-    "/edit-complaint/:complaint_id",
-    verifyGoogleToken,
-    asyncHandler(async (req, res) => {
-      const { complaint_id } = req.params;
-      const { title, description, category, image, room_number, internet_speed, mobile_number, issue_duration } = req.body;
+userApp.put(
+  "/edit-complaint/:complaint_id",
+  verifyGoogleToken,
+  asyncHandler(async (req, res) => {
+    const { complaint_id } = req.params;
+    const { title, description, category, image, room_number, internet_speed, mobile_number, issue_duration } = req.body;
 
-      if (!complaint_id) return res.status(400).json({ message: "Complaint ID is required." });
-      
-      // Validate required fields are not empty
-      const trimmedTitle = title ? title.trim() : "";
-      const trimmedDescription = description ? description.trim() : "";
-      
-      if (!trimmedTitle || !trimmedDescription) {
-        return res.status(400).json({ message: "Title and description are required fields and cannot be empty. Please fill them before saving." });
-      }    const existingComplaint = await complaintsCollectionObj.findOne({ complaint_id });
+    if (!complaint_id) return res.status(400).json({ message: "Complaint ID is required." });
+
+    // Validate required fields are not empty
+    const trimmedTitle = title ? title.trim() : "";
+    const trimmedDescription = description ? description.trim() : "";
+
+    if (!trimmedTitle || !trimmedDescription) {
+      return res.status(400).json({ message: "Title and description are required fields and cannot be empty. Please fill them before saving." });
+    } const existingComplaint = await complaintsCollectionObj.findOne({ complaint_id });
     if (!existingComplaint) return res.status(404).json({ message: "Complaint not found." });
 
     const result = sentiment.analyze(description);
@@ -421,7 +412,7 @@ userApp.delete("/delete-complaint/:complaint_id", verifyGoogleToken, asyncHandle
   const deleteResult = await complaintsCollectionObj.deleteOne({ complaint_id });
   if (deleteResult.deletedCount === 0) return res.status(500).json({ message: "Failed to delete complaint" });
 
-  res.status(200).json({ message: "Complaint deleted successfully" });
+  res.status(200).json({ message: "Complaint deleted successfully" });
 }));
 
 
@@ -654,14 +645,6 @@ userApp.post(
             .toArray();
 
           if (admins.length > 0) {
-            const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                user: process.env.ADMIN_EMAIL,
-                pass: process.env.ADMIN_PASS,
-              },
-            });
-
             const adminEmails = admins.map((a) => a.email).join(", ");
             const mailOptions = {
               from: process.env.ADMIN_EMAIL,
@@ -685,13 +668,8 @@ userApp.post(
               `,
             };
 
-            transporter.sendMail(mailOptions, (err) => {
-              if (err) {
-                console.error("❌ Error sending reopen email:", err);
-              } else {
-                console.log("✅ Reopen notification sent to admins");
-              }
-            });
+            await sendEmail(mailOptions);
+            console.log("✅ Reopen notification sent to admins");
           }
         } catch (err) {
           console.error("⚠️ Error in reopen notification:", err);
@@ -772,17 +750,10 @@ userApp.post(
       res.status(200).json({ message: "Reply added successfully", complaint: updatedComplaint });
 
       // Notify the admin who made the original comment (if email exists)
+      // Notify the admin who made the original comment (if email exists)
       setImmediate(async () => {
         try {
           if (targetComment.email) {
-            const transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                user: process.env.ADMIN_EMAIL,
-                pass: process.env.ADMIN_PASS,
-              },
-            });
-
             const mailOptions = {
               from: process.env.ADMIN_EMAIL,
               to: targetComment.email,
@@ -799,7 +770,7 @@ userApp.post(
               `,
             };
 
-            await transporter.sendMail(mailOptions);
+            await sendEmail(mailOptions);
             console.log(`📧 Reply notification sent to admin (${targetComment.email})`);
           }
         } catch (err) {

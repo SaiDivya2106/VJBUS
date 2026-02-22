@@ -15,6 +15,7 @@ import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import { FaExclamationTriangle, FaUserCircle } from "react-icons/fa";
 import "./SuperAdminDashboard.css";
+import { isExperimental } from "../../utils/isExperimental";
 
 const SuperAdminDashboard = () => {
   const [complaints, setComplaints] = useState([]);
@@ -76,6 +77,7 @@ const SuperAdminDashboard = () => {
       setSelectedComplaint(null);
       setNote("");
       alert(`Complaint marked as '${actionType}' successfully!`);
+      if (isExperimental) alert("📧 Demo: Action email simulated.");
     } catch (err) {
       console.error("Error performing action:", err);
       alert("Failed to perform action");
@@ -111,74 +113,74 @@ const SuperAdminDashboard = () => {
           ⚠ Super Admin - Flagged Requests
         </h2>
 
-{/* Filters */}
-{/* Filters */}
-{/* Filters */}
-<Row className="filter-row justify-content-center">
-  <Col xs={12} lg={10}>
-    <div className="filter-container">
-      <div className="filter-box-grid">
+        {/* Filters */}
+        {/* Filters */}
+        {/* Filters */}
+        <Row className="filter-row justify-content-center">
+          <Col xs={12} lg={10}>
+            <div className="filter-container">
+              <div className="filter-box-grid">
 
-        {/* Category */}
-        <div className="filter-group">
-          <div className="filter-title">
-            <span className="filter-icon blue">
-              <i className="bi bi-funnel"></i>
-            </span>
-            Filter by Category
-          </div>
+                {/* Category */}
+                <div className="filter-group">
+                  <div className="filter-title">
+                    <span className="filter-icon blue">
+                      <i className="bi bi-funnel"></i>
+                    </span>
+                    Filter by Category
+                  </div>
 
-          <Form.Select
-            className="form-select filter-select-bootstrap"
-            value={filters.category}
-            onChange={(e) =>
-              setFilters({ ...filters, category: e.target.value })
-            }
-          >
-            <option value="">All Categories</option>
-            {uniqueCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </Form.Select>
-        </div>
+                  <Form.Select
+                    className="form-select filter-select-bootstrap"
+                    value={filters.category}
+                    onChange={(e) =>
+                      setFilters({ ...filters, category: e.target.value })
+                    }
+                  >
+                    <option value="">All Categories</option>
+                    {uniqueCategories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
 
-        {/* Reason */}
-        <div className="filter-group">
-          <div className="filter-title">
-            <span className="filter-icon purple">
-              <i className="bi bi-funnel"></i>
-            </span>
-            Filter by Reason
-          </div>
+                {/* Reason */}
+                <div className="filter-group">
+                  <div className="filter-title">
+                    <span className="filter-icon purple">
+                      <i className="bi bi-funnel"></i>
+                    </span>
+                    Filter by Reason
+                  </div>
 
-          <Form.Select
-            className="form-select filter-select-bootstrap purple-border"
-            value={filters.reason}
-            onChange={(e) =>
-              setFilters({ ...filters, reason: e.target.value })
-            }
-          >
-            <option value="">All Reasons</option>
-            {filteredReasons.length > 0
-              ? filteredReasons.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))
-              : allowedFlagReasons.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-          </Form.Select>
-        </div>
+                  <Form.Select
+                    className="form-select filter-select-bootstrap purple-border"
+                    value={filters.reason}
+                    onChange={(e) =>
+                      setFilters({ ...filters, reason: e.target.value })
+                    }
+                  >
+                    <option value="">All Reasons</option>
+                    {filteredReasons.length > 0
+                      ? filteredReasons.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))
+                      : allowedFlagReasons.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                  </Form.Select>
+                </div>
 
-      </div>
-    </div>
-  </Col>
-</Row>
+              </div>
+            </div>
+          </Col>
+        </Row>
 
 
 
@@ -193,65 +195,65 @@ const SuperAdminDashboard = () => {
         ) : (
           <div className="filter-container">
             <Row className="gx-4 gy-4">
-    {filteredComplaints.map((complaint) => {
-      const words = complaint.description.split(" ");
-      const shortDesc = words.slice(0, 25).join(" ");
+              {filteredComplaints.map((complaint) => {
+                const words = complaint.description.split(" ");
+                const shortDesc = words.slice(0, 25).join(" ");
 
-      return (
-        <Col
-          key={complaint.complaint_id}
-          sm={12}
-          md={6}
-          lg={4}
-        >
-          <Card className="flag-card h-100">
-                    <div className="category-chip">{complaint.category}</div>
+                return (
+                  <Col
+                    key={complaint.complaint_id}
+                    sm={12}
+                    md={6}
+                    lg={4}
+                  >
+                    <Card className="flag-card h-100">
+                      <div className="category-chip">{complaint.category}</div>
 
-                    <Card.Body className="flag-body">
-                      <h5 className="card-title-custom">{complaint.title}</h5>
+                      <Card.Body className="flag-body">
+                        <h5 className="card-title-custom">{complaint.title}</h5>
 
-                      {/* Description with "View More" */}
-                      <Card.Text className="description">
-                        {words.length > 25
-                          ? shortDesc + "..."
-                          : complaint.description}
+                        {/* Description with "View More" */}
+                        <Card.Text className="description">
+                          {words.length > 25
+                            ? shortDesc + "..."
+                            : complaint.description}
 
-                        {words.length > 25 && (
-                          <Button
-                            variant="link"
-                            className="read-more"
-                            onClick={() => setFullViewComplaint(complaint)}
-                          >
-                            View More
-                          </Button>
-                        )}
-                      </Card.Text>
+                          {words.length > 25 && (
+                            <Button
+                              variant="link"
+                              className="read-more"
+                              onClick={() => setFullViewComplaint(complaint)}
+                            >
+                              View More
+                            </Button>
+                          )}
+                        </Card.Text>
 
-                      {/* Details */}
-                      <div className="details-section">
-                        <div className="detail-row">
-                          <span className="detail-label text-dark">User:</span>
-                          <span className="">
-                            <FaUserCircle size={16} className="user-icon me-1" />
-                            {complaint.user_id}
-                          </span>
-                        </div>
+                        {/* Details */}
+                        <div className="details-section">
+                          <div className="detail-row">
+                            <span className="detail-label text-dark">User:</span>
+                            <span className="">
+                              <FaUserCircle size={16} className="user-icon me-1" />
+                              {complaint.user_id}
+                            </span>
+                          </div>
 
-                        <div className="detail-row">
-                          <span className="detail-label text-dark">Flagged By:</span>
-                          <span className="">
-                            {complaint.flagged.flaggedBy}
-                          </span>
-                        </div>
+                          <div className="detail-row">
+                            <span className="detail-label text-dark">Flagged By:</span>
+                            <span className="">
+                              {complaint.flagged.flaggedBy}
+                            </span>
+                          </div>
 
-                        <div className="detail-row">
-                          <span className="detail-label text-dark">Reason:</span>
-                          <span className="reason-badge">
-                            {complaint.flagged.reason}
-                          </span>
-                        </div>
+                          <div className="detail-row">
+                            <span className="detail-label text-dark">Reason:</span>
+                            <span className="reason-badge">
+                              {complaint.flagged.reason}
+                            </span>
+                          </div>
 
-                        {/* {complaint.flagged.note && (
+                          {/* {complaint.flagged.note && (
                           <div className="detail-row">
                             <span className="detail-label text-dark">Note:</span>
                             <span className="">
@@ -261,216 +263,216 @@ const SuperAdminDashboard = () => {
                         )} */}
 
 
- {complaint.flagged.note && (
-  <div className="detail-row">
-    <span className="detail-label text-dark">Note:</span>
+                          {complaint.flagged.note && (
+                            <div className="detail-row">
+                              <span className="detail-label text-dark">Note:</span>
 
-    <span className="note-preview">
-      {complaint.flagged.note.length > 120
-        ? complaint.flagged.note.slice(0, 120) + "..."
-        : complaint.flagged.note}
+                              <span className="note-preview">
+                                {complaint.flagged.note.length > 120
+                                  ? complaint.flagged.note.slice(0, 120) + "..."
+                                  : complaint.flagged.note}
 
-      {complaint.flagged.note.length > 120 && (
-        <Button
-          variant="link"
-          className="read-more"
-          onClick={() => setFullViewComplaint(complaint)}
-        >
-          View More
-        </Button>
-      )}
-    </span>
-  </div>
-)}
-
-
-                      </div>
-
-                      <hr className="separator" />
-
-                      {/* Buttons */}
-<div className="btn-row">
-  <Button
-    className="super-btn super-valid"
-    onClick={() => {
-      setSelectedComplaint(complaint);
-      setActionType("valid");
-    }}
-  >
-    ✔ Mark Valid
-  </Button>
-
-  <Button
-    className="super-btn super-warn"
-    onClick={() => {
-      setSelectedComplaint(complaint);
-      setActionType("warn");
-    }}
-  >
-    ⚠ Warn User
-  </Button>
-</div>
+                                {complaint.flagged.note.length > 120 && (
+                                  <Button
+                                    variant="link"
+                                    className="read-more"
+                                    onClick={() => setFullViewComplaint(complaint)}
+                                  >
+                                    View More
+                                  </Button>
+                                )}
+                              </span>
+                            </div>
+                          )}
 
 
-                      <hr className="separator bottom" />
+                        </div>
 
-                      <div className="card-id-footer">
-                        ID: {complaint.complaint_id}
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              );
-            })}
+                        <hr className="separator" />
+
+                        {/* Buttons */}
+                        <div className="btn-row">
+                          <Button
+                            className="super-btn super-valid"
+                            onClick={() => {
+                              setSelectedComplaint(complaint);
+                              setActionType("valid");
+                            }}
+                          >
+                            ✔ Mark Valid
+                          </Button>
+
+                          <Button
+                            className="super-btn super-warn"
+                            onClick={() => {
+                              setSelectedComplaint(complaint);
+                              setActionType("warn");
+                            }}
+                          >
+                            ⚠ Warn User
+                          </Button>
+                        </div>
+
+
+                        <hr className="separator bottom" />
+
+                        <div className="card-id-footer">
+                          ID: {complaint.complaint_id}
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                );
+              })}
             </Row>
           </div>
         )}
 
         {/* ACTION MODAL */}
         {/* ACTION MODAL */}
-{selectedComplaint && (
-<Modal
-  show={!!selectedComplaint}
-  onHide={() => setSelectedComplaint(null)}
-  centered
-  className="white-modal"
->
-    <Modal.Header closeButton>
-      <Modal.Title className="modal-header-title">
-        Confirm Action
-      </Modal.Title>
-    </Modal.Header>
+        {selectedComplaint && (
+          <Modal
+            show={!!selectedComplaint}
+            onHide={() => setSelectedComplaint(null)}
+            centered
+            className="white-modal"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title className="modal-header-title">
+                Confirm Action
+              </Modal.Title>
+            </Modal.Header>
 
-    <Modal.Body className="confirm-modal-body">
-      <p className="confirm-text">
-        Are you sure you want to{" "}
-        <b
-          className={
-            actionType === "valid"
-              ? "highlight-valid"
-              : "highlight-warn"
-          }
-        >
-          {actionType === "valid" ? "mark as Valid" : "Warn User"}
-        </b>{" "}
-        for this complaint?
-      </p>
+            <Modal.Body className="confirm-modal-body">
+              <p className="confirm-text">
+                Are you sure you want to{" "}
+                <b
+                  className={
+                    actionType === "valid"
+                      ? "highlight-valid"
+                      : "highlight-warn"
+                  }
+                >
+                  {actionType === "valid" ? "mark as Valid" : "Warn User"}
+                </b>{" "}
+                for this complaint?
+              </p>
 
-      {/* Title */}
-      <div className="modal-section-title">Title</div>
-      <div className="modal-description-box">
-        <h5>{selectedComplaint.title}</h5>
-      </div>
+              {/* Title */}
+              <div className="modal-section-title">Title</div>
+              <div className="modal-description-box">
+                <h5>{selectedComplaint.title}</h5>
+              </div>
 
-      {/* Description */}
-      <div className="modal-section-title">Description</div>
-      <div className="modal-description-box">
-        {selectedComplaint.description}
-      </div>
+              {/* Description */}
+              <div className="modal-section-title">Description</div>
+              <div className="modal-description-box">
+                {selectedComplaint.description}
+              </div>
 
-      {/* Note Input */}
-      <div className="modal-section-title">Note (Optional)</div>
-     <Form.Control
-  as="textarea"
-  rows={3}
-  className="form-control note-textarea-bootstrap"
-  placeholder="Add an internal note..."
-  value={note}
-  onChange={(e) => setNote(e.target.value)}
-/>
+              {/* Note Input */}
+              <div className="modal-section-title">Note (Optional)</div>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                className="form-control note-textarea-bootstrap"
+                placeholder="Add an internal note..."
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
 
-    </Modal.Body>
+            </Modal.Body>
 
-   <Modal.Footer className="justify-content-end gap-2">
-  <Button
-    variant="outline-secondary"
-    className="btnsuperadmin"
-    onClick={() => setSelectedComplaint(null)}
-  >
-    Cancel
-  </Button>
+            <Modal.Footer className="justify-content-end gap-2">
+              <Button
+                variant="outline-secondary"
+                className="btnsuperadmin"
+                onClick={() => setSelectedComplaint(null)}
+              >
+                Cancel
+              </Button>
 
-  <Button
-    variant={actionType === "valid" ? "success" : "warning"}
-    onClick={() => handleAction(selectedComplaint.complaint_id)}
-  >
-    Confirm
-  </Button>
-</Modal.Footer>
+              <Button
+                variant={actionType === "valid" ? "success" : "warning"}
+                onClick={() => handleAction(selectedComplaint.complaint_id)}
+              >
+                Confirm
+              </Button>
+            </Modal.Footer>
 
 
-  </Modal>
-)}
+          </Modal>
+        )}
 
 
         {/* FULL VIEW POPUP */}
         <Modal
-  show={!!fullViewComplaint}
-  onHide={() => setFullViewComplaint(null)}
-  centered
-  className="superadmin-detail-modal detail-modal no-scrollbar"
->
-  <Modal.Body>
+          show={!!fullViewComplaint}
+          onHide={() => setFullViewComplaint(null)}
+          centered
+          className="superadmin-detail-modal detail-modal no-scrollbar"
+        >
+          <Modal.Body>
 
 
-      <button
-    className="modal-close-x"
-    onClick={() => setFullViewComplaint(null)}
-    aria-label="Close"
-  >
-    ×
-  </button>
+            <button
+              className="modal-close-x"
+              onClick={() => setFullViewComplaint(null)}
+              aria-label="Close"
+            >
+              ×
+            </button>
 
-    <h2 className="detail-title">Complaint Details</h2>
+            <h2 className="detail-title">Complaint Details</h2>
 
-    <div className="detail-row">
-      <div className="detail-label">Title:</div>
-      <div className="detail-value">{fullViewComplaint?.title}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">Title:</div>
+              <div className="detail-value">{fullViewComplaint?.title}</div>
+            </div>
 
-    <div className="detail-row">
-      <div className="detail-label">Description:</div>
-      <div className="detail-value">{fullViewComplaint?.description}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">Description:</div>
+              <div className="detail-value">{fullViewComplaint?.description}</div>
+            </div>
 
-    <div className="detail-row">
-      <div className="detail-label">User:</div>
-      <div className="detail-value">{fullViewComplaint?.user_id}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">User:</div>
+              <div className="detail-value">{fullViewComplaint?.user_id}</div>
+            </div>
 
-    <div className="detail-row">
-      <div className="detail-label">Category:</div>
-      <div className="detail-value">{fullViewComplaint?.category}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">Category:</div>
+              <div className="detail-value">{fullViewComplaint?.category}</div>
+            </div>
 
-    <div className="detail-row">
-      <div className="detail-label">Flagged By:</div>
-      <div className="detail-value">{fullViewComplaint?.flagged?.flaggedBy}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">Flagged By:</div>
+              <div className="detail-value">{fullViewComplaint?.flagged?.flaggedBy}</div>
+            </div>
 
-    <div className="detail-row text-white">
-      <div className="detail-label">Reason:</div>
-      <div className="detail-value reason-box">
-        {fullViewComplaint?.flagged?.reason}
-      </div>
-    </div>
+            <div className="detail-row text-white">
+              <div className="detail-label">Reason:</div>
+              <div className="detail-value reason-box">
+                {fullViewComplaint?.flagged?.reason}
+              </div>
+            </div>
 
-    <div className="detail-row">
-      <div className="detail-label">Note:</div>
-      <div className="detail-value">{fullViewComplaint?.flagged?.note}</div>
-    </div>
+            <div className="detail-row">
+              <div className="detail-label">Note:</div>
+              <div className="detail-value">{fullViewComplaint?.flagged?.note}</div>
+            </div>
 
-    <div className="d-flex justify-content-center">
-      <button
-        className="detail-close-btn"
-        onClick={() => setFullViewComplaint(null)}
-      >
-        Close
-      </button>
-    </div>
+            <div className="d-flex justify-content-center">
+              <button
+                className="detail-close-btn"
+                onClick={() => setFullViewComplaint(null)}
+              >
+                Close
+              </button>
+            </div>
 
-  </Modal.Body>
-</Modal>
+          </Modal.Body>
+        </Modal>
 
       </Container>
     </div>
