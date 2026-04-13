@@ -94,7 +94,9 @@ const [expandedReplies, setExpandedReplies] = useState({});
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => {
-      setComplaints(res.data.complaints || []);
+      const fetchedComplaints = res.data.complaints || [];
+      fetchedComplaints.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      setComplaints(fetchedComplaints);
 
       const votes = {};
       (res.data.complaints || []).forEach((complaint) => {
@@ -220,6 +222,8 @@ const getVisibleAdminComments = (complaint) => {
       if (res?.data?.complaint) {
         setExpandedCard(res.data.complaint);
         setReplyTexts((prev) => ({ ...prev, [comment.id]: "" }));
+        // Auto-expand the replies section to show the new reply immediately
+        setExpandedReplies((prev) => ({ ...prev, [comment.id]: true }));
         setOpenReply(null);
         toast.success("Reply added successfully");
       } else {

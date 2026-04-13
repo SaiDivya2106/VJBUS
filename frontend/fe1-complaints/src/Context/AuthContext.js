@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [demoRole, setDemoRole] = useState(localStorage.getItem("demoRole") || "student");
 
   const baseUrl = process.env.REACT_APP_COMPLAINTS_APP_BE_URL;
-  const authServerUrl = process.env.REACT_APP_AUTH_SERVER_URL || "https://authv2.vjstartup.com";
+  const authServerUrl = process.env.REACT_APP_AUTH_SERVER_URL || "http://localhost:2999";
 
   useEffect(() => {
     // Attach token globally and keep interceptor ids so we can eject them on cleanup
@@ -392,6 +392,12 @@ export const AuthProvider = ({ children }) => {
           setUser(data.user);
           checkAdminStatus(data.user.email);
         } else {
+          // Clear localStorage and user state if session is invalid
+          setUser(null);
+          setIsAdmin(false);
+          setAdminCategory(null);
+          localStorage.removeItem("authToken");
+          setAuthToken(null);
           showLoginButton();
         }
       } catch (err) {

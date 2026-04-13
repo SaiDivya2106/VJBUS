@@ -5,13 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port:3105,
-    allowedHosts: [
-      '3d87df051e73.ngrok-free.app',
-      'dev-wall.vjstartup.com'
-    ],
+    port: parseInt(process.env.VITE_PORT) || 3105,
+    allowedHosts: (process.env.VITE_ALLOWED_HOSTS || '').split(',').filter(Boolean),
     optimizeDeps: {
       exclude: ['react-icons']
-      }
+    }
   }
 })

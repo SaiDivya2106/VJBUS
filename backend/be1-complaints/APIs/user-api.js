@@ -31,10 +31,22 @@ userApp.use(exp.json());
 let complaintsCollectionObj;
 let adminsCollectionObj;
 
-// Middleware to get the collection object from the app
+// Middleware to get the collection object from the app and fail-fast if missing
 userApp.use((req, res, next) => {
   complaintsCollectionObj = req.app.get("complaintsCollectionObj");
   adminsCollectionObj = req.app.get("adminsCollectionObj");
+
+  if (!complaintsCollectionObj || !adminsCollectionObj) {
+    // Log useful debug info and return a 503 so handlers don't throw
+    console.error('DB collections not available on app object', {
+      complaintsCollectionObj: !!complaintsCollectionObj,
+      adminsCollectionObj: !!adminsCollectionObj,
+      path: req.originalUrl,
+      method: req.method,
+    });
+    return res.status(503).json({ error: 'Service unavailable: database not connected' });
+  }
+
   next();
 });
 
@@ -155,9 +167,7 @@ userApp.post(
           it_details,
         }
         : {}),
-      // timestamp: new Date().toISOString(),
-      timestamp: new Date(),
-
+      timestamp: new Date().toISOString(),
       likes: 0,
       dislikes: 0,
       status: "Pending",
@@ -601,14 +611,7 @@ userApp.post(
         id: new Date().getTime(),
         text: trimmedText,
         role: "student", // Student comment
-        // timestamp: new Date().toISOString(),
-
-
-
-
-
-        timestamp: new Date(),
-
+        timestamp: new Date().toISOString(),
       };
 
       // Update complaint: add comment, change status to Reopened, update lastCommentAt

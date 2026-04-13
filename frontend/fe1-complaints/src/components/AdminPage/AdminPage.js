@@ -598,12 +598,16 @@ useEffect(() => {
 
 
   // Normalize admin categories into array
-const categories = isAssistant
-  ? assistantCategories
-  : (Array.isArray(adminCategory)
+  const adminCats = Array.isArray(adminCategory)
       ? adminCategory
-      : [adminCategory].filter(Boolean)
-    );
+      : [adminCategory].filter(Boolean);
+
+  // Combine admin, assistant, and currently visible complaints' categories so nothing is missed
+  const fetchedComplaintCats = complaints.map(c => c.category).filter(Boolean);
+  const allPossibleCategories = [...new Set([...adminCats, ...assistantCategories, ...fetchedComplaintCats])];
+  
+  // Filter out 'All Categories' literal string to avoid duplicating the hardcoded 'All' option
+  const categories = allPossibleCategories.filter(cat => cat && cat !== "All Categories" && cat !== "All");
 
 
   const [selectedCategory, setSelectedCategory] = useState("All");

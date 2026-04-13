@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../styles/Login.css";
 import '../components/NavigationBar.jsx'; // Import NavigationBar for consistent styling
+// import dotenv from "dotenv";
+// dotenv.config();
 
-// Declare google as a global variable. For production, consider using @types/google.accounts
-/* global google */
-
-const API_URL = "https://dev-auth.vjstartup.com"; // **IMPORTANT: Your actual backend API URL**
+const API_URL = import.meta.env.VITE_AUTH_SERVER_URL; // Use .env for backend API URL
 
 const Login = () => {
   const [user, setUser] = useState(null); // Stores the logged-in user's info
@@ -47,45 +46,38 @@ const Login = () => {
   };
 
   // --- Function to update user state based on the 'user' cookie and localStorage ---
-  const updateUserStateFromCookie = () => {
+  const updateUserStateFromCookie = async () => {
     console.log("Login.js: updateUserStateFromCookie called");
-    const userCookie = getCookieValue("user");
-    if (userCookie) {
-      let parsedUser = null;
-      try {
-        parsedUser = JSON.parse(userCookie);
-      } catch (e) {
-        console.log("Login.js: Cookie not direct JSON, attempting JWT decode.");
-        if (userCookie.split('.').length === 3) {
-          try {
-            parsedUser = decodeJwt(userCookie);
-          } catch (jwtError) {
-            console.error("Login.js: Error decoding JWT from user cookie:", jwtError);
-          }
-        }
-      }
-      if (parsedUser) {
+
+    try {
+      const response = await fetch(`${API_URL}/check-auth`, {
+        credentials: "include", // important for cookies
+      });
+
+      const data = await response.json();
+
+      console.log("Auth response:", data);
+
+      if (data.logged_in && data.user) {
+        const user = data.user;
+
         setUser({
-          name: parsedUser.name || parsedUser.given_name || parsedUser.family_name || 'Student',
-          email: parsedUser.email || ''
+          name: user.name || user.family_name || "Student",
+          email: user.email || "",
+          picture: user.picture || "",
         });
-        // Set user in localStorage and dispatch event
-        localStorage.setItem('user', JSON.stringify(parsedUser));
-        console.log("Login.js: User data set in localStorage. Dispatching 'loginStatusChanged' event.");
-        window.dispatchEvent(new Event('loginStatusChanged')); // <--- KEY DISPATCH
+
+        // Dispatch login event for NavigationBar
+        window.dispatchEvent(new Event("user-login"));
       } else {
         setUser(null);
-        // Remove from localStorage and dispatch event if cookie is invalid
-        localStorage.removeItem('user');
-        console.log("Login.js: Invalid user cookie. Removing from localStorage. Dispatching 'loginStatusChanged' event.");
-        window.dispatchEvent(new Event('loginStatusChanged')); // <--- KEY DISPATCH
-      }
-    } else {
+        window.dispatchEvent(new Event("user-logout"));
+
+      } 
+    } catch (error) {
+      console.error("Auth check failed:", error);
       setUser(null);
-      // Remove from localStorage and dispatch event if no user cookie
-      localStorage.removeItem('user');
-      console.log("Login.js: No user cookie found. Removing from localStorage. Dispatching 'loginStatusChanged' event.");
-      window.dispatchEvent(new Event('loginStatusChanged')); // <--- KEY DISPATCH
+      window.dispatchEvent(new Event('user-logout'));
     }
   };
 
@@ -109,12 +101,13 @@ const Login = () => {
       if (data.user) { // Assuming `data.user` indicates success and contains user info
         console.log("Login.js: Backend auth successful. Updating user state.");
         updateUserStateFromCookie(); // This will now update localStorage and dispatch event
+        setUser(data.user); // Update local state immediately for responsiveness
+        console.log(" Dispatching 'user-login' event.");
         window.dispatchEvent(new Event("user-login"));
         // window.location.reload(); // Reload to ensure the UI reflects the new user state
       } else {
         alert("❌ Login failed! " + (data.message || "Please try again."));
         setUser(null);
-        localStorage.removeItem('user'); // Ensure localStorage is cleared on failed login
         console.log("Login.js: Login failed from backend. Dispatching 'loginStatusChanged' event.");
         window.dispatchEvent(new Event('loginStatusChanged')); // <--- EXPLICIT DISPATCH ON FAILURE
       }
@@ -122,7 +115,6 @@ const Login = () => {
       console.error("Login.js: Error during Google authentication:", error);
       alert("Error during login. Please try again.");
       setUser(null);
-      localStorage.removeItem('user'); // Ensure localStorage is cleared on error
       console.log("Login.js: Error during auth fetch. Dispatching 'loginStatusChanged' event.");
       window.dispatchEvent(new Event('loginStatusChanged')); // <--- EXPLICIT DISPATCH ON ERROR
     } finally {
@@ -165,7 +157,7 @@ const Login = () => {
       // const res = await fetch('/get-google-client-id');
       // const data = await res.json();
       // setGoogleClientId(data.apiKey);
-      setGoogleClientId("522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com");
+      setGoogleClientId(import.meta.env.VITE_GOOGLE_CLIENT_ID);
       console.log("Login.js: Google Client ID fetched successfully.");
     } catch (error) {
       console.error("Login.js: Error fetching Google Client ID:", error);

@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config(); // Load environment variables first
+
 import 'express'; // This ensures global types are merged
 import express, { Request, Response, NextFunction } from 'express';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { PORT } from './config';
@@ -11,17 +13,21 @@ import { mentorRoutes } from './routes/mentor.routes';
 import securityRoutes from './routes/security.routes'; // ✅ correct import
 import userRoutes from './routes/user.routes'; // ✅ new user routes
 import adminRoutes from './routes/admin.routes'; // ✅ new admin routes
-// import cronJob from './utils/cron';
-//cronJob.start();
+import { keepAliveJob, autoRejectJob } from './utils/cron';
 
-dotenv.config();
+// Start cron jobs
+keepAliveJob.start();
+autoRejectJob.start();
+console.log('🕐 Cron jobs started: Keep-alive and Auto-rejection');
+
 const app = express();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'http://localhost:3000',
+  'http://localhost:3112',
   'https://dev-outpass.vjstartup.com',
   'https://outpass.vjstartup.com',
+
 ];
 
 app.use(cors({

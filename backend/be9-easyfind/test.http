@@ -45,7 +45,7 @@ Content-Type: application/json
 
 
 ###
-POST https://easyfind.vnrzone.site/ef-be/api/items/lost
+POST https://easyfind.vjstartup.com/ef-be/api/items/lost
 Content-Type: application/json
 
 {

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { prisma } from '../prisma/client'
 import { generateQRCode, generateToken } from '../utils/qr.util'
 import { GatePassStatus } from '@prisma/client' // ✅ enum import
+import { smsService } from '../utils/sms.util'
 
 export async function getMentorRequests(req: Request, res: Response) {
   const mentor = (req as any).user
@@ -84,6 +85,24 @@ export async function respondToRequest(req: Request, res: Response): Promise<any
 
       }
     })
+
+    // Send SMS notifications for approval/rejection
+    try {
+      const gatePassWithDetails = await prisma.gatePass.findUnique({
+        where: { id: gatePassId },
+        include: {
+          student: true
+        }
+      });
+
+      // SMS notifications for approval/rejection are not implemented
+      // Only mentor notification (on application) and parent QR scan notification are available
+      console.log(`✅ Gate pass ${action.toLowerCase()}d for student: ${gatePassWithDetails?.student?.name || 'Unknown'}`);
+
+    } catch (error) {
+      console.error('Action processing error:', error);
+      // Don't fail the request if there's an error
+    }
 
     res.json({ message: `Gate pass ${action.toLowerCase()}d`, gatePass: updated, qr })
   } catch (err) {

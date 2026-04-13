@@ -4,11 +4,12 @@ import { MessageCircle, PlayCircle, ThumbsUp, Filter, ChevronDown, ChevronUp } f
 import ProjectModal from './components/ProjectModal';
 import Navbar from './components/Navbar';
 import { Project } from './types';
-import handleCredentialResponse from './components/handleCrendentialResponse';
+// import handleCredentialResponse from './components/handleCrendentialResponse';
 import MyProjects from './components/MyProjects';
 import Upload from './components/Upload';
 import './App.css';
 import bgImage from './images/12.png'; // adjust the path if you're in a subfolder
+
 
 
 declare global {
@@ -33,25 +34,27 @@ export interface User {
   picture: string;
 }
 
-// ✅ Load user from cookie if available
-function getUserFromCookie(): User | null {
-  const userCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('user='));
 
-  if (userCookie) {
-    try {
-      const value = decodeURIComponent(userCookie.split('=')[1]);
-      return JSON.parse(value);
-    } catch (err) {
-      console.error('Failed to parse user cookie:', err);
+// SSO: Always check auth-server for user state
+async function fetchUserFromAuthServer(): Promise<User | null> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_AUTH_SERVER_URL || ''}/check-auth`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (data.logged_in && data.user) {
+      return data.user;
     }
+    return null;
+  } catch (err) {
+    console.error('Failed to fetch user from auth-server:', err);
+    return null;
   }
-  return null;
 }
 
 function App() {
-  const [user, setUser] = useState<User | null>(() => getUserFromCookie());
+  const [user, setUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -61,30 +64,58 @@ function App() {
   const [selectedDepartments, setSelectedDepartments] = useState<Set<string>>(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // ✅ Google login button init
+  // SSO: On mount, check auth-server for user
   useEffect(() => {
-    if (window.google?.accounts?.id && !user) {
-      window.google.accounts.id.initialize({
-        client_id: '522460567146-ubk3ojomopil8f68hl73jt1pj0jbbm68.apps.googleusercontent.com',
-        callback: (response: any) => {
-          const decoded = handleCredentialResponse(response);
-          setUser(decoded);
-          document.cookie = `user=${encodeURIComponent(JSON.stringify(decoded))}; path=/; SameSite=Lax`;
-        }
-      });
+    fetchUserFromAuthServer().then(setUser);
+  }, []);
 
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-login-button')!,
-        { theme: 'outline', size: 'large' }
-      );
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   const handleMessage = async (event: MessageEvent) => {
+  //     // security check
+  //     if (event.origin !== window.location.origin) return;
+
+  //     if (event.data?.type === "AUTH_UPDATED") {
+  //       await fetchUserFromAuthServer();
+  //       setUser(event.data.user)
+  //     }
+  //   };
+
+  //   window.addEventListener("message", handleMessage);
+  //   return () => window.removeEventListener("message", handleMessage);
+  // }, []);
+
+  useEffect(() => {
+  if (user) return;
+  const script = document.createElement("script");
+  script.src = "https://accounts.google.com/gsi/client";
+  script.async = true;
+  script.defer = true;
+  document.body.appendChild(script);
+
+  script.onload = () => {
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: handleGoogleResponse,
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById("google-login-button"),
+      {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "pill",
+        width: 250,
+      }
+    );
+  };
+}, [user]);
 
   // ✅ Fetch projects and tags/departments only after login
   useEffect(() => {
     if (!user) return;
 
-    fetch(`${API_URL}/projects`)
+    fetch(`${API_URL}/projects/`)
       .then(res => res.json())
       .then(data => {
         const formatted = data.map((item: any) => ({
@@ -93,9 +124,7 @@ function App() {
           abstract: item.abstract,
           techStack: item.domain ? [item.domain] : [],
           tags: item.tags ? item.tags.split(',').map((tag: string) => tag.trim()) : [],
-          thumbnail: item.cover_poster
-            ? `${API_URL}/uploads/${item.cover_poster}`
-            : 'https://via.placeholder.com/500x300?text=No+Cover',
+          thumbnail: item.cover_poster ? `${API_URL}/uploads/${item.cover_poster}`: 'https://via.placeholder.com/500x300?text=No+Cover',
           images: [
             item.cover_poster
               ? `${API_URL}/uploads/${item.cover_poster}`
@@ -108,8 +137,8 @@ function App() {
               : 'https://via.placeholder.com/800x500?text=No+Methodology'
           ],
           demoUrl: item.drive_link || '#',
-          likes: item.aggr_upvote_count || 0, // Display the likes count
-          comments: item.agggr_comment_count || 0, // Display the comment count
+          likes: item.aggr_upvote_count || 0,
+          comments: item.agggr_comment_count || 0,
           department: item.department || 'General',
           team: item.team_details || '',
           mentor: item.mentor_name || '',
@@ -120,16 +149,14 @@ function App() {
             ? `${API_URL}/uploads/${item.pdf_poster}`
             : null
         }));
-        setProjects(formatted);
-
-        // Extract unique tags and departments from the project data
         const allTags = new Set<string>();
         const allDepartments = new Set<string>();
         data.forEach((item: any) => {
           item.tags && item.tags.split(',').forEach((tag: string) => allTags.add(tag.trim()));
           item.department && allDepartments.add(item.department);
         });
-
+        // console.log('User after login:', formatted);
+        setProjects(formatted);
         setTags([...allTags]);
         setDepartments([...allDepartments]);
       })
@@ -143,6 +170,39 @@ function App() {
       return newTags;
     });
   };
+
+  const handleGoogleResponse = async (response: any) => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_AUTH_SERVER_URL}/auth/google`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // VERY IMPORTANT for cookies
+        body: JSON.stringify({
+          token: response.credential,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Auth failed:", data);
+      return;
+    }
+
+    console.log("✅ Logged in:", data.user);
+
+    // set user in frontend
+    setUser(data.user);
+  } catch (err) {
+    console.error("Google login error:", err);
+  }
+};
+
 
   const handleDepartmentToggle = (department: string) => {
     setSelectedDepartments(prev => {

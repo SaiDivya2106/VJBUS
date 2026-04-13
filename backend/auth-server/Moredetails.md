@@ -407,3 +407,9 @@ const verifyAuth = async (req, res, next) => {
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
+
+## Smoke Test
+
+node scripts/smoke-test.js
+ or
+npm run test:smoke
