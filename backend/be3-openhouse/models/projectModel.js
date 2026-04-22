@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS projects (
   drive_link TEXT, 
   user_name TEXT, 
   phone_number TEXT, 
+  upload_date DATE,
   comments_count INTEGER DEFAULT 0, 
   votes_count INTEGER DEFAULT 0
     )

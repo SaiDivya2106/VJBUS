@@ -12,10 +12,11 @@ router.post('/upload-project', upload.fields([
   { name: 'pdf_poster' }
 ]), projectController.createProject);
 
-router.delete('/:id',  projectController.deleteProject);
+router.delete('/:id', projectController.deleteProject);
 
 
 router.get('/', projectController.getProjects);
+router.get('/stats', projectController.getStats);
 router.get('/me', projectController.getProjectsByUserName);
 
 router.get('/:id', projectController.getProject);

@@ -14,7 +14,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 0.5rem;
     max-width: 1500px;
     margin: 0 auto;
     flex-wrap: nowrap; /* Prevent breaking to new line */

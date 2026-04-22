@@ -47,15 +47,19 @@ const addComment = async (req, res) => {
   }
 };
 
-// Get all projects
+// Get projects with pagination and filtering
 const getProjects = (req, res) => {
-  console.log("level1: Fetching all projects with aggr counts")
+  const { page, limit, tags, department } = req.query;
+  const options = { page, limit, tags, department };
 
-  projectService.getAllProjects((err, projects) => {
+  console.log("Fetching projects with options:", options);
+
+  projectService.getAllProjects(options, (err, result) => {
     if (err) {
+      console.error('Error fetching projects:', err);
       return res.status(500).send('Error fetching projects');
     }
-    res.status(200).json(projects);
+    res.status(200).json(result);
   });
 };
 
@@ -80,7 +84,7 @@ const extractUsernameFromCookie = (req) => {
 
   // If cookies are not available, return null or handle it as needed
   if (!cookies) {
-      return null;
+    return null;
   }
 
   // Split the cookie string into individual cookies
@@ -90,7 +94,7 @@ const extractUsernameFromCookie = (req) => {
   const userCookie = cookiesArray.find(cookie => cookie.trim().startsWith('user='));
 
   if (!userCookie) {
-      return null;
+    return null;
   }
 
   // Get the value of the 'user' cookie (after 'user=')
@@ -101,15 +105,15 @@ const extractUsernameFromCookie = (req) => {
 
   // Parse the decoded string as JSON to access the user data
   try {
-      const userData = JSON.parse(decodedUser);
+    const userData = JSON.parse(decodedUser);
 
-      // Extract the part before '@' in the email
-      const username = userData.email.split('@')[0]; // Split the email at '@' and take the first part
-      
-      return username;
+    // Extract the part before '@' in the email
+    const username = userData.email.split('@')[0]; // Split the email at '@' and take the first part
+
+    return username;
   } catch (error) {
-      console.error('Error parsing user cookie:', error);
-      return null;
+    console.error('Error parsing user cookie:', error);
+    return null;
   }
 };
 
@@ -254,15 +258,27 @@ const getCommentsAndUpvotes = async (req, res) => {
 
 
 
+const getStats = async (req, res) => {
+  try {
+    const stats = await projectService.getProjectStats();
+    res.status(200).json(stats);
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+    res.status(500).json({ error: 'Error fetching stats' });
+  }
+};
+
+
 module.exports = {
   createProject,
   getProjects,
-  getProject, 
+  getProject,
   getProjectsByUserName,
   addComment,
   upvoteProject,
   deleteProject,
   removeVote,
   removeComment,
-  getCommentsAndUpvotes
+  getCommentsAndUpvotes,
+  getStats
 };

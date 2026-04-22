@@ -18,11 +18,12 @@ const addProject = (projectData, fileData, callback) => {
   console.log('PDF Poster File:', pdf_poster);
   console.log('Phone number:', phone_number);
 
+  const upload_date = new Date().toISOString().split('T')[0];
   const query = `
-    INSERT INTO projects (title, abstract, team_details, department, tags, domain, is_software, methodology, result, cover_poster, pdf_poster, mentor_name, startup_potential, drive_link, user_name, phone_number)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO projects (title, abstract, team_details, department, tags, domain, is_software, methodology, result, cover_poster, pdf_poster, mentor_name, startup_potential, drive_link, user_name, phone_number, upload_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
-  const params = [title, abstract, team_details, department, tags, domain, is_software, methodology, result, cover_poster, pdf_poster, mentor_name, startup_potential, drive_link, user_name, phone_number];
+  const params = [title, abstract, team_details, department, tags, domain, is_software, methodology, result, cover_poster, pdf_poster, mentor_name, startup_potential, drive_link, user_name, phone_number, upload_date];
 
   db.run(query, params, function (err) {
     if (err) {
@@ -39,7 +40,7 @@ const addComment = async (projectId, userName, commentText) => {
   try {
     // Insert the comment into the database (SQLite)
     const query = 'INSERT INTO comments (project_id, user_name, comment_text) VALUES (?, ?, ?)';
-    
+
     // Return a Promise to ensure async/await works
     await new Promise((resolve, reject) => {
       db.run(query, [projectId, userName, commentText], function (err) {
@@ -60,26 +61,62 @@ const addComment = async (projectId, userName, commentText) => {
 // Get a project by ID
 const getProjectByUser = (id, callback) => {
   db.all('SELECT * FROM projects WHERE user_name = ?', [id], (err, row) => {
-    
+
     callback(err, row);
   });
 };
 
-// Get all projects
-const getAllProjects = (callback) => {
-  // Query to fetch all projects and their associated vote and comment counts
-  console.log("Fetching all projects with aggr counts")
+// Get all projects with filtering and pagination
+const getAllProjects = (options, callback) => {
+  const { page = 1, limit = 30, tags, department } = options;
+  const offset = (page - 1) * limit;
+
+  let whereClauses = [];
+  let params = [];
+
+  if (department) {
+    whereClauses.push('p.department = ?');
+    params.push(department);
+  }
+
+  if (tags) {
+    // tags is expected to be a string or array
+    const tagList = Array.isArray(tags) ? tags : [tags];
+    tagList.forEach(tag => {
+      whereClauses.push('p.tags LIKE ?');
+      params.push(`%${tag}%`);
+    });
+  }
+
+  const whereStr = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+  const countQuery = `SELECT COUNT(*) as total FROM projects p ${whereStr}`;
+
   const query = `
     SELECT 
       p.*, 
-      (SELECT COUNT(*) FROM comments WHERE project_id = p.id) AS agggr_comment_count,
+      (SELECT COUNT(*) FROM comments WHERE project_id = p.id) AS aggr_comment_count,
       (SELECT COUNT(*) FROM votes WHERE project_id = p.id AND vote_type = 'upvote') AS aggr_upvote_count
     FROM projects p
+    ${whereStr}
+    ORDER BY p.id DESC
+    LIMIT ? OFFSET ?
   `;
-  
-  // Execute the query
-  db.all(query, [], (err, rows) => {
-    callback(err, rows);  // Return the result to the callback
+
+  const queryParams = [...params, parseInt(limit), parseInt(offset)];
+
+  db.get(countQuery, params, (err, countResult) => {
+    if (err) return callback(err);
+
+    db.all(query, queryParams, (err, rows) => {
+      if (err) return callback(err);
+      callback(null, {
+        projects: rows,
+        total: countResult.total,
+        page: parseInt(page),
+        limit: parseInt(limit)
+      });
+    });
   });
 };
 
@@ -92,7 +129,7 @@ const getProjectById = (id, callback) => {
 
 // Update a project by ID// Update a project by ID
 const updateProjectById = (id, projectData, fileData, callback) => {
-  const { title, abstract, team_details, department, tags, domain, is_software, mentor_name, startup_potential, drive_link} = projectData;
+  const { title, abstract, team_details, department, tags, domain, is_software, mentor_name, startup_potential, drive_link } = projectData;
   const { methodology, result, cover_poster, pdf_poster } = fileData;
 
   const query = `
@@ -115,24 +152,24 @@ const updateProjectById = (id, projectData, fileData, callback) => {
   `;
 
   const params = [
-    title, 
-    abstract, 
-    team_details, 
-    department, 
-    tags, 
-    domain, 
-    is_software, 
-    methodology, 
-    result, 
-    cover_poster, 
-    pdf_poster, 
-    mentor_name,         
-    startup_potential,   
-    drive_link,          
+    title,
+    abstract,
+    team_details,
+    department,
+    tags,
+    domain,
+    is_software,
+    methodology,
+    result,
+    cover_poster,
+    pdf_poster,
+    mentor_name,
+    startup_potential,
+    drive_link,
     id
   ];
 
-  db.run(query, params, function(err) {
+  db.run(query, params, function (err) {
     if (err) {
       console.error('Error occurred during Update:', err);  // Log error
       return callback(err);  // Pass it to callback
@@ -144,7 +181,7 @@ const updateProjectById = (id, projectData, fileData, callback) => {
 // Delete a project by ID using Promises
 const deleteProjectById = (id) => {
   return new Promise((resolve, reject) => {
-    db.run('DELETE FROM projects WHERE id = ?', [id], function(err) {
+    db.run('DELETE FROM projects WHERE id = ?', [id], function (err) {
       if (err) {
         console.error('Error occurred during delete:', err);
         return reject(err);  // Reject the promise if an error occurs
@@ -170,13 +207,13 @@ const upvoteProject = async (projectId, userName) => {
     });
 
     if (rows.length > 0) {
-        // Nothing needs to be done. Already user upvoted. 
-        return 'Vote removed successfully';  // Return remove vote message
+      // Nothing needs to be done. Already user upvoted. 
+      return 'Vote removed successfully';  // Return remove vote message
     } else {
       // If no vote exists, add an upvote for the project
       const insertQuery = 'INSERT INTO votes (project_id, user_name, vote_type) VALUES (?, ?, ?)';
       await new Promise((resolve, reject) => {
-        db.run(insertQuery, [projectId, userName, 'upvote'], function(err) {
+        db.run(insertQuery, [projectId, userName, 'upvote'], function (err) {
           if (err) reject(err);
           else resolve(this);
         });
@@ -306,6 +343,24 @@ const getProjectCommentsAndUpvotes = async (projectId) => {
 };
 
 
+const getProjectStats = () => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        department,
+        strftime('%Y', upload_date) as year,
+        COUNT(*) as count
+      FROM projects
+      GROUP BY department, year
+    `;
+    db.all(query, [], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+};
+
+
 module.exports = {
   addProject,
   getAllProjects,
@@ -317,5 +372,6 @@ module.exports = {
   upvoteProject,
   removeVote,
   removeComment,
-  getProjectCommentsAndUpvotes
+  getProjectCommentsAndUpvotes,
+  getProjectStats
 };

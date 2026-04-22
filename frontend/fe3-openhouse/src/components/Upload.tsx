@@ -15,8 +15,8 @@ const MAX_PDF_SIZE_BYTES = MAX_PDF_SIZE_MB * 1024 * 1024;
 
 // Department Options
 const DEPARTMENTS = [
-    "CE", "EEE", "ECE", "ME", "CSE", "CS-AIML", "CS-DS",
-    "CS-IOT", "CS-CyS", "AI & DS", "CSBS", "EIE", "IT", "AE"
+  "CE", "EEE", "ECE", "ME", "CSE", "CS-AIML", "CS-DS",
+  "CS-IOT", "CS-CyS", "AI & DS", "CSBS", "EIE", "IT", "AE"
 ];
 
 // --- Types ---
@@ -84,9 +84,9 @@ const performActualUpload = async (formDataObject: any) => {
 
   try {
     const response = await fetch(endpointUrl, {
-        method: 'POST',
-        body: data
-        // No 'Content-Type' header needed for FormData, browser sets it with boundary
+      method: 'POST',
+      body: data
+      // No 'Content-Type' header needed for FormData, browser sets it with boundary
     });
 
     // Check response status
@@ -97,7 +97,7 @@ const performActualUpload = async (formDataObject: any) => {
         const text = await response.text();
         // Avoid parsing HTML error pages as JSON
         if (text && text.trim().toLowerCase().startsWith('<!doctype html')) {
-             console.warn("Backend returned an HTML error page instead of JSON/text error.");
+          console.warn("Backend returned an HTML error page instead of JSON/text error.");
         } else if (text) {
           // Try parsing as JSON, fallback to raw text
           try {
@@ -142,7 +142,7 @@ function Upload({ user }: UploadProps) {
   const [abstract, setAbstract] = useState('');
   const [teamDetails, setTeamDetails] = useState('');
   const [department, setDepartment] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState('OpenHouse2026');
   const [domain, setDomain] = useState('');
   const [isSoftwareOnly, setIsSoftwareOnly] = useState(false); // Boolean state
   const [methodologyFile, setMethodologyFile] = useState<File | null>(null);
@@ -187,23 +187,23 @@ function Upload({ user }: UploadProps) {
     else if (name === 'mentorName') { if (!value.trim()) error = 'Faculty Mentor Name is required.'; }
     else if (name === 'startupPotential') { if (!value || value === "") error = 'Startup potential selection is required.'; }
     else if (name === 'driveLink') {
-        if (value.trim()) {  // If the value is not empty
-            try {
-                new URL(value); // Basic URL format check
-            } catch (_) { error = 'Please enter a valid URL format (e.g., https://...).'; }
-        }
+      if (value.trim()) {  // If the value is not empty
+        try {
+          new URL(value); // Basic URL format check
+        } catch (_) { error = 'Please enter a valid URL format (e.g., https://...).'; }
+      }
     }
     // Validate File Fields (only if file is provided or if it's being checked on submit)
     else if (file === null) {
-        // Only trigger 'required' error on submit check, not file clear
+      // Only trigger 'required' error on submit check, not file clear
     } else { // File exists, check size and type
-        if (['methodologyFile', 'resultFile', 'coverPosterFile'].includes(name)) {
-            if (!file.type.startsWith('image/')) { error = `Invalid file type. Please select an image.`; }
-            else if (file.size > MAX_IMAGE_SIZE_BYTES) { error = `Image exceeds ${MAX_IMAGE_SIZE_MB}MB size limit.`; }
-        } else if (name === 'pdfPosterFile') {
-            if (!file.type.includes('pdf')) { error = 'Invalid file type. Please select a PDF.'; }
-            else if (file.size > MAX_PDF_SIZE_BYTES) { error = `PDF Poster exceeds ${MAX_PDF_SIZE_MB}MB size limit.`; }
-        }
+      if (['methodologyFile', 'resultFile', 'coverPosterFile'].includes(name)) {
+        if (!file.type.startsWith('image/')) { error = `Invalid file type. Please select an image.`; }
+        else if (file.size > MAX_IMAGE_SIZE_BYTES) { error = `Image exceeds ${MAX_IMAGE_SIZE_MB}MB size limit.`; }
+      } else if (name === 'pdfPosterFile') {
+        if (!file.type.includes('pdf')) { error = 'Invalid file type. Please select a PDF.'; }
+        else if (file.size > MAX_PDF_SIZE_BYTES) { error = `PDF Poster exceeds ${MAX_PDF_SIZE_MB}MB size limit.`; }
+      }
     }
     // Update errors state
     setErrors(prev => ({ ...prev, [name]: error }));
@@ -216,49 +216,49 @@ function Upload({ user }: UploadProps) {
     const { name, value } = e.target;
     // Update corresponding state
     switch (name) {
-        case 'title': setTitle(value); break;
-        case 'abstract': setAbstract(value); break;
-        case 'teamDetails': setTeamDetails(value); break;
-        case 'tags': setTags(value); break;
-        case 'domain': setDomain(value); break;
-        case 'mentorName': setMentorName(value); break;
-        case 'driveLink': setDriveLink(value); break;
-        case 'phoneNumber': setPhoneNumber(value); break; // New handler for phone number
-        default: break;
+      case 'title': setTitle(value); break;
+      case 'abstract': setAbstract(value); break;
+      case 'teamDetails': setTeamDetails(value); break;
+      case 'tags': setTags(value); break;
+      case 'domain': setDomain(value); break;
+      case 'mentorName': setMentorName(value); break;
+      case 'driveLink': setDriveLink(value); break;
+      case 'phoneNumber': setPhoneNumber(value); break; // New handler for phone number
+      default: break;
     }
-     // Clear error for this field on change
-     if (errors[name]) {
-         setErrors(prev => ({ ...prev, [name]: null }));
-     }
+    // Clear error for this field on change
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      if (name === 'department') {
-          setDepartment(value);
-          validateField('department', value); // Validate immediately
-      } else if (name === 'startupPotential') {
-          setStartupPotential(value);
-          validateField('startupPotential', value); // Validate immediately
-      }
-     // Clear error for this field on change
-     if (errors[name]) {
-         setErrors(prev => ({ ...prev, [name]: null }));
-     }
+    const { name, value } = e.target;
+    if (name === 'department') {
+      setDepartment(value);
+      validateField('department', value); // Validate immediately
+    } else if (name === 'startupPotential') {
+      setStartupPotential(value);
+      validateField('startupPotential', value); // Validate immediately
+    }
+    // Clear error for this field on change
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Update boolean state directly
-      setIsSoftwareOnly(e.target.checked);
+    // Update boolean state directly
+    setIsSoftwareOnly(e.target.checked);
   };
 
   // Debounced blur validation
   const handleTextBlur = debounce((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-     const { name, value } = e.target;
-     // Validate text/url fields on blur
-     if (['title', 'abstract', 'teamDetails', 'tags', 'domain', 'mentorName', 'driveLink'].includes(name)) {
-        validateField(name, value);
-     }
+    const { name, value } = e.target;
+    // Validate text/url fields on blur
+    if (['title', 'abstract', 'teamDetails', 'tags', 'domain', 'mentorName', 'driveLink'].includes(name)) {
+      validateField(name, value);
+    }
   }, 300); // 300ms delay
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,11 +272,11 @@ function Upload({ user }: UploadProps) {
 
     // Update state with the selected file
     switch (name) {
-        case 'methodologyFile': setMethodologyFile(file); break;
-        case 'resultFile': setResultFile(file); break;
-        case 'coverPosterFile': setCoverPosterFile(file); break;
-        case 'pdfPosterFile': setPdfPosterFile(file); break;
-        default: break;
+      case 'methodologyFile': setMethodologyFile(file); break;
+      case 'resultFile': setResultFile(file); break;
+      case 'coverPosterFile': setCoverPosterFile(file); break;
+      case 'pdfPosterFile': setPdfPosterFile(file); break;
+      default: break;
     }
 
     // Validate the selected file (if one exists)
@@ -284,14 +284,14 @@ function Upload({ user }: UploadProps) {
       const isValid = await validateField(name, '', file);
       // If validation fails for the *newly selected* file, clear state and input
       if (!isValid) {
-          inputRef.value = ''; // Clear the file input visually
-           switch (name) { // Clear the corresponding state variable
-               case 'methodologyFile': setMethodologyFile(null); break;
-               case 'resultFile': setResultFile(null); break;
-               case 'coverPosterFile': setCoverPosterFile(null); break;
-               case 'pdfPosterFile': setPdfPosterFile(null); break;
-               default: break;
-           }
+        inputRef.value = ''; // Clear the file input visually
+        switch (name) { // Clear the corresponding state variable
+          case 'methodologyFile': setMethodologyFile(null); break;
+          case 'resultFile': setResultFile(null); break;
+          case 'coverPosterFile': setCoverPosterFile(null); break;
+          case 'pdfPosterFile': setPdfPosterFile(null); break;
+          default: break;
+        }
       }
     }
     // If file is null (cleared), no immediate validation needed here
@@ -323,21 +323,21 @@ function Upload({ user }: UploadProps) {
       validateField('coverPosterFile', '', coverPosterFile),
       validateField('pdfPosterFile', '', pdfPosterFile)
     ];
-    
+
     const validationResults = await Promise.all(validationPromises);
     const formIsValid = validationResults.every(isValid => isValid);
     // --- End Validation ---
 
     if (!formIsValid) {
       console.log("Client-side validation failed. Errors:", errors);
-       // Focus the first field with an error
-       const firstErrorFieldKey = Object.keys(errors).find(key => errors[key]);
-       if(firstErrorFieldKey) {
-          const element = document.getElementById(firstErrorFieldKey);
-          element?.focus({ preventScroll: true }); // Focus the element
-          // Scroll into view smoothly, centered if possible
-          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-       }
+      // Focus the first field with an error
+      const firstErrorFieldKey = Object.keys(errors).find(key => errors[key]);
+      if (firstErrorFieldKey) {
+        const element = document.getElementById(firstErrorFieldKey);
+        element?.focus({ preventScroll: true }); // Focus the element
+        // Scroll into view smoothly, centered if possible
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       setSubmitStatus({ message: 'Please review the form and fix the highlighted errors.', type: 'error' });
       setIsSubmitting(false); // Stop submission process
       return; // Exit handler
@@ -346,54 +346,54 @@ function Upload({ user }: UploadProps) {
     // If validation passes
     console.log('Client-side validation passed. Attempting backend upload...');
     const formDataToSubmit = {
-        title, abstract, teamDetails, department, tags, domain,
-        isSoftwareOnly, mentorName, startupPotential, driveLink,
-        methodologyFile, resultFile, coverPosterFile, pdfPosterFile, user_name, phoneNumber
+      title, abstract, teamDetails, department, tags, domain,
+      isSoftwareOnly, mentorName, startupPotential, driveLink,
+      methodologyFile, resultFile, coverPosterFile, pdfPosterFile, user_name, phoneNumber
     };
 
     // --- Call the upload function ---
     try {
-        console.log("Just before upload");
-        console.log(user_name); // Example: Display the user object in the console
+      console.log("Just before upload");
+      console.log(user_name); // Example: Display the user object in the console
 
-        
-        const result = await performActualUpload(formDataToSubmit);
-        setSubmitStatus({ message: result.message || 'Upload successful!', type: 'success' });
-        console.log("Submission successful.");
 
-        // --- Clear form fields on success ---
-        setTitle('');
-        setAbstract('');
-        setTeamDetails('');
-        setDepartment('');
-        setTags('');
-        setDomain('');
-        setIsSoftwareOnly(false);
-        setMentorName('');
-        setStartupPotential('');
-        setDriveLink('');
-        // Clear file states
-        setMethodologyFile(null);
-        setResultFile(null);
-        setCoverPosterFile(null);
-        setPdfPosterFile(null);
-        // Clear file input elements using refs
-        if(methodologyInputRef.current) methodologyInputRef.current.value = '';
-        if(resultsInputRef.current) resultsInputRef.current.value = '';
-        if(coverPosterInputRef.current) coverPosterInputRef.current.value = '';
-        if(pdfInputRef.current) pdfInputRef.current.value = '';
-        // Clear errors
-        setErrors({});
-        // --- End Form Clear ---
+      const result = await performActualUpload(formDataToSubmit);
+      setSubmitStatus({ message: result.message || 'Upload successful!', type: 'success' });
+      console.log("Submission successful.");
+
+      // --- Clear form fields on success ---
+      setTitle('');
+      setAbstract('');
+      setTeamDetails('');
+      setDepartment('');
+      setTags('');
+      setDomain('');
+      setIsSoftwareOnly(false);
+      setMentorName('');
+      setStartupPotential('');
+      setDriveLink('');
+      // Clear file states
+      setMethodologyFile(null);
+      setResultFile(null);
+      setCoverPosterFile(null);
+      setPdfPosterFile(null);
+      // Clear file input elements using refs
+      if (methodologyInputRef.current) methodologyInputRef.current.value = '';
+      if (resultsInputRef.current) resultsInputRef.current.value = '';
+      if (coverPosterInputRef.current) coverPosterInputRef.current.value = '';
+      if (pdfInputRef.current) pdfInputRef.current.value = '';
+      // Clear errors
+      setErrors({});
+      // --- End Form Clear ---
 
     } catch (error) {
-        // Handle errors from performActualUpload
-        console.error('Caught submission error in handleSubmit:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-        setSubmitStatus({ message: `Upload Failed: ${errorMessage}`, type: 'error' });
+      // Handle errors from performActualUpload
+      console.error('Caught submission error in handleSubmit:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      setSubmitStatus({ message: `Upload Failed: ${errorMessage}`, type: 'error' });
     } finally {
-        // Always stop the submitting indicator
-        setIsSubmitting(false);
+      // Always stop the submitting indicator
+      setIsSubmitting(false);
     }
   };
 
@@ -403,15 +403,15 @@ function Upload({ user }: UploadProps) {
     <div className="upld-page-container"> {/* Prefixed class */}
       <header className="upld-header-section"> {/* Prefixed class */}
         <div className="upld-header-logo"> {/* Prefixed class */}
-            <img src={siteLogo} alt="VNR VJIET Crest" className="upld-site-logo"/> {/* Prefixed class */}
-            <div className="upld-logo-subtext"> {/* Prefixed class */}
-                <span>EST. 1995</span>
-                <span>Hyderabad, Telangana</span>
-            </div>
+          <img src={siteLogo} alt="VNR VJIET Crest" className="upld-site-logo" /> {/* Prefixed class */}
+          <div className="upld-logo-subtext"> {/* Prefixed class */}
+            <span>EST. 1995</span>
+            <span>Hyderabad, Telangana</span>
+          </div>
         </div>
         <div className="upld-header-title-block"> {/* Prefixed class */}
-             <span className="upld-presenter-text">VNRVJIET PRESENTS</span> {/* Prefixed class */}
-             <h1 className="upld-main-headline">OPEN HOUSE</h1> {/* Prefixed class */}
+          <span className="upld-presenter-text">VNRVJIET PRESENTS</span> {/* Prefixed class */}
+          <h1 className="upld-main-headline">OPEN HOUSE</h1> {/* Prefixed class */}
         </div>
         <div className="upld-header-placeholder"></div> {/* Prefixed class */}
       </header>
@@ -424,7 +424,7 @@ function Upload({ user }: UploadProps) {
         {/* Title */}
         <div className="upld-form-group"> {/* Prefixed class */}
           <label htmlFor="title">Project Title</label>
-          <input type="text" id="title" name="title" value={title} onChange={handleTextChange} onBlur={handleTextBlur} aria-describedby="title-error" aria-invalid={!!errors.title} required placeholder="Enter the main title of your project"/>
+          <input type="text" id="title" name="title" value={title} onChange={handleTextChange} onBlur={handleTextBlur} aria-describedby="title-error" aria-invalid={!!errors.title} required placeholder="Enter the main title of your project" />
           <span className="upld-word-count">{countWords(title)}/{MAX_TITLE_WORDS} words</span> {/* Prefixed class */}
           {errors.title && <p id="title-error" className="upld-error-message">{errors.title}</p>} {/* Prefixed class */}
         </div>
@@ -432,7 +432,7 @@ function Upload({ user }: UploadProps) {
         {/* Abstract */}
         <div className="upld-form-group"> {/* Prefixed class */}
           <label htmlFor="abstract">Abstract</label>
-          <textarea id="abstract" name="abstract" value={abstract} rows={5} onChange={handleTextChange} onBlur={handleTextBlur} aria-describedby="abstract-error" aria-invalid={!!errors.abstract} required placeholder="Provide a brief summary of your project..."/>
+          <textarea id="abstract" name="abstract" value={abstract} rows={5} onChange={handleTextChange} onBlur={handleTextBlur} aria-describedby="abstract-error" aria-invalid={!!errors.abstract} required placeholder="Provide a brief summary of your project..." />
           <span className="upld-word-count">{countWords(abstract)}/{MAX_ABSTRACT_WORDS} words</span> {/* Prefixed class */}
           {errors.abstract && <p id="abstract-error" className="upld-error-message">{errors.abstract}</p>} {/* Prefixed class */}
         </div>
@@ -469,8 +469,8 @@ function Upload({ user }: UploadProps) {
         <div className="upld-form-group"> {/* Prefixed class */}
           <label htmlFor="department">Department</label>
           <select id="department" name="department" value={department} onChange={handleSelectChange} aria-describedby="department-error" aria-invalid={!!errors.department} required >
-              <option value="" disabled>-- Select Department --</option>
-              {DEPARTMENTS.map(dept => ( <option key={dept} value={dept}>{dept}</option> ))}
+            <option value="" disabled>-- Select Department --</option>
+            {DEPARTMENTS.map(dept => (<option key={dept} value={dept}>{dept}</option>))}
           </select>
           {errors.department && <p id="department-error" className="upld-error-message">{errors.department}</p>} {/* Prefixed class */}
         </div>
@@ -497,22 +497,22 @@ function Upload({ user }: UploadProps) {
 
         {/* Tags Input */}
         <div className="upld-form-group"> {/* Prefixed class */}
-            <label htmlFor="tags">Tags</label>
-            <input type="text" id="tags" name="tags" value={tags} onChange={handleTextChange} onBlur={handleTextBlur} placeholder="Technology Tags, comma separated (e.g., AI, Web, IOT, Robotics, AR-VR )" aria-describedby="tags-error" aria-invalid={!!errors.tags} required />
-            {errors.tags && <p id="tags-error" className="upld-error-message">{errors.tags}</p>} {/* Prefixed class */}
+          <label htmlFor="tags">Tags - Comma Seperated</label>
+          <input type="text" id="tags" name="tags" value={tags} onChange={handleTextChange} onBlur={handleTextBlur} placeholder="Technology Tags, comma separated (e.g., AI, Web, IOT, Robotics, AR-VR )" aria-describedby="tags-error" aria-invalid={!!errors.tags} required />
+          {errors.tags && <p id="tags-error" className="upld-error-message">{errors.tags}</p>} {/* Prefixed class */}
         </div>
 
         {/* Domain Input */}
         <div className="upld-form-group"> {/* Prefixed class */}
-            <label htmlFor="domain">Domain</label>
-            <input type="text" id="domain" name="domain" value={domain} onChange={handleTextChange} onBlur={handleTextBlur} placeholder="e.g., ArgiTech, Healthcare Technology, EduTech, FinTech, E-commerce Platform" aria-describedby="domain-error" aria-invalid={!!errors.domain} required />
-            {errors.domain && <p id="domain-error" className="upld-error-message">{errors.domain}</p>} {/* Prefixed class */}
+          <label htmlFor="domain">Domain</label>
+          <input type="text" id="domain" name="domain" value={domain} onChange={handleTextChange} onBlur={handleTextBlur} placeholder="e.g., ArgiTech, Healthcare Technology, EduTech, FinTech, E-commerce Platform" aria-describedby="domain-error" aria-invalid={!!errors.domain} required />
+          {errors.domain && <p id="domain-error" className="upld-error-message">{errors.domain}</p>} {/* Prefixed class */}
         </div>
 
         {/* Software Checkbox */}
         <div className="upld-checkbox-group"> {/* Prefixed class */}
-            <input type="checkbox" id="isSoftwareOnly" name="isSoftwareOnly" checked={isSoftwareOnly} onChange={handleCheckboxChange} />
-            <label htmlFor="isSoftwareOnly">Is this a Software-Only Project?</label>
+          <input type="checkbox" id="isSoftwareOnly" name="isSoftwareOnly" checked={isSoftwareOnly} onChange={handleCheckboxChange} />
+          <label htmlFor="isSoftwareOnly">Is this a Software-Only Project?</label>
         </div>
 
         {/* Methodology File */}
@@ -552,7 +552,7 @@ function Upload({ user }: UploadProps) {
         <div className="upld-form-group"> {/* Prefixed class */}
           <label htmlFor="pdfPosterFile">Project Poster (PDF, Max {MAX_PDF_SIZE_MB}MB)</label>
           <input type="file" id="pdfPosterFile" name="pdfPosterFile" accept=".pdf,application/pdf" ref={pdfInputRef} onChange={handleFileChange} aria-describedby="pdfPosterFile-error" aria-invalid={!!errors.pdfPosterFile} required />
-           {pdfPosterFile && !errors.pdfPosterFile && <span className="upld-file-name">{pdfPosterFile.name}</span>} {/* Prefixed class */}
+          {pdfPosterFile && !errors.pdfPosterFile && <span className="upld-file-name">{pdfPosterFile.name}</span>} {/* Prefixed class */}
           {errors.pdfPosterFile && <p id="pdfPosterFile-error" className="upld-error-message">{errors.pdfPosterFile}</p>} {/* Prefixed class */}
           <span className="upld-help-text"> Your actual poster that you prepared for Expo in PDF format.  </span>
         </div>
@@ -560,13 +560,13 @@ function Upload({ user }: UploadProps) {
         {/* Phone Number Field */}
         <div className="upld-form-group">
           <label htmlFor="phoneNumber">Team Lead Phone Number</label>
-          <input 
-            type="text" 
-            id="phoneNumber" 
-            name="phoneNumber" 
-            value={phoneNumber} 
-            onChange={handleTextChange} 
-            required 
+          <input
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            value={phoneNumber}
+            onChange={handleTextChange}
+            required
             placeholder="Enter Team Lead's Phone Number (10 digits)"
           />
           {errors.phoneNumber && <p className="upld-error-message">{errors.phoneNumber}</p>}

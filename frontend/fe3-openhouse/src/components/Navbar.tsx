@@ -20,14 +20,14 @@ function Navbar({ currentRoute, onGoogleCredentialResponse, user, setUser }: Nav
       method: 'POST',
       credentials: 'include',
     })
-    .then(response => {
-      if (!response.ok) {
-        console.error('Logout request failed');
-      }
-    })
-    .catch(error => {
-      console.error('Logout request error:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          console.error('Logout request failed');
+        }
+      })
+      .catch(error => {
+        console.error('Logout request error:', error);
+      });
 
     if (window.google?.accounts?.id) {
       window.google.accounts.id.disableAutoSelect();
@@ -50,33 +50,36 @@ function Navbar({ currentRoute, onGoogleCredentialResponse, user, setUser }: Nav
         </button>
 
         <div className={`navbar-links-container ${isMobileMenuOpen ? 'open' : ''}`}>
-        <div className="navbar-links">
-        {user && (
-  <div className="user-info">
-    <img src={user.picture} alt={user.name} className="avatar" />
-    <span className="user-name">{user.name}</span>
-  </div>
-)}
+          <div className="navbar-links">
+            {user && (
+              <div className="user-info">
+                <img src={user.picture} alt={user.name} className="avatar" />
+                <span className="user-name">{user.name}</span>
+              </div>
+            )}
 
 
-  <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-    Projects
-  </Link>
-  <Link to="/myprojects" className={location.pathname === '/myprojects' ? 'active' : ''}>
-    My Projects
-  </Link>
-  <Link to="/upload">
-    <button className="submit-button">Submit Project</button>
-  </Link>
+            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+              Projects
+            </Link>
+            <Link to="/myprojects" className={location.pathname === '/myprojects' ? 'active' : ''}>
+              My Projects
+            </Link>
+            <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
+              Dashboard
+            </Link>
+            <Link to="/upload">
+              <button className="submit-button">Submit Project</button>
+            </Link>
 
-  {!user && <Link to="/" className="login-link">Login</Link>}
+            {!user && <Link to="/" className="login-link">Login</Link>}
 
-  {user && (
-    <button onClick={handleLogout} className="logout-button logout-mobile mb-4">
-      Logout
-    </button>
-  )}
-</div>
+            {user && (
+              <button onClick={handleLogout} className="logout-button logout-mobile mb-4">
+                Logout
+              </button>
+            )}
+          </div>
 
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Code2, Tags, MessageCircle, Trash, ThumbsUp, PlayCircle } from 'lucide-react';
+import { X, Code2, Tags, MessageCircle, Trash, ThumbsUp, PlayCircle, Share2 } from 'lucide-react';
 import { Project } from '../types';
 
 const API_URL = `${import.meta.env.VITE_API_URL || ''}`;
@@ -14,9 +14,9 @@ interface ProjectModalProps {
 }
 
 function ProjectModal({ user, project, onClose }: ProjectModalProps) {
-    // Add state for PDF page navigation (must be at the top, before return)
-    const [pdfPage, setPdfPage] = useState(1);
-    useEffect(() => { setPdfPage(1); }, [project.pdfPoster]);
+  // Add state for PDF page navigation (must be at the top, before return)
+  const [pdfPage, setPdfPage] = useState(1);
+  useEffect(() => { setPdfPage(1); }, [project.pdfPoster]);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +32,28 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
       timeZone: 'Asia/Kolkata',
     }).format(date);
   };
+
+  function showAlert(message: string) {
+    const alertBox = document.createElement("div");
+    alertBox.innerText = message;
+
+    alertBox.style.position = "fixed";
+    alertBox.style.bottom = "20px";
+    alertBox.style.right = "20px";
+    alertBox.style.padding = "10px 16px";
+    alertBox.style.background = "#000";
+    alertBox.style.color = "#fff";
+    alertBox.style.borderRadius = "8px";
+    alertBox.style.fontSize = "14px";
+    alertBox.style.zIndex = "9999";
+
+    document.body.appendChild(alertBox);
+
+    setTimeout(() => {
+      alertBox.remove();
+    }, 2000);
+  }
+
 
   useEffect(() => {
     if (project.id) {
@@ -98,6 +120,12 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
     }
   };
 
+  const handleShare = () => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    navigator.clipboard.writeText(url);
+    showAlert('Project URL copied to clipboard!');
+  };
+
   const handleLike = async () => {
     const user_name = user.name;
 
@@ -134,10 +162,23 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
     }
   };
 
-  return (
+  // Handle Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden m-4 flex flex-col">
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden m-4 flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Sticky Title Bar */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4">
           {/* Title takes remaining space */}
@@ -163,13 +204,20 @@ function ProjectModal({ user, project, onClose }: ProjectModalProps) {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <button
               onClick={handleLike}
-              className={`flex items-center gap-1 text-sm font-medium mt-2 ${isLiked ? 'text-emerald-600' : 'text-gray-600'}`}
+              className={`flex items-center gap-1 text-sm font-medium mt-2 p-2 rounded-full hover:bg-emerald-100 transition-colors ${isLiked ? 'text-emerald-600 fill-emerald-600 bg-emerald-100' : 'text-gray-600'}`}
             >
               <ThumbsUp size={20} />
               Like
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1 text-sm font-medium mt-2 text-gray-600 hover:text-blue-600 hover:bg-blue-100 p-2 rounded-full transition-colors"
+            >
+              <Share2 size={20} />
+              Share
             </button>
           </div>
 

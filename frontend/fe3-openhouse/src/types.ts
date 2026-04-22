@@ -19,4 +19,7 @@ export interface Project {
   startupPotential?: string;
   uploadedBy?: string;
   pdfPoster?: string | null;
+  aggr_comment_count?: number;
+  aggr_upvote_count?: number;
+  drive_link?: string;
 }
