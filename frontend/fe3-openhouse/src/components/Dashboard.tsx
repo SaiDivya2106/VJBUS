@@ -57,11 +57,15 @@ const Dashboard: React.FC = () => {
 
     const totalProjects = data.reduce((sum, curr) => sum + curr.count, 0);
     const totalDepts = deptData.length;
+    const latestYear = data.reduce((max, curr) => {
+        const yearInt = parseInt(curr.year);
+        return isNaN(yearInt) ? max : Math.max(max, yearInt);
+    }, 0);
 
     const renderDepartmentChart = () => {
         if (deptChartType === 'bar') {
             return (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                     <BarChart data={deptData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis
@@ -90,7 +94,7 @@ const Dashboard: React.FC = () => {
             );
         }
         return (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                 <PieChart>
                     <Pie
                         data={deptData}
@@ -98,7 +102,7 @@ const Dashboard: React.FC = () => {
                         cy="50%"
                         innerRadius={80}
                         outerRadius={120}
-                        paddingAngle={8}
+                        paddingAngle={0}
                         dataKey="value"
                     >
                         {deptData.map((_, index) => (
@@ -122,7 +126,7 @@ const Dashboard: React.FC = () => {
     const renderYearChart = () => {
         if (yearChartType === 'bar') {
             return (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                     <BarChart data={yearData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis
@@ -147,7 +151,7 @@ const Dashboard: React.FC = () => {
             );
         }
         return (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                 <PieChart>
                     <Pie
                         data={yearData}
@@ -155,7 +159,7 @@ const Dashboard: React.FC = () => {
                         cy="50%"
                         innerRadius={80}
                         outerRadius={120}
-                        paddingAngle={8}
+                        paddingAngle={0}
                         dataKey="value"
                     >
                         {yearData.map((_, index) => (
@@ -216,7 +220,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Latest Year</p>
-                            <p className="text-3xl font-bold text-gray-800">2026</p>
+                            <p className="text-3xl font-bold text-gray-800">{latestYear}</p>
                         </div>
                     </div>
                 </div>

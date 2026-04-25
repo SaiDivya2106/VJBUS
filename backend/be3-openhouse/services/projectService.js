@@ -348,10 +348,10 @@ const getProjectStats = () => {
     const query = `
       SELECT 
         department,
-        strftime('%Y', upload_date) as year,
+        max(strftime('%Y', upload_date)) as year,
         COUNT(*) as count
       FROM projects
-      GROUP BY department, year
+      GROUP BY department
     `;
     db.all(query, [], (err, rows) => {
       if (err) return reject(err);
