@@ -12,12 +12,17 @@ const socket = io("wss://dev-bus.vjstartup.com", {
 const fixedLatLng = [17.539896, 78.386511];
 
 // Custom bus icon
-const busIcon = L.divIcon({
-    className: 'bus-marker',
-    html: '<div style="font-size: 25px;">🚌</div>',
-    iconSize: [50, 50],
-    iconAnchor: [25, 25]
+const busIcon = L.icon({
+    iconUrl: 'https://dev-bus.vjstartup.com/bus.png',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+
+    
+
 });
+L.marker([17.539896, 78.386511], {
+    icon: testIcon
+}).addTo(map);
 
 // Wait for DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function() {

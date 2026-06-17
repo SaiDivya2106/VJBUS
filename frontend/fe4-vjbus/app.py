@@ -7,7 +7,8 @@ load_dotenv()
 app = Flask(__name__)
 API_KEY = os.getenv("API_KEY")
 CLIENT_ID = os.getenv("CLIENT_ID")
-ROUTES = os.getenv("ALL_ROUTES")
+ROUTES = os.getenv("all_start_timings")
+print("ROUTES =", ROUTES)
 DB_PATH = os.getenv("BACKEND_DB_PATH", "../../backend/be4-vjbus/database.db")
 
 def get_db_connection():

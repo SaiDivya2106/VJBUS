@@ -4,7 +4,17 @@ let state = {
     username: ""
 };
 const socket = io("https://dev-bus.vjstartup.com");
+socket.on("connect", () => {
+    console.log("✅ Connected:", socket.id);
+});
 
+socket.on("disconnect", () => {
+    console.log("❌ Disconnected");
+});
+
+socket.on("connect_error", (err) => {
+    console.error("🚨 Connection Error:", err);
+});
 // Wait for DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function() {
     // Initialize event listeners

@@ -128,7 +128,9 @@ async function getRoutes() {
         console.log("Fetching routes...");
         const res = await fetch("/get-all-routes");
         const text = await res.text();
-        routes = JSON.parse(text); // Assign to global `routes`
+       const data = JSON.parse(text);
+routes = Object.keys(data);
+console.log("Routes fetched:", routes);
         console.log("Routes fetched:", routes);
     } catch (err) {
         console.error("Error fetching routes:", err);
@@ -730,6 +732,25 @@ function setupSocketEvents() {
             statusText.innerText = "Failed to connect to server";
         }
     });
+    socket.on("reconnect", () => {
+    console.log("✅ Reconnected to server");
+
+    if (selectedRoute) {
+        socket.emit("subscribe", selectedRoute);
+    }
+});
+
+socket.on("reconnect_attempt", () => {
+    console.log("🔄 Trying to reconnect...");
+});
+
+socket.on("reconnect_failed", () => {
+    console.log("❌ Reconnect failed");
+});
+
+socket.on("connect_error", (err) => {
+    console.error("🚨 Connection Error:", err);
+});
     
     socket.on("disconnect", () => {
         console.log("Disconnected from WebSocket server");
