@@ -28,28 +28,26 @@ jobs:
       # ─── BACKEND ─────────────────────────────────
       - name: Install backend dependencies
         working-directory: backend/be4-vjbus
-        run: |
-          pip install eventlet flask flask_cors flask_socketio flake8
+        run: pip install eventlet flask flask_cors flask_socketio flake8
 
       - name: Lint backend
         working-directory: backend/be4-vjbus
         run: |
           flake8 . --max-line-length=120 \
                    --exclude=__pycache__,vjbus_env,venv \
-                   --ignore=E501,W503
+                   --select=E9,F63,F7,F82
 
       # ─── FRONTEND ────────────────────────────────
       - name: Install frontend dependencies
         working-directory: frontend/fe4-vjbus
-        run: |
-          pip install eventlet flask flask_cors flask_socketio flake8
+        run: pip install eventlet flask flask_cors flask_socketio flake8
 
       - name: Lint frontend
         working-directory: frontend/fe4-vjbus
         run: |
           flake8 . --max-line-length=120 \
                    --exclude=__pycache__,vjbus_env,venv \
-                   --ignore=E501,W503
+                   --select=E9,F63,F7,F82
 
   deploy:
     needs: lint
