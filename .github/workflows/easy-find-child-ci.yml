@@ -1,0 +1,77 @@
+name: lostandfound-ci
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/be-lostandfound/**"
+      - "frontend/fe-lostandfound/**"
+      - "deploy/docker-compose.lostandfound.yml"
+      - ".github/workflows/lostandfound-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/be-lostandfound/**"
+      - "frontend/fe-lostandfound/**"
+      - ".github/workflows/lostandfound-ci.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ─── BACKEND ─────────────────────────────────
+      - name: Install backend dependencies
+        working-directory: backend/be-lostandfound
+        run: npm install
+
+      - name: Lint backend
+        working-directory: backend/be-lostandfound
+        run: npm run lint
+
+      # ─── FRONTEND ────────────────────────────────
+      - name: Install frontend dependencies
+        working-directory: frontend/fe-lostandfound
+        run: npm install
+
+      - name: Lint frontend
+        working-directory: frontend/fe-lostandfound
+        run: npm run lint
+
+  deploy:
+    needs: lint
+    if: github.event_name == 'push'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "MONGO_USER=${{ secrets.MONGO_USER }}" > .env
+          echo "MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}" >> .env
+          echo "MONGO_DB=${{ secrets.MONGO_DB }}" >> .env
+          echo "REDIS_URL=redis://redis:6379" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}" >> .env
+          echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
+          echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
+          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
+
+      - name: Build and Deploy
+        run: |
+          docker compose -f deploy/docker-compose.lostandfound.yml down
+          docker compose -f deploy/docker-compose.lostandfound.yml up -d --build
+          docker image prune -f
+          docker compose -f deploy/docker-compose.lostandfound.yml ps
+
+      - name: Cleanup .env
+        if: always()
+        run: rm -f .env
