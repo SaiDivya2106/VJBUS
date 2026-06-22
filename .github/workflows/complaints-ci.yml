@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # needed to push private images to GHCR below
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -26,20 +26,25 @@ jobs:
         with:
           node-version: 20
 
+      # ─── BACKEND ───────────────────────────────────────────
       - name: Install backend dependencies
         working-directory: backend/be1-complaints
         run: npm ci
+
       - name: Lint backend
         working-directory: backend/be1-complaints
-        run: npm run lint -- --max-warnings=0 || true   # remove "|| true" once a lint script exists
+        run: npm run lint -- --max-warnings=0
 
+      # ─── FRONTEND ──────────────────────────────────────────
       - name: Install frontend dependencies
         working-directory: frontend/fe1-complaints
         run: npm ci
+
       - name: Lint frontend
         working-directory: frontend/fe1-complaints
-        run: npm run lint -- --max-warnings=0 || true
+        run: npm run lint -- --max-warnings=0
 
+      # ─── DOCKER BUILD ──────────────────────────────────────
       - name: Build backend image
         run: docker build -t complaints-backend ./backend/be1-complaints
 
@@ -49,7 +54,8 @@ jobs:
             --build-arg VITE_API_URL=https://complaints.vjstartup.com/be/api \
             ./frontend/fe1-complaints
 
-      - name: Login to GitHub Container Registry (private, no extra secrets needed)
+      # ─── PUSH TO GHCR ──────────────────────────────────────
+      - name: Login to GitHub Container Registry
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
@@ -57,7 +63,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push images to GHCR (private by default for a private repo)
+      - name: Push images to GHCR
         if: github.event_name == 'push'
         run: |
           docker tag complaints-backend ghcr.io/headiie/complaints-backend:latest
@@ -68,11 +74,11 @@ jobs:
   deploy:
     needs: build-and-lint
     if: github.event_name == 'push'
-    runs-on: self-hosted   # the runner registered to the vjservers repo
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy ONLY the complaints app's containers
+      - name: Deploy complaints app containers
         run: |
           docker compose -f deploy/docker-compose.complaints.yml down
           docker compose -f deploy/docker-compose.complaints.yml up -d --build
