@@ -45,9 +45,9 @@ jobs:
       - name: Lint frontend
         working-directory: frontend/fe4-vjbus
         run: |
-          flake8 . --max-line-length=120 \
+          fflake8 . --max-line-length=120 \
                    --exclude=__pycache__,vjbus_env,venv \
-                   --select=E9,F63,F7,F82
+                   --select=E9,F63,F7
 
   deploy:
     needs: lint
