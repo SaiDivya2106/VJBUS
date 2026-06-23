@@ -5,7 +5,8 @@
     "scripts": {
         "start": "node src/server.js",
         "dev": "nodemon src/server.js",
-        "seed": "node seed-apps.js"
+        "seed": "node seed-apps.js",
+        "lint": "eslint . --ext .js"
     },
     "dependencies": {
         "cors": "^2.8.5",
@@ -15,6 +16,7 @@
         "sqlite3": "^5.1.7"
     },
     "devDependencies": {
-        "nodemon": "^3.1.11"
+        "nodemon": "^3.1.11",
+        "eslint": "^8.57.0" 
     }
 }
