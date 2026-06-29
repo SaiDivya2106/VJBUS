@@ -16,6 +16,11 @@ import time
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
+from flask import Flask
+
+from flask_cors import CORS
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
 
 
 
@@ -24,7 +29,7 @@ all_locations = []
 all_drivers={}
 user_count={"Student":0, "Driver":0, "Admin":0, "Unknown":0}
 
-all_start_timings=json.loads(os.getenv("all_start_timings"))
+all_start_timings=json.loads(os.getenv("all_start_timings", "{}"))
 
 PORT = 6104
 
@@ -36,6 +41,10 @@ def is_port_in_use(port):
 if is_port_in_use(PORT):
     print(f"❌ Flask is already running on port {PORT}. Exiting.")
     sys.exit(1)
+
+
+CLIENT_ID = "719105319954-5alrrgdri16s96121ikn662p16ltp2nj.apps.googleusercontent.com"
+print("CLIENT_ID =", CLIENT_ID)
 
 app = Flask(__name__)
 CORS(app)
@@ -523,21 +532,29 @@ def handle_leave(data):
 
 @socketio.on("send_message")
 def handle_message(data):
+    print("Received message:", data)
+
     room = data["room"]
     sender = data["sender"]
     message = data["message"]
 
     conn = sqlite3.connect("database.db", check_same_thread=False)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)", (room, sender, message))
+    cursor.execute(
+        "INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)",
+        (room, sender, message)
+    )
     conn.commit()
     conn.close()
 
     socketio.emit("chat_message", {
+        "room": room,
         "sender": sender,
         "message": message,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "timestamp": datetime.now().isoformat()
     }, room=room)
+
+    print("Broadcasted message to room:", room)
 
 
 @app.route('/health', methods=['GET'])
@@ -547,6 +564,52 @@ def health():
         'service': 'bus-be',
         'timestamp': datetime.now().isoformat()
     }), 200
+
+
+@app.route('/test')
+def test():
+    return "TEST ROUTE WORKING"
+
+@app.route('/auth/google', methods=['POST'])
+def auth_google():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+
+        if not token:
+            return jsonify({
+                "success": False,
+                "error": "Token missing"
+            }), 400
+
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            grequests.Request(),
+            CLIENT_ID
+        )
+
+        user = {
+            "email": idinfo.get("email"),
+            "name": idinfo.get("name"),
+            "picture": idinfo.get("picture")
+        }
+
+        print("Google Login Success:", user)
+
+        return jsonify({
+            "success": True,
+            "user": user
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 401
+        
 
 
 if __name__ == "__main__":
