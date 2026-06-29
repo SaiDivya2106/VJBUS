@@ -1,5 +1,5 @@
 // ===== CONFIGURATION CONSTANTS =====
-const API_URL = "https://auth.vjstartup.com";
+const API_URL = "http://localhost:2999";
 let socket; // Will be initialized after scripts are loaded
 
 // ===== GLOBAL VARIABLES =====
@@ -363,7 +363,7 @@ function setupEventListeners() {
     if (chatBtn) {
         chatBtn.addEventListener("click", function() {
             setActive(this);
-            window.location.href = "https://dev-bus.vjstartup.com/chat";
+            window.location.href = "http://localhost:3104/chat";
         });
     }
     
@@ -599,11 +599,17 @@ function fill_tracking_info() {
 
     if (!routeInfo) return;
 
-    if (sRoute !== "") {
-        routeInfo.innerHTML = `Hello👋 <br> Tracking ${sRoute} 🔴`;
-    } else {
-        routeInfo.innerHTML = `Hello👋 <br>No Route Being Tracked 🔴`;
-    }
+  if (sRoute !== "") {
+    routeInfo.innerHTML = `
+        Hello ${userName} 👋<br>
+        Tracking ${sRoute} 🔴
+    `;
+} else {
+    routeInfo.innerHTML = `
+        Hello ${userName} 👋<br>
+        No Route Being Tracked 🔴
+    `;
+}
     
     if (isLogged) {
         chatBtn.style.display = "block";
@@ -819,7 +825,10 @@ socket.on("connect_error", (err) => {
             
             const routeInfo = document.querySelector(".route_info");
             if (routeInfo) {
-                routeInfo.innerHTML = `Hello👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🟢`;
+                routeInfo.innerHTML = `
+    Hello ${userName} 👋<br>
+    Tracking ${selectedRoute.split(" (")[0]} 🟢
+`;
             }
             
             latestBusLocation = `${data.longitude},${data.latitude}`;
@@ -871,7 +880,10 @@ socket.on("connect_error", (err) => {
             if (markers[selectedRoute] && markers[selectedRoute]._map) {
                 markers[selectedRoute].remove();
                 if (routeInfo) {
-                    routeInfo.innerHTML = `Hello👋 <br> Tracking ${selectedRoute.split(" (")[0]} 🔴`;
+                    routeInfo.innerHTML = `
+    Hello ${userName} 👋<br>
+    Tracking ${selectedRoute.split(" (")[0]} 🔴
+`;
                 }
             }
             

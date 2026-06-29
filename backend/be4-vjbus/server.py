@@ -15,8 +15,18 @@ import threading
 import time
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-load_dotenv()
 
+
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
+from dotenv import load_dotenv
+import os
+
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path=dotenv_path)
+
+print("Using .env:", dotenv_path)
+print("ENV =", os.getenv("all_start_timings"))
 
 
 started_routes = {}
@@ -24,9 +34,16 @@ all_locations = []
 all_drivers={}
 user_count={"Student":0, "Driver":0, "Admin":0, "Unknown":0}
 
-all_start_timings=json.loads(os.getenv("all_start_timings"))
+timings = os.getenv("all_start_timings")
+
+if timings:
+    all_start_timings = json.loads(timings)
+else:
+    print("ERROR: all_start_timings not found in .env")
+    all_start_timings = {}
 
 PORT = 6104
+CLIENT_ID = "719105319954-5alrrgdri16s96121ikn662p16ltp2nj.apps.googleusercontent.com"
 
 # Check port availability
 def is_port_in_use(port):
@@ -529,24 +546,73 @@ def handle_message(data):
 
     conn = sqlite3.connect("database.db", check_same_thread=False)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)", (room, sender, message))
+    cursor.execute(
+        "INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)",
+        (room, sender, message)
+    )
     conn.commit()
     conn.close()
 
-    socketio.emit("chat_message", {
-        "sender": sender,
-        "message": message,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }, room=room)
+    socketio.emit(
+        "chat_message",
+        {
+            "room": room,
+            "sender": sender,
+            "message": message,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        },
+        room=room
+    )
 
 
-@app.route('/health', methods=['GET'])
+@app.route("/health", methods=["GET"])
 def health():
     return jsonify({
-        'status': 'healthy',
-        'service': 'bus-be',
-        'timestamp': datetime.now().isoformat()
+        "status": "healthy",
+        "service": "bus-be",
+        "timestamp": datetime.now().isoformat()
     }), 200
+
+
+@app.route("/auth/google", methods=["POST"])
+def auth_google():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+
+        if not token:
+            return jsonify({
+                "success": False,
+                "error": "Token missing"
+            }), 400
+
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            grequests.Request(),
+            CLIENT_ID
+        )
+
+        user = {
+            "email": idinfo.get("email"),
+            "name": idinfo.get("name"),
+            "picture": idinfo.get("picture")
+        }
+
+        print("Google Login Success:", user)
+
+        return jsonify({
+            "success": True,
+            "user": user
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 401
 
 
 if __name__ == "__main__":

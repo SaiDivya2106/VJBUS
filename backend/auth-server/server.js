@@ -16,6 +16,8 @@ app.use(cors({
             "http://localhost:6000", 
             "http://localhost:3117",
             "http://localhost:3203",
+            "http://localhost:3104",
+            "http://localhost:6104",
             "https://dev-auth.vjstartup.com",
             "https://auth.vjstartup.com",
             "https://dev-bus.vjstartup.com",
