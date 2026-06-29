@@ -1,6 +1,4 @@
 require("dotenv").config();
-console.log("GOOGLE_CLIENT_ID =", process.env.GOOGLE_CLIENT_ID);
-console.log("JWT_SECRET =", process.env.JWT_SECRET);
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -18,7 +16,6 @@ app.use(cors({
             "http://localhost:6000", 
             "http://localhost:3117",
             "http://localhost:3203",
-            "http://localhost:3104",
             "https://dev-auth.vjstartup.com",
             "https://auth.vjstartup.com",
             "https://dev-bus.vjstartup.com",
@@ -207,12 +204,9 @@ app.post("/auth/google", async (req, res) => {
 
         res.json({ token: userToken, user: { email, name, picture ,family_name} });
 
-    }catch (err) {
-        console.error("Google Login Error:", err);
-
-        res.status(401).json({
-            error: err.message
-        });
+    } catch (error) {
+        console.error("❌ Google Token Verification Failed:", error);
+        res.status(401).json({ error: "Invalid Token" });
     }
 });
 

@@ -1,5 +1,5 @@
 // ===== CONFIGURATION CONSTANTS =====
-const API_URL = "http://localhost:2999";
+const API_URL = "https://auth.vjstartup.com";
 let socket; // Will be initialized after scripts are loaded
 
 // ===== GLOBAL VARIABLES =====
@@ -363,7 +363,7 @@ function setupEventListeners() {
     if (chatBtn) {
         chatBtn.addEventListener("click", function() {
             setActive(this);
-            window.location.href = "http://localhost:3104/chat";
+            window.location.href = "https://dev-bus.vjstartup.com/chat";
         });
     }
     
@@ -408,15 +408,11 @@ function setupEventListeners() {
 function updateLoginButton() {
     const btn = document.getElementById("login-logout");
     if (!btn) return;
-
+    
     if (getCookieValue("user") !== null) {
-        // User is logged in
-        btn.style.display = "block";
-        btn.innerHTML = "Logout";
-        btn.style.background = "#dc3545";   // red
+        btn.innerHTML = "LogOut";
+        btn.style.background = "red";
     } else {
-        // User is not logged in
-        btn.style.display = "block";
         btn.innerHTML = "Login";
         btn.style.background = "green";
     }
@@ -573,69 +569,45 @@ function startGoogleLogin() {
 }
 
 // ===== TRACKING FUNCTIONS =====
-function fill_tracking_info() {
+function fill_tracking_info() {    
+    // Safely get user name from cookie or localStorage
     let userName = "";
     const userCookie = getCookieValue("user");
     let isLogged = false;
-
+    
     if (userCookie) {
         isLogged = true;
-
         try {
+            // Try to parse the cookie directly first
             const userData = JSON.parse(userCookie);
-
-            // Use given_name if available, otherwise family_name
-            userName = userData.given_name || userData.family_name || "";
-
+            userName = userData.family_name || "";
+            
+            // If no family_name in direct parsing, try JWT decoding
             if (!userName && userCookie.split('.').length === 3) {
                 const decoded = decodeJwt(userCookie);
-                userName = decoded.given_name || decoded.family_name || "";
+                userName = decoded.family_name || "";
             }
-
-            userName = userName.toUpperCase();
         } catch (e) {
-            console.log(e);
+            console.log("Error parsing user cookie", e);
         }
     }
-
-    const sRoute = localStorage.getItem("busApplicationSelectedRouteByStudent")
-        ? localStorage.getItem("busApplicationSelectedRouteByStudent").split(" ")[0]
-        : "";
-
-    const routeInfo = document.querySelector(".route_info");
-    const chatBtn = document.getElementById("chatBtn");
+    
+    const sRoute = localStorage.getItem("busApplicationSelectedRouteByStudent") ? 
+                  localStorage.getItem("busApplicationSelectedRouteByStudent").split(" ")[0] : "";
+    let routeInfo = document.querySelector(".route_info");
+    let chatBtn = document.getElementById("chatBtn");
 
     if (!routeInfo) return;
 
-    if (isLogged) {
-        if (sRoute) {
-            routeInfo.innerHTML = `
-                Hello ${userName} 👋<br>
-                Tracking ${sRoute} 🔴
-            `;
-        } else {
-            routeInfo.innerHTML = `
-                Hello ${userName} 👋<br>
-                No Route Being Tracked 🔴
-            `;
-        }
-
-        chatBtn.style.display = "block";
-
+    if (sRoute !== "") {
+        routeInfo.innerHTML = `Hello👋 <br> Tracking ${sRoute} 🔴`;
     } else {
-
-        if (sRoute) {
-            routeInfo.innerHTML = `
-                Hello 👋<br>
-                Tracking ${sRoute} 🔴
-            `;
-        } else {
-            routeInfo.innerHTML = `
-                Hello 👋<br>
-                No Route Being Tracked 🔴
-            `;
-        }
-
+        routeInfo.innerHTML = `Hello👋 <br>No Route Being Tracked 🔴`;
+    }
+    
+    if (isLogged) {
+        chatBtn.style.display = "block";
+    } else {
         chatBtn.style.display = "none";
     }
 }

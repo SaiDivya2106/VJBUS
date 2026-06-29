@@ -554,19 +554,16 @@ def handle_message(data):
 
     conn = sqlite3.connect("database.db", check_same_thread=False)
     cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)",
-        (room, sender, message)
-    )
+    cursor.execute("INSERT INTO chat (room, sender, message) VALUES (?, ?, ?)", (room, sender, message))
     conn.commit()
     conn.close()
 
     socketio.emit("chat_message", {
-        "room": room,
         "sender": sender,
         "message": message,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }, room=room)
+
 #New http to socket
 
 @socketio.on("all_uis")
